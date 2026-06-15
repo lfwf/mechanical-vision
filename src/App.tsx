@@ -1,9 +1,13 @@
 import { lazy, Suspense, useState } from "react";
 import { AppHeader } from "./components/app/AppHeader";
 import { CatalogSidebar } from "./components/catalog/CatalogSidebar";
+import { ExperimentControlPanel } from "./components/controls/ExperimentControlPanel";
 import { GearControlPanel } from "./components/controls/GearControlPanel";
+import { ExperimentSceneRouter } from "./components/experiments/ExperimentSceneRouter";
 import { InfoPanel } from "./components/info/InfoPanel";
 import { ExperimentQualityBadge } from "./components/quality/ExperimentQualityBadge";
+import { getExperimentDefinition } from "./data/experiments/experimentRegistry";
+import { useExperimentStore } from "./store/useExperimentStore";
 
 const GearScene = lazy(async () => {
   const module = await import("./components/gear/GearScene");
@@ -12,6 +16,8 @@ const GearScene = lazy(async () => {
 
 export function App() {
   const [catalogQuery, setCatalogQuery] = useState("");
+  const activeExperimentId = useExperimentStore((state) => state.activeExperimentId);
+  const definition = getExperimentDefinition(activeExperimentId);
 
   return (
     <div className="app-shell">
@@ -22,11 +28,13 @@ export function App() {
         <section className="lab-stage">
           <div className="lab-toolbar">
             <div>
-              <span className="lab-index">实验 01 · 传动机构</span>
-              <h1>外啮合直齿圆柱齿轮</h1>
+              <span className="lab-index">
+                实验 {String(definition.index).padStart(2, "0")} · {definition.category}
+              </span>
+              <h1>{definition.title}</h1>
             </div>
             <div className="lab-toolbar-actions">
-              <ExperimentQualityBadge />
+              <ExperimentQualityBadge experimentId={activeExperimentId} />
               <div className="lab-mode">
                 <span className="lab-mode-dot" />
                 交互实验模式
@@ -35,25 +43,31 @@ export function App() {
           </div>
 
           <div className="scene-shell">
-            <Suspense
-              fallback={
-                <div className="scene-loading">
-                  <span />
-                  正在加载 3D 实验室…
-                </div>
-              }
-            >
-              <GearScene />
-            </Suspense>
-            <div className="scene-tip">
-              拖拽旋转 · 滚轮缩放 · 点击齿轮查看对应说明
-            </div>
+            {activeExperimentId === "gear-pair" ? (
+              <Suspense
+                fallback={
+                  <div className="scene-loading">
+                    <span />
+                    正在加载 3D 实验室…
+                  </div>
+                }
+              >
+                <GearScene />
+              </Suspense>
+            ) : (
+              <ExperimentSceneRouter id={activeExperimentId} />
+            )}
+            <div className="scene-tip">{definition.sceneTip}</div>
           </div>
 
-          <GearControlPanel />
+          {activeExperimentId === "gear-pair" ? (
+            <GearControlPanel />
+          ) : (
+            <ExperimentControlPanel />
+          )}
         </section>
 
-        <InfoPanel />
+        <InfoPanel experimentId={activeExperimentId} />
       </main>
     </div>
   );

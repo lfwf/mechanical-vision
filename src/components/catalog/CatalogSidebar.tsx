@@ -1,6 +1,7 @@
 import { ChevronRight, FlaskConical, Search } from "lucide-react";
 import { useMemo } from "react";
 import { labCatalog } from "../../data/catalog";
+import { useExperimentStore } from "../../store/useExperimentStore";
 
 interface CatalogSidebarProps {
   query: string;
@@ -8,6 +9,11 @@ interface CatalogSidebarProps {
 }
 
 export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
+  const activeExperimentId = useExperimentStore((state) => state.activeExperimentId);
+  const selectExperiment = useExperimentStore((state) => state.selectExperiment);
+  const allItems = labCatalog.flatMap((category) => category.items);
+  const activeIndex = allItems.findIndex((item) => item.id === activeExperimentId) + 1;
+
   const categories = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return labCatalog;
@@ -29,7 +35,9 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
           <div className="eyebrow">知识目录</div>
           <h2>机械原理实验室</h2>
         </div>
-        <div className="sidebar-count">01 / 09</div>
+        <div className="sidebar-count">
+          {String(activeIndex).padStart(2, "0")} / {String(allItems.length).padStart(2, "0")}
+        </div>
       </div>
 
       <label className="sidebar-search">
@@ -48,19 +56,15 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
             <div className="catalog-items">
               {category.items.map((item) => {
                 const Icon = item.icon;
-                const active = item.id === "gear-pair";
+                const active = item.id === activeExperimentId;
 
                 return (
                   <button
                     key={item.id}
                     type="button"
                     className={`catalog-item ${active ? "is-active" : ""}`}
-                    disabled={item.status === "planned"}
-                    title={
-                      item.status === "planned"
-                        ? "该实验尚未进入模型与内容审核"
-                        : item.title
-                    }
+                    onClick={() => selectExperiment(item.id)}
+                    title={`${item.title} · ${item.status === "released" ? "已发布" : "预览审查中"}`}
                   >
                     <span className="catalog-item-icon">
                       <Icon size={18} />
@@ -69,11 +73,8 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
                       <strong>{item.title}</strong>
                       <small>{item.subtitle}</small>
                     </span>
-                    {item.status === "planned" && (
-                      <span className="planned-badge">规划中</span>
-                    )}
                     {item.status === "preview" && (
-                      <span className="review-badge">审查中</span>
+                      <span className="review-badge">预览</span>
                     )}
                     {item.status === "released" && <ChevronRight size={16} />}
                   </button>
@@ -93,7 +94,7 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
 
       <div className="sidebar-footnote">
         <span className="status-dot status-dot-review" />
-        当前齿轮实验为公开预览版。独立模型审核、内容审核和实体干涉扫描完成前，不标记为正式发布。
+        9 个实验均可交互查看。未完成独立模型与内容审核的实验统一标记为预览版，不作为工程设计依据。
       </div>
     </aside>
   );

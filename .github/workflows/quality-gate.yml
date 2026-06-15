@@ -22,25 +22,33 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        id: install
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee install.log
 
       - name: Validate quality records, mechanics and build
         id: verify
+        if: steps.install.outcome == 'success'
         continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
           npm run verify 2>&1 | tee verify.log
 
-      - name: Upload verification log
+      - name: Upload verification logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: verification-log
-          path: verify.log
+          name: verification-logs
+          path: |
+            install.log
+            verify.log
           if-no-files-found: warn
           retention-days: 7
 
-      - name: Fail when verification failed
-        if: steps.verify.outcome == 'failure'
+      - name: Fail when install or verification failed
+        if: steps.install.outcome == 'failure' || steps.verify.outcome == 'failure'
         run: exit 1

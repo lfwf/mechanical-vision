@@ -1,19 +1,47 @@
 export const GEAR_MODULE = 0.145;
+export const PRESSURE_ANGLE_DEGREES = 20;
+export const PRESSURE_ANGLE_RADIANS =
+  (PRESSURE_ANGLE_DEGREES * Math.PI) / 180;
+export const STANDARD_ADDENDUM_COEFFICIENT = 1;
+export const STANDARD_DEDENDUM_COEFFICIENT = 1.25;
 
 export function getPitchRadius(teeth: number): number {
   return (GEAR_MODULE * teeth) / 2;
 }
 
+export function getBaseRadius(teeth: number): number {
+  return getPitchRadius(teeth) * Math.cos(PRESSURE_ANGLE_RADIANS);
+}
+
 export function getOuterRadius(teeth: number): number {
-  return getPitchRadius(teeth) + GEAR_MODULE;
+  return (
+    getPitchRadius(teeth) + GEAR_MODULE * STANDARD_ADDENDUM_COEFFICIENT
+  );
 }
 
 export function getRootRadius(teeth: number): number {
-  return Math.max(getPitchRadius(teeth) - GEAR_MODULE * 1.18, GEAR_MODULE * 1.8);
+  return Math.max(
+    getPitchRadius(teeth) - GEAR_MODULE * STANDARD_DEDENDUM_COEFFICIENT,
+    GEAR_MODULE * 1.8,
+  );
+}
+
+export function getCircularPitch(): number {
+  return Math.PI * GEAR_MODULE;
 }
 
 export function getCenterDistance(driverTeeth: number, drivenTeeth: number): number {
   return getPitchRadius(driverTeeth) + getPitchRadius(drivenTeeth);
+}
+
+/**
+ * 当前几何以 0 弧度方向的齿中心作为主动轮初始相位。
+ * 从动轮在两轴连线方向必须以齿槽中心迎向主动轮。
+ * Three.js 绕 Y 轴正旋转与齿廓在 XZ 平面中的可见角度方向相反，
+ * 因此这里返回的是组 rotation.y 使用的相位，而不是二维齿廓角度。
+ */
+export function getExternalMeshPhaseOffset(drivenTeeth: number): number {
+  return Math.PI / drivenTeeth - Math.PI;
 }
 
 export function getTransmissionRatio(driverTeeth: number, drivenTeeth: number): number {

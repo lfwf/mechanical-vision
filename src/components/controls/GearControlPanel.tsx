@@ -69,16 +69,16 @@ export function GearControlPanel() {
         <RangeField
           label="主动轮齿数"
           value={driverTeeth}
-          min={12}
-          max={42}
+          min={17}
+          max={48}
           suffix="齿"
           onChange={setDriverTeeth}
         />
         <RangeField
           label="从动轮齿数"
           value={drivenTeeth}
-          min={12}
-          max={42}
+          min={17}
+          max={48}
           suffix="齿"
           onChange={setDrivenTeeth}
         />

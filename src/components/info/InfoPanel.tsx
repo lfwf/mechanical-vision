@@ -1,6 +1,14 @@
 import { Activity, BookOpen, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getExperimentDefinition } from "../../data/experiments/experimentRegistry";
+import {
+  getExperimentQuality,
+  getExperimentQualityGate,
+} from "../../data/experiments/qualityRecords";
+import type { ExperimentId } from "../../types/experiment";
 import { AnalysisView } from "./AnalysisView";
+import { GenericAnalysisView } from "./GenericAnalysisView";
+import { GenericKnowledgeView } from "./GenericKnowledgeView";
 import { KnowledgeView } from "./KnowledgeView";
 import { QualityView } from "./QualityView";
 
@@ -16,20 +24,27 @@ const infoTabs: Array<{
   { id: "quality", label: "质量", icon: ShieldCheck },
 ];
 
-const viewHeadings: Record<InfoView, { eyebrow: string; title: string }> = {
-  analysis: { eyebrow: "实时分析", title: "传动结果" },
-  knowledge: { eyebrow: "结构化知识", title: "原理与工程边界" },
-  quality: { eyebrow: "可信度档案", title: "模型与内容审查" },
-};
-
-export function InfoPanel() {
+export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
   const [activeView, setActiveView] = useState<InfoView>("analysis");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heading = viewHeadings[activeView];
+  const definition = getExperimentDefinition(experimentId);
+  const quality = getExperimentQuality(experimentId);
+  const gate = getExperimentQualityGate(experimentId);
+
+  const heading =
+    activeView === "analysis"
+      ? { eyebrow: "实时分析", title: definition.title }
+      : activeView === "knowledge"
+        ? { eyebrow: "结构化知识", title: "原理与工程边界" }
+        : { eyebrow: "可信度档案", title: "模型与内容审查" };
+
+  useEffect(() => {
+    setActiveView("analysis");
+  }, [experimentId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
-  }, [activeView]);
+  }, [activeView, experimentId]);
 
   return (
     <aside className="info-panel">
@@ -41,7 +56,7 @@ export function InfoPanel() {
           </div>
           <span className={`live-badge ${activeView === "quality" ? "is-review" : ""}`}>
             <span />
-            {activeView === "quality" ? "PREVIEW" : "LIVE"}
+            {gate.canRelease ? "RELEASED" : "PREVIEW"}
           </span>
         </div>
 
@@ -64,9 +79,19 @@ export function InfoPanel() {
       </div>
 
       <div className="info-panel-scroll" ref={scrollRef}>
-        {activeView === "analysis" && <AnalysisView />}
-        {activeView === "knowledge" && <KnowledgeView />}
-        {activeView === "quality" && <QualityView />}
+        {activeView === "analysis" &&
+          (experimentId === "gear-pair" ? (
+            <AnalysisView />
+          ) : (
+            <GenericAnalysisView experimentId={experimentId} />
+          ))}
+        {activeView === "knowledge" &&
+          (experimentId === "gear-pair" ? (
+            <KnowledgeView />
+          ) : (
+            <GenericKnowledgeView experimentId={experimentId} />
+          ))}
+        {activeView === "quality" && <QualityView record={quality} gate={gate} />}
       </div>
     </aside>
   );

@@ -7,10 +7,7 @@ import {
   FileWarning,
   ShieldAlert,
 } from "lucide-react";
-import {
-  gearPairQuality,
-  gearPairQualityGate,
-} from "../../data/experiments/gearPairQuality";
+import type { ExperimentQualityRecord, QualityGateResult } from "../../types/quality";
 
 const statusLabels = {
   pass: "通过",
@@ -25,9 +22,13 @@ const decisionLabels = {
   pending: "待审核",
 } as const;
 
-export function QualityView() {
-  const record = gearPairQuality;
-  const gate = gearPairQualityGate;
+export function QualityView({
+  record,
+  gate,
+}: {
+  record: ExperimentQualityRecord;
+  gate: QualityGateResult;
+}) {
   const completedVerifications = record.verification.filter(
     (item) => item.status === "pass" || item.status === "not-applicable",
   ).length;
@@ -105,6 +106,7 @@ export function QualityView() {
               <span>{statusLabels[item.status]}{item.critical ? " · 关键" : ""}</span>
               <p>{item.method}</p>
               {item.evidence && <small>证据：{item.evidence}</small>}
+              {item.notes && <small>说明：{item.notes}</small>}
             </article>
           ))}
         </div>

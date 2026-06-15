@@ -1,12 +1,14 @@
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 import {
-  gearPairQuality,
-  gearPairQualityGate,
-} from "../../data/experiments/gearPairQuality";
+  getExperimentQuality,
+  getExperimentQualityGate,
+} from "../../data/experiments/qualityRecords";
+import type { ExperimentId } from "../../types/experiment";
 
-export function ExperimentQualityBadge() {
-  const model = gearPairQuality.modelCard;
-  const gate = gearPairQualityGate;
+export function ExperimentQualityBadge({ experimentId }: { experimentId: ExperimentId }) {
+  const record = getExperimentQuality(experimentId);
+  const model = record.modelCard;
+  const gate = getExperimentQualityGate(experimentId);
 
   return (
     <div

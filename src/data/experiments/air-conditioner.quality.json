@@ -1,0 +1,226 @@
+{
+  "experimentId": "air-conditioner",
+  "title": "分体式空调拆解与制冷循环",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-AIR-CONDITIONER-001",
+    "title": "分体式房间空调器系统示意模型",
+    "version": "0.1.0",
+    "precisionLevel": "L1",
+    "precisionLabel": "系统结构与能量路径示意级",
+    "intendedUses": [
+      "认识室内机和室外机的主要组成",
+      "理解压缩、冷凝、节流和蒸发的循环顺序",
+      "观察前面板、过滤网、换热器、风机和压缩机的拆装层级"
+    ],
+    "prohibitedUses": [
+      "制冷剂充注、回收、检漏或带压维修指导",
+      "电气接线、故障诊断、选型、能效或制冷量计算",
+      "替代具体产品的安装维修手册和持证专业人员操作"
+    ],
+    "units": "Three.js 场景比例单位；动画速度和拆装进度为无量纲演示参数",
+    "coordinateSystem": "右手坐标系；室内机位于场景左侧，室外机位于右侧",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "以程序化外壳、换热器、风机、压缩机、节流元件和分段制冷剂路径构成系统级示意模型",
+    "parameters": [
+      {
+        "symbol": "mode",
+        "name": "观察模式",
+        "value": "工作原理 / 拆解观察 / 组合演示",
+        "sourceIds": ["ASHRAE-HANDBOOK-FUNDAMENTALS", "DAIKIN-SPLIT-AC-SERVICE-MANUAL"]
+      },
+      {
+        "symbol": "assembly",
+        "name": "拆装进度",
+        "value": "0–100",
+        "unit": "%",
+        "sourceIds": ["DAIKIN-SPLIT-AC-SERVICE-MANUAL"]
+      }
+    ],
+    "simplifications": [
+      "换热器盘管、翅片、风道、阀件和管路尺寸均为教学比例",
+      "红、橙、蓝、青颜色只表示循环阶段，不代表实际温度、压力或相态数值",
+      "拆装方向用于解释层级，不对应任何单一品牌型号的完整维修步骤",
+      "只展示制冷工况，未建模四通阀换向、化霜和制热控制逻辑"
+    ],
+    "knownLimitations": [
+      "不计算制冷剂物性、焓值、过热度、过冷度、制冷量、能效或压降",
+      "不展示高低压保护、电控板、传感器、冷凝水泵和完整安装附件",
+      "尚未完成独立暖通或制冷专业模型审核与内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-AIR-CONDITIONER-001",
+    "version": "0.1.0",
+    "audience": [
+      "机械与暖通专业入门学习者",
+      "制造业新人",
+      "设备管理与流程人员",
+      "家电工作原理兴趣学习者"
+    ],
+    "learningObjectives": [
+      "按顺序解释压缩、冷凝、节流和蒸发",
+      "区分室内换热器与室外换热器在制冷工况下的作用",
+      "理解室外放热量包含室内吸热量和压缩机输入功",
+      "识别空调拆解中的压力、电气和制冷剂安全边界"
+    ],
+    "scope": [
+      "分体式空调主要结构",
+      "制冷工况的蒸气压缩循环路径",
+      "室内机和室外机的概念拆装层级",
+      "系统能量路径与安全边界"
+    ],
+    "outOfScope": [
+      "具体制冷剂状态点计算",
+      "维修操作步骤和故障诊断",
+      "制热、化霜、变频控制和电气控制定量分析"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "ASHRAE-HANDBOOK-FUNDAMENTALS",
+      "evidenceLevel": "B",
+      "title": "ASHRAE Handbook — Fundamentals",
+      "publisher": "ASHRAE",
+      "locator": "Thermodynamics and refrigeration-cycle fundamentals",
+      "supports": [
+        "蒸气压缩制冷循环",
+        "压缩机、冷凝器、节流元件和蒸发器的功能",
+        "制冷系统能量平衡"
+      ]
+    },
+    {
+      "id": "ISO-5149-1",
+      "evidenceLevel": "A",
+      "title": "Refrigerating systems and heat pumps — Safety and environmental requirements — Part 1: Definitions, classification and selection criteria",
+      "publisher": "International Organization for Standardization",
+      "locator": "ISO 5149-1",
+      "supports": [
+        "制冷系统安全与环境边界",
+        "不将教学模型作为维修操作指导"
+      ]
+    },
+    {
+      "id": "DAIKIN-SPLIT-AC-SERVICE-MANUAL",
+      "evidenceLevel": "C",
+      "title": "Representative split-system air-conditioner service documentation",
+      "publisher": "Daikin Industries",
+      "locator": "Indoor and outdoor unit component arrangement; exact construction varies by model",
+      "supports": [
+        "室内机过滤网、换热器、贯流风机和排水层级",
+        "室外机风机、换热器和压缩机布置",
+        "拆装方向只作代表性说明"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-AC-001",
+      "statement": "制冷工况的基本循环顺序为压缩、冷凝、节流和蒸发。",
+      "sourceIds": ["ASHRAE-HANDBOOK-FUNDAMENTALS"],
+      "scope": "definition"
+    },
+    {
+      "id": "CLAIM-AC-002",
+      "statement": "室外侧放热量等于室内侧吸热量与压缩机输入功之和。",
+      "sourceIds": ["ASHRAE-HANDBOOK-FUNDAMENTALS"],
+      "scope": "kinematics"
+    },
+    {
+      "id": "CLAIM-AC-003",
+      "statement": "实际制冷系统拆装涉及压力、电气和制冷剂安全要求，不应由非专业人员依据动画操作。",
+      "sourceIds": ["ISO-5149-1"],
+      "scope": "maintenance"
+    },
+    {
+      "id": "CLAIM-AC-004",
+      "statement": "具体室内机和室外机的部件位置与拆装步骤因产品型号而异。",
+      "sourceIds": ["DAIKIN-SPLIT-AC-SERVICE-MANUAL"],
+      "scope": "application"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-AC-STRUCTURE",
+      "category": "geometry",
+      "title": "室内机与室外机主要部件层级检查",
+      "critical": true,
+      "status": "pass",
+      "method": "检查外壳、过滤网、换热器、风机、压缩机和节流元件的相对层级及拆装方向",
+      "evidence": "src/components/experiments/AirConditionerScene.tsx"
+    },
+    {
+      "id": "VERIFY-AC-CYCLE",
+      "category": "kinematics",
+      "title": "制冷剂循环顺序与颜色分段检查",
+      "critical": true,
+      "status": "pass",
+      "method": "核对压缩机至冷凝器、节流元件、蒸发器并返回压缩机的闭合路径",
+      "evidence": "分段曲线、粒子路径与知识卡内容"
+    },
+    {
+      "id": "VERIFY-AC-THERMODYNAMIC",
+      "category": "kinematics",
+      "title": "定量热力状态验证",
+      "critical": false,
+      "status": "not-applicable",
+      "method": "L1 模型不提供温度、压力、焓值、制冷量和能效计算",
+      "notes": "页面必须持续明确颜色和动画仅为流程提示"
+    },
+    {
+      "id": "VERIFY-AC-INDEPENDENT",
+      "category": "geometry",
+      "title": "独立暖通或制冷专业复核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者专业人员复核部件布置、循环表述、拆装层级和安全边界"
+    },
+    {
+      "id": "VERIFY-AC-CONTENT",
+      "category": "content",
+      "title": "关键结论来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "关键结论均绑定登记来源",
+      "evidence": "src/data/experiments/air-conditioner.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-AC-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立暖通或制冷系统模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待核对系统部件层级、制冷剂路径和拆装表达"
+    },
+    {
+      "id": "REVIEW-AC-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立暖通或制冷专业内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待核对循环术语、能量关系、来源和安全边界"
+    },
+    {
+      "id": "REVIEW-AC-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成三种观察模式、参数同步、缩放控制和基础交互检查；不代表暖通专业审核"
+    }
+  ]
+}

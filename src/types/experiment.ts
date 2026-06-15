@@ -8,10 +8,10 @@ export const experimentIds = [
   "valves",
   "bearing",
   "seal",
+  "air-conditioner",
 ] as const;
 
 export type ExperimentId = (typeof experimentIds)[number];
-
 export type RuntimeControlKey = "speed" | "primary" | "secondary";
 
 export interface ExperimentRuntimeValues {
@@ -29,6 +29,7 @@ export interface NumericControlDefinition {
   max: number;
   step?: number;
   suffix?: string;
+  visibleWhenVariants?: number[];
 }
 
 export interface ExperimentMetric {
@@ -63,6 +64,7 @@ export interface ExperimentDefinition {
   controls: NumericControlDefinition[];
   variantLabel?: string;
   variants?: string[];
+  showDirectionControl?: boolean;
   quickSummary: string;
   formula?: string;
   parts: Array<{ name: string; role: string }>;

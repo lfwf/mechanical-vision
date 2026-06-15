@@ -7,6 +7,7 @@ import {
   Gauge,
   Orbit,
   RotateCw,
+  Snowflake,
   Waves,
 } from "lucide-react";
 import type { LabCategory } from "../types/lab";
@@ -96,6 +97,19 @@ export const labCatalog: LabCategory[] = [
         subtitle: "动环、静环与密封界面",
         status: "preview",
         icon: Waves,
+      },
+    ],
+  },
+  {
+    id: "thermal",
+    title: "热力设备",
+    items: [
+      {
+        id: "air-conditioner",
+        title: "分体式空调",
+        subtitle: "拆解、组合与制冷循环",
+        status: "preview",
+        icon: Snowflake,
       },
     ],
   },

@@ -16,17 +16,16 @@ function MechanicalSealMechanism() {
   const opacity = Math.max(0.12, 1 - transparency / 100);
 
   useFrame((_, delta) => {
-    if (isPlaying && rotatingRef.current) {
-      rotatingRef.current.rotation.x +=
-        rpmToRadiansPerSecond(speed * direction) * delta * 0.12;
-    }
+    if (!isPlaying || !rotatingRef.current) return;
+    const visualAngularSpeed = Math.min(Math.abs(rpmToRadiansPerSecond(speed)) * 0.06, 11) * direction;
+    rotatingRef.current.rotation.x += visualAngularSpeed * delta;
   });
 
-  const rotaryX = -0.2 - exploded * 0.65;
-  const stationaryX = 0.2 + exploded * 0.65;
+  const rotaryX = -0.2 - exploded * 0.75;
+  const stationaryX = 0.2 + exploded * 0.75;
 
   return (
-    <group rotation={[0, 0, 0]}>
+    <group>
       <group ref={rotatingRef}>
         <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
           <cylinderGeometry args={[0.48, 0.48, 7.5, 56]} />
@@ -44,6 +43,34 @@ function MechanicalSealMechanism() {
           <torusGeometry args={[0.82, 0.12, 24, 72]} />
           <meshStandardMaterial color="#324c50" metalness={0.2} roughness={0.5} />
         </mesh>
+        {Array.from({ length: 3 }, (_, index) => {
+          const angle = (index * Math.PI * 2) / 3;
+          return (
+            <mesh
+              key={index}
+              position={[
+                rotaryX - 0.28,
+                Math.cos(angle) * 0.92,
+                Math.sin(angle) * 0.92,
+              ]}
+              rotation={[angle, 0, Math.PI / 2]}
+              castShadow
+            >
+              <boxGeometry args={[0.28, 0.16, 0.42]} />
+              <meshStandardMaterial
+                color={index === 0 ? "#f3d47f" : "#9a6a2f"}
+                metalness={0.55}
+                roughness={0.24}
+                emissive={index === 0 ? "#6d4c16" : "#000000"}
+                emissiveIntensity={index === 0 ? 0.28 : 0}
+              />
+            </mesh>
+          );
+        })}
+        <mesh position={[-3.05, 0.5, 0]} castShadow>
+          <boxGeometry args={[0.75, 0.11, 0.22]} />
+          <meshStandardMaterial color="#f3d47f" metalness={0.42} roughness={0.24} emissive="#6d4c16" emissiveIntensity={0.24} />
+        </mesh>
       </group>
 
       <mesh position={[stationaryX, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
@@ -55,25 +82,11 @@ function MechanicalSealMechanism() {
         <meshStandardMaterial color="#344d51" metalness={0.2} roughness={0.5} />
       </mesh>
 
-      <Spring
-        length={1.4 + exploded * 0.8}
-        radius={0.72}
-        turns={7}
-        position={[-1.25 - exploded * 0.25, 0, 0]}
-      />
+      <Spring length={1.4 + exploded * 0.9} radius={0.72} turns={7} position={[-1.25 - exploded * 0.25, 0, 0]} />
 
       <mesh position={[1.85, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[1.7, 1.7, 2.5, 72, 1, true]} />
-        <meshPhysicalMaterial
-          color="#5f8f9a"
-          metalness={0.2}
-          roughness={0.3}
-          transparent
-          opacity={opacity}
-          transmission={Math.min(0.7, transparency / 120)}
-          side={2}
-          depthWrite={false}
-        />
+        <meshPhysicalMaterial color="#5f8f9a" metalness={0.2} roughness={0.3} transparent opacity={opacity} transmission={Math.min(0.7, transparency / 120)} side={2} depthWrite={false} />
       </mesh>
       <mesh position={[3.1, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <torusGeometry args={[1.55, 0.18, 28, 80]} />
@@ -85,8 +98,8 @@ function MechanicalSealMechanism() {
         <meshStandardMaterial color="#344b4f" metalness={0.35} roughness={0.42} />
       </mesh>
 
-      <SceneLabel position={[-1.4, 1.8, 0]}>动环 · 随轴旋转</SceneLabel>
-      <SceneLabel position={[0.9, 1.8, 0]}>静环 · 固定</SceneLabel>
+      <SceneLabel position={[-1.7, 1.95, 0]}>动环与黄色标记随轴旋转</SceneLabel>
+      <SceneLabel position={[0.95, 1.9, 0]}>静环固定不转</SceneLabel>
       <SceneLabel position={[2.7, 2.25, 0]}>介质侧腔体</SceneLabel>
     </group>
   );
@@ -94,7 +107,7 @@ function MechanicalSealMechanism() {
 
 export default function MechanicalSealScene() {
   return (
-    <ExperimentCanvas camera={[10, 6.5, 10]} target={[0.3, 0, 0]} gridY={-2.3} shadowY={-2.25}>
+    <ExperimentCanvas camera={[10, 6.5, 10]} target={[0.3, 0, 0]} gridY={-2.3} shadowY={-2.25} minDistance={7.5} maxDistance={22}>
       <MechanicalSealMechanism />
     </ExperimentCanvas>
   );

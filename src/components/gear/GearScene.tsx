@@ -11,7 +11,6 @@ import {
 } from "../../lib/gearMath";
 import { useGearLabStore } from "../../store/useGearLabStore";
 import { CameraController } from "./CameraController";
-import { MeshReferenceOverlay } from "./MeshReferenceOverlay";
 import { ProceduralGear } from "./ProceduralGear";
 
 function GearPair() {
@@ -87,15 +86,6 @@ function GearPair() {
         onSelect={selectPart}
         materialVariant="driven"
       />
-
-      {showPitchCircles && (
-        <MeshReferenceOverlay
-          driverTeeth={driverTeeth}
-          drivenTeeth={drivenTeeth}
-          driverAngle={driverAngle}
-          inputDirection={inputDirection}
-        />
-      )}
 
       <mesh
         position={[0, 0.12, 0]}
@@ -211,7 +201,6 @@ export function GearScene() {
           <span><i className="legend-base" />基圆</span>
           <span><i className="legend-pitch" />节圆</span>
           <span><i className="legend-outer" />齿顶圆</span>
-          <span><i className="legend-action" />作用线</span>
         </div>
       )}
     </div>

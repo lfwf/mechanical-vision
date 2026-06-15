@@ -163,6 +163,7 @@ function SceneContent() {
         makeDefault
         enableDamping
         dampingFactor={0.08}
+        zoomSpeed={0.45}
         minPolarAngle={0.35}
         maxPolarAngle={1.38}
         minDistance={5}

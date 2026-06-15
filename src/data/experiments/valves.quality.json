@@ -1,0 +1,208 @@
+{
+  "experimentId": "valves",
+  "title": "工业阀门结构对比",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-VALVES-001",
+    "title": "工业阀门结构对比",
+    "version": "0.1.0",
+    "precisionLevel": "L1",
+    "precisionLabel": "结构与功能示意级",
+    "intendedUses": [
+      "比较球阀、蝶阀和截止阀关闭件运动",
+      "观察开度与流道相对位置",
+      "理解开度不等同于流量百分比"
+    ],
+    "prohibitedUses": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "units": "Three.js 场景比例单位；页面显示参数另行标注",
+    "coordinateSystem": "右手坐标系；具体轴向在模型说明中定义",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "用透明阀体和三种程序化关闭件展示基本结构与运动方式",
+    "parameters": [
+      {
+        "symbol": "opening",
+        "name": "几何开度",
+        "value": "0–100",
+        "sourceIds": [
+          "IEC-60534-2-1"
+        ],
+        "unit": "%"
+      }
+    ],
+    "simplifications": [
+      "阀体承压结构、阀座细节和密封材料为示意",
+      "未按具体公称压力和尺寸系列建模"
+    ],
+    "knownLimitations": [
+      "不计算 Cv、压降、泄漏等级、操作力矩和材料适用性",
+      "尚未完成独立机械专业模型审核和内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-MODEL-VALVES-001",
+    "version": "0.1.0",
+    "audience": [
+      "机械专业学生",
+      "制造业新人",
+      "设备与流程人员",
+      "机械原理兴趣学习者"
+    ],
+    "learningObjectives": [
+      "比较球阀、蝶阀和截止阀关闭件运动",
+      "观察开度与流道相对位置",
+      "理解开度不等同于流量百分比"
+    ],
+    "scope": [
+      "结构组成",
+      "理想运动或功能路径",
+      "参数变化趋势",
+      "工程边界"
+    ],
+    "outOfScope": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "ASME-B16.34",
+      "evidenceLevel": "A",
+      "title": "Valves — Flanged, Threaded, and Welding End",
+      "publisher": "ASME",
+      "locator": "ASME B16.34",
+      "supports": [
+        "阀门设计和压力温度边界"
+      ]
+    },
+    {
+      "id": "API-608",
+      "evidenceLevel": "A",
+      "title": "Metal Ball Valves",
+      "publisher": "API",
+      "locator": "API Standard 608",
+      "supports": [
+        "球阀结构"
+      ]
+    },
+    {
+      "id": "API-609",
+      "evidenceLevel": "A",
+      "title": "Butterfly Valves: Double-flanged, Lug- and Wafer-type",
+      "publisher": "API",
+      "locator": "API Standard 609",
+      "supports": [
+        "蝶阀结构"
+      ]
+    },
+    {
+      "id": "IEC-60534-2-1",
+      "evidenceLevel": "A",
+      "title": "Industrial-process control valves — Flow capacity",
+      "publisher": "IEC",
+      "locator": "IEC 60534-2-1",
+      "supports": [
+        "流量系数与开度边界"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-VALVE-001",
+      "statement": "球阀和蝶阀主要通过旋转关闭件改变流道。",
+      "sourceIds": [
+        "API-608",
+        "API-609"
+      ],
+      "scope": "definition"
+    },
+    {
+      "id": "CLAIM-VALVE-002",
+      "statement": "阀门几何开度不能直接等同于系统流量百分比。",
+      "sourceIds": [
+        "IEC-60534-2-1"
+      ],
+      "scope": "application"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-VALVES-STRUCTURE",
+      "category": "geometry",
+      "title": "主要部件相对位置检查",
+      "critical": true,
+      "status": "pass",
+      "method": "程序参数、相对位置和运动约束内部检查",
+      "evidence": "运行时参数化模型与代码公式"
+    },
+    {
+      "id": "VERIFY-VALVES-MOTION",
+      "category": "kinematics",
+      "title": "定量流量和密封验证",
+      "critical": true,
+      "status": "pending",
+      "method": "按登记公式检查输入、输出、方向和极限参数",
+      "evidence": null,
+      "notes": "L1 模型不声称具备定量运动学精度"
+    },
+    {
+      "id": "VERIFY-VALVES-INDEPENDENT",
+      "category": "geometry",
+      "title": "独立工程模型复核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者机械专业人员对几何、运动、装配和简化边界进行复核"
+    },
+    {
+      "id": "VERIFY-VALVES-CONTENT",
+      "category": "content",
+      "title": "关键内容来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "关键结论必须绑定登记来源",
+      "evidence": "src/data/experiments/valves.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-VALVES-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对模型几何、装配、运动和简化"
+    },
+    {
+      "id": "REVIEW-VALVES-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对术语、结论、来源和工程边界"
+    },
+    {
+      "id": "REVIEW-VALVES-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成页面集成、参数同步和基础交互检查；不代表机械专业审核"
+    }
+  ]
+}

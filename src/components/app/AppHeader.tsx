@@ -32,7 +32,7 @@ export function AppHeader({ query, onQueryChange }: AppHeaderProps) {
       <div className="header-actions">
         <span className="version-badge">
           <BadgeCheck size={16} />
-          基础框架 v0.1
+          渐开线啮合 v0.2
         </span>
       </div>
     </header>

@@ -26,7 +26,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          npm ci 2>&1 | tee install.log
+          npm install --no-audit --no-fund 2>&1 | tee install.log
 
       - name: Validate quality records, mechanics and build
         id: verify

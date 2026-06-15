@@ -1,0 +1,207 @@
+{
+  "experimentId": "centrifugal-pump",
+  "title": "单级端吸离心泵",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-PUMP-001",
+    "title": "单级端吸离心泵",
+    "version": "0.1.0",
+    "precisionLevel": "L1",
+    "precisionLabel": "结构与能量路径示意级",
+    "intendedUses": [
+      "认识叶轮、叶轮眼、蜗壳、入口和出口",
+      "理解轴向吸入与径向排出路径",
+      "理解相似定律的适用边界"
+    ],
+    "prohibitedUses": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "units": "Three.js 场景比例单位；页面显示参数另行标注",
+    "coordinateSystem": "右手坐标系；具体轴向在模型说明中定义",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "用透明泵壳、程序化叶轮和概念粒子路径展示流体能量路径",
+    "parameters": [
+      {
+        "symbol": "n",
+        "name": "演示转速",
+        "value": "300–3000",
+        "sourceIds": [
+          "ANSI-HI-14.3"
+        ],
+        "unit": "RPM"
+      }
+    ],
+    "simplifications": [
+      "叶片曲率、蜗壳截面和间隙为示意几何",
+      "粒子动画不是 CFD 速度场或压力场"
+    ],
+    "knownLimitations": [
+      "不计算扬程、效率、NPSH、汽蚀、轴功率和密封载荷",
+      "尚未完成独立机械专业模型审核和内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-MODEL-PUMP-001",
+    "version": "0.1.0",
+    "audience": [
+      "机械专业学生",
+      "制造业新人",
+      "设备与流程人员",
+      "机械原理兴趣学习者"
+    ],
+    "learningObjectives": [
+      "认识叶轮、叶轮眼、蜗壳、入口和出口",
+      "理解轴向吸入与径向排出路径",
+      "理解相似定律的适用边界"
+    ],
+    "scope": [
+      "结构组成",
+      "理想运动或功能路径",
+      "参数变化趋势",
+      "工程边界"
+    ],
+    "outOfScope": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "ANSI-HI-14.3",
+      "evidenceLevel": "A",
+      "title": "Rotodynamic Pumps for Design and Application",
+      "publisher": "Hydraulic Institute",
+      "locator": "ANSI/HI 14.3",
+      "supports": [
+        "离心泵结构与应用",
+        "相似关系"
+      ]
+    },
+    {
+      "id": "ANSI-HI-9.6.1",
+      "evidenceLevel": "A",
+      "title": "Rotodynamic Pumps Guideline for NPSH Margin",
+      "publisher": "Hydraulic Institute",
+      "locator": "ANSI/HI 9.6.1",
+      "supports": [
+        "NPSH 与汽蚀边界"
+      ]
+    },
+    {
+      "id": "KSB-CENTRIFUGAL-PUMP-LEXICON",
+      "evidenceLevel": "C",
+      "title": "Centrifugal Pump Lexicon",
+      "publisher": "KSB",
+      "locator": "KSB technical reference",
+      "supports": [
+        "泵结构与能量转换"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-PUMP-001",
+      "statement": "离心泵中液体从叶轮眼进入并在叶轮和蜗壳中完成能量转换。",
+      "sourceIds": [
+        "ANSI-HI-14.3",
+        "KSB-CENTRIFUGAL-PUMP-LEXICON"
+      ],
+      "scope": "definition"
+    },
+    {
+      "id": "CLAIM-PUMP-002",
+      "statement": "相似定律只在满足相似条件时近似适用。",
+      "sourceIds": [
+        "ANSI-HI-14.3"
+      ],
+      "scope": "application"
+    },
+    {
+      "id": "CLAIM-PUMP-003",
+      "statement": "入口 NPSH 条件不足可能导致汽蚀风险。",
+      "sourceIds": [
+        "ANSI-HI-9.6.1"
+      ],
+      "scope": "failure"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-CENTRIFUGAL-PUMP-STRUCTURE",
+      "category": "geometry",
+      "title": "主要部件与流向结构检查",
+      "critical": true,
+      "status": "pass",
+      "method": "程序参数、相对位置和运动约束内部检查",
+      "evidence": "运行时参数化模型与代码公式"
+    },
+    {
+      "id": "VERIFY-CENTRIFUGAL-PUMP-MOTION",
+      "category": "kinematics",
+      "title": "定量流场验证",
+      "critical": true,
+      "status": "pending",
+      "method": "按登记公式检查输入、输出、方向和极限参数",
+      "evidence": null,
+      "notes": "L1 模型不声称具备定量运动学精度"
+    },
+    {
+      "id": "VERIFY-CENTRIFUGAL-PUMP-INDEPENDENT",
+      "category": "geometry",
+      "title": "独立工程模型复核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者机械专业人员对几何、运动、装配和简化边界进行复核"
+    },
+    {
+      "id": "VERIFY-CENTRIFUGAL-PUMP-CONTENT",
+      "category": "content",
+      "title": "关键内容来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "关键结论必须绑定登记来源",
+      "evidence": "src/data/experiments/centrifugal-pump.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-CENTRIFUGAL-PUMP-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对模型几何、装配、运动和简化"
+    },
+    {
+      "id": "REVIEW-CENTRIFUGAL-PUMP-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对术语、结论、来源和工程边界"
+    },
+    {
+      "id": "REVIEW-CENTRIFUGAL-PUMP-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成页面集成、参数同步和基础交互检查；不代表机械专业审核"
+    }
+  ]
+}

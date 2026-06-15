@@ -1,0 +1,186 @@
+{
+  "experimentId": "slider-crank",
+  "title": "曲柄滑块机构",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-SLIDER-CRANK-001",
+    "title": "曲柄滑块机构",
+    "version": "0.1.0",
+    "precisionLevel": "L2",
+    "precisionLabel": "运动原理级",
+    "intendedUses": [
+      "理解旋转与往复运动转换",
+      "观察曲柄半径对行程的影响",
+      "观察连杆比对摆角和速度曲线的影响"
+    ],
+    "prohibitedUses": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "units": "Three.js 场景比例单位；页面显示参数另行标注",
+    "coordinateSystem": "右手坐标系；具体轴向在模型说明中定义",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "按闭环几何方程实时计算曲柄销、连杆和滑块位置",
+    "parameters": [
+      {
+        "symbol": "r",
+        "name": "曲柄半径",
+        "value": "0.7–1.4",
+        "sourceIds": [
+          "NORTON-DESIGN-MACHINERY"
+        ]
+      },
+      {
+        "symbol": "l/r",
+        "name": "连杆曲柄比",
+        "value": "2.5–5.0",
+        "sourceIds": [
+          "NORTON-DESIGN-MACHINERY"
+        ]
+      }
+    ],
+    "simplifications": [
+      "销轴、轴承和间隙未详细建模",
+      "构件均按刚体处理"
+    ],
+    "knownLimitations": [
+      "不计算惯性力、应力、摩擦、润滑和振动",
+      "尚未完成独立机械专业模型审核和内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-MODEL-SLIDER-CRANK-001",
+    "version": "0.1.0",
+    "audience": [
+      "机械专业学生",
+      "制造业新人",
+      "设备与流程人员",
+      "机械原理兴趣学习者"
+    ],
+    "learningObjectives": [
+      "理解旋转与往复运动转换",
+      "观察曲柄半径对行程的影响",
+      "观察连杆比对摆角和速度曲线的影响"
+    ],
+    "scope": [
+      "结构组成",
+      "理想运动或功能路径",
+      "参数变化趋势",
+      "工程边界"
+    ],
+    "outOfScope": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "NORTON-DESIGN-MACHINERY",
+      "evidenceLevel": "B",
+      "title": "Design of Machinery",
+      "publisher": "McGraw-Hill",
+      "locator": "Robert L. Norton, Design of Machinery",
+      "supports": [
+        "机构运动学",
+        "曲柄滑块",
+        "凸轮设计"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-SC-001",
+      "statement": "无偏置曲柄滑块理论行程为 2r。",
+      "sourceIds": [
+        "NORTON-DESIGN-MACHINERY"
+      ],
+      "scope": "kinematics"
+    },
+    {
+      "id": "CLAIM-SC-002",
+      "statement": "滑块位移由曲柄转角、曲柄半径和连杆长度共同决定。",
+      "sourceIds": [
+        "NORTON-DESIGN-MACHINERY"
+      ],
+      "scope": "kinematics"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-SLIDER-CRANK-STRUCTURE",
+      "category": "geometry",
+      "title": "构件长度与导轨约束检查",
+      "critical": true,
+      "status": "pass",
+      "method": "程序参数、相对位置和运动约束内部检查",
+      "evidence": "运行时参数化模型与代码公式"
+    },
+    {
+      "id": "VERIFY-SLIDER-CRANK-MOTION",
+      "category": "kinematics",
+      "title": "滑块位移方程和死点检查",
+      "critical": true,
+      "status": "pass",
+      "method": "按登记公式检查输入、输出、方向和极限参数",
+      "evidence": "当前仅完成内部代码检查",
+      "notes": null
+    },
+    {
+      "id": "VERIFY-SLIDER-CRANK-INDEPENDENT",
+      "category": "geometry",
+      "title": "独立工程模型复核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者机械专业人员对几何、运动、装配和简化边界进行复核"
+    },
+    {
+      "id": "VERIFY-SLIDER-CRANK-CONTENT",
+      "category": "content",
+      "title": "关键内容来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "关键结论必须绑定登记来源",
+      "evidence": "src/data/experiments/slider-crank.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-SLIDER-CRANK-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对模型几何、装配、运动和简化"
+    },
+    {
+      "id": "REVIEW-SLIDER-CRANK-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对术语、结论、来源和工程边界"
+    },
+    {
+      "id": "REVIEW-SLIDER-CRANK-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成页面集成、参数同步和基础交互检查；不代表机械专业审核"
+    }
+  ]
+}

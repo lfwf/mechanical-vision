@@ -1,0 +1,31 @@
+name: 技术纠错
+about: 报告模型、公式、运动、术语或来源问题
+labels: [technical-correction]
+body:
+  - type: input
+    id: experiment
+    attributes:
+      label: 实验/模型名称
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 问题类型
+      options: [几何, 装配, 运动, 公式, 内容, 来源, 视觉表达, 适用边界]
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题描述
+      description: 请说明当前表现、正确表现及可能造成的误导。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 依据或复现方法
+      description: 可填写标准编号、教材章节、计算过程、截图或复现步骤。
+    validations:
+      required: true

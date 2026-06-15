@@ -20,7 +20,7 @@ export const labCatalog: LabCategory[] = [
         id: "gear-pair",
         title: "外啮合齿轮",
         subtitle: "齿数、转速与方向",
-        status: "available",
+        status: "preview",
         icon: Cog,
       },
       {

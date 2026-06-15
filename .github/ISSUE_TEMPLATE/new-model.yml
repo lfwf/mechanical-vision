@@ -1,0 +1,44 @@
+name: 新模型提案
+about: 在开始建模前明确用户价值、资料和审核人
+labels: [model-proposal]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 模型/机构名称
+    validations:
+      required: true
+  - type: textarea
+    id: user_value
+    attributes:
+      label: 用户要解决什么理解问题
+      description: 不要写“做一个 3D 模型”，说明用户看完后应该会什么。
+    validations:
+      required: true
+  - type: dropdown
+    id: precision
+    attributes:
+      label: 目标精度等级
+      options: [L1 结构示意级, L2 运动原理级, L3 工程参数级, L4 仿真与制造级]
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: 计划采用的 A/B 级来源
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: 准备如何验证几何和运动
+    validations:
+      required: true
+  - type: input
+    id: model_reviewer
+    attributes:
+      label: 独立模型审核人
+  - type: input
+    id: content_reviewer
+    attributes:
+      label: 独立内容审核人

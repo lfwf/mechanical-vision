@@ -1,0 +1,196 @@
+{
+  "experimentId": "rack-pinion",
+  "title": "齿轮齿条机构",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-RACK-PINION-001",
+    "title": "齿轮齿条机构",
+    "version": "0.1.0",
+    "precisionLevel": "L2",
+    "precisionLabel": "运动原理级",
+    "intendedUses": [
+      "理解旋转运动与直线运动转换",
+      "观察齿数和转速对齿条速度的影响",
+      "认识小齿轮、齿条和导轨的作用"
+    ],
+    "prohibitedUses": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "units": "Three.js 场景比例单位；页面显示参数另行标注",
+    "coordinateSystem": "右手坐标系；具体轴向在模型说明中定义",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "按标准齿轮节圆关系生成小齿轮，并用直齿条齿形建立周期啮合演示",
+    "parameters": [
+      {
+        "symbol": "m",
+        "name": "演示模数",
+        "value": "0.145",
+        "sourceIds": [
+          "ISO-21771-2007"
+        ],
+        "unit": "场景单位"
+      },
+      {
+        "symbol": "z",
+        "name": "小齿轮齿数",
+        "value": "18–40",
+        "sourceIds": [
+          "ISO-21771-2007"
+        ]
+      }
+    ],
+    "simplifications": [
+      "齿条齿根过渡和侧隙未按具体刀具加工建模",
+      "导轨与支承结构为教学简化"
+    ],
+    "knownLimitations": [
+      "未计算齿面强度、摩擦、效率和导轨变形",
+      "尚未完成独立机械专业模型审核和内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-MODEL-RACK-PINION-001",
+    "version": "0.1.0",
+    "audience": [
+      "机械专业学生",
+      "制造业新人",
+      "设备与流程人员",
+      "机械原理兴趣学习者"
+    ],
+    "learningObjectives": [
+      "理解旋转运动与直线运动转换",
+      "观察齿数和转速对齿条速度的影响",
+      "认识小齿轮、齿条和导轨的作用"
+    ],
+    "scope": [
+      "结构组成",
+      "理想运动或功能路径",
+      "参数变化趋势",
+      "工程边界"
+    ],
+    "outOfScope": [
+      "加工制造或生成工程图纸",
+      "实际设备选型、强度、寿命或安全决策",
+      "替代制造商手册、标准计算或专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "ISO-21771-2007",
+      "evidenceLevel": "A",
+      "title": "Gears — Cylindrical involute gears and gear pairs — Concepts and geometry",
+      "publisher": "ISO",
+      "locator": "ISO 21771:2007",
+      "supports": [
+        "渐开线齿轮与齿条几何",
+        "节圆与运动关系"
+      ]
+    },
+    {
+      "id": "ISO-6336-1-2019",
+      "evidenceLevel": "A",
+      "title": "Calculation of load capacity of spur and helical gears — Part 1",
+      "publisher": "ISO",
+      "locator": "ISO 6336-1:2019",
+      "supports": [
+        "承载能力计算边界"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-RACK-001",
+      "statement": "理想齿条位移等于小齿轮节圆弧长。",
+      "sourceIds": [
+        "ISO-21771-2007"
+      ],
+      "scope": "kinematics"
+    },
+    {
+      "id": "CLAIM-RACK-002",
+      "statement": "实际设计不能只由几何速度关系判断承载能力。",
+      "sourceIds": [
+        "ISO-6336-1-2019"
+      ],
+      "scope": "failure"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-RACK-PINION-STRUCTURE",
+      "category": "geometry",
+      "title": "齿轮与齿条几何位置检查",
+      "critical": true,
+      "status": "pass",
+      "method": "程序参数、相对位置和运动约束内部检查",
+      "evidence": "运行时参数化模型与代码公式"
+    },
+    {
+      "id": "VERIFY-RACK-PINION-MOTION",
+      "category": "kinematics",
+      "title": "s = rθ 运动关系检查",
+      "critical": true,
+      "status": "pass",
+      "method": "按登记公式检查输入、输出、方向和极限参数",
+      "evidence": "当前仅完成内部代码检查",
+      "notes": null
+    },
+    {
+      "id": "VERIFY-RACK-PINION-INDEPENDENT",
+      "category": "geometry",
+      "title": "独立工程模型复核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者机械专业人员对几何、运动、装配和简化边界进行复核"
+    },
+    {
+      "id": "VERIFY-RACK-PINION-CONTENT",
+      "category": "content",
+      "title": "关键内容来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "关键结论必须绑定登记来源",
+      "evidence": "src/data/experiments/rack-pinion.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-RACK-PINION-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对模型几何、装配、运动和简化"
+    },
+    {
+      "id": "REVIEW-RACK-PINION-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员核对术语、结论、来源和工程边界"
+    },
+    {
+      "id": "REVIEW-RACK-PINION-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成页面集成、参数同步和基础交互检查；不代表机械专业审核"
+    }
+  ]
+}

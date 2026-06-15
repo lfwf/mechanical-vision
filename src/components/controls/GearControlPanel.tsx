@@ -85,9 +85,9 @@ export function GearControlPanel() {
         <RangeField
           label="输入转速"
           value={inputRpm}
-          min={20}
+          min={1}
           max={240}
-          step={5}
+          step={1}
           suffix="RPM"
           onChange={setInputRpm}
         />

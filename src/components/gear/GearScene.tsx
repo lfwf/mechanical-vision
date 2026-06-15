@@ -11,6 +11,7 @@ import {
 } from "../../lib/gearMath";
 import { useGearLabStore } from "../../store/useGearLabStore";
 import { CameraController } from "./CameraController";
+import { MeshReferenceOverlay } from "./MeshReferenceOverlay";
 import { ProceduralGear } from "./ProceduralGear";
 
 function GearPair() {
@@ -87,6 +88,15 @@ function GearPair() {
         materialVariant="driven"
       />
 
+      {showPitchCircles && (
+        <MeshReferenceOverlay
+          driverTeeth={driverTeeth}
+          drivenTeeth={drivenTeeth}
+          driverAngle={driverAngle}
+          inputDirection={inputDirection}
+        />
+      )}
+
       <mesh
         position={[0, 0.12, 0]}
         rotation={[Math.PI / 2, 0, 0]}
@@ -99,7 +109,7 @@ function GearPair() {
         <meshBasicMaterial
           color={selectedPartId === "mesh" ? "#f4d27b" : "#87b2bf"}
           transparent
-          opacity={0.85}
+          opacity={0.75}
           depthWrite={false}
         />
       </mesh>
@@ -119,19 +129,19 @@ function SceneContent() {
       <color attach="background" args={["#eef0e8"]} />
       <fog attach="fog" args={["#eef0e8", 16, 34]} />
 
-      <ambientLight intensity={1.15} />
+      <ambientLight intensity={1.08} />
       <directionalLight
         castShadow
         position={[6, 10, 6]}
-        intensity={2.5}
+        intensity={2.6}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
-      <directionalLight position={[-6, 4, -5]} intensity={0.7} color="#b7d7de" />
+      <directionalLight position={[-6, 4, -5]} intensity={0.75} color="#b7d7de" />
 
       <Suspense fallback={null}>
         <GearPair />
-        <Environment preset="warehouse" environmentIntensity={0.42} />
+        <Environment preset="warehouse" environmentIntensity={0.46} />
       </Suspense>
 
       {showGrid && (
@@ -181,6 +191,7 @@ function SceneContent() {
 
 export function GearScene() {
   const selectPart = useGearLabStore((state) => state.selectPart);
+  const showPitchCircles = useGearLabStore((state) => state.showPitchCircles);
 
   return (
     <div className="scene-canvas" aria-label="外啮合齿轮三维交互区域">
@@ -193,6 +204,16 @@ export function GearScene() {
       >
         <SceneContent />
       </Canvas>
+
+      {showPitchCircles && (
+        <div className="reference-legend" aria-label="基准几何图例">
+          <span><i className="legend-root" />齿根圆</span>
+          <span><i className="legend-base" />基圆</span>
+          <span><i className="legend-pitch" />节圆</span>
+          <span><i className="legend-outer" />齿顶圆</span>
+          <span><i className="legend-action" />作用线</span>
+        </div>
+      )}
     </div>
   );
 }

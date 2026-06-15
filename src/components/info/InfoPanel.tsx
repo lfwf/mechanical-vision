@@ -28,7 +28,7 @@ export function InfoPanel() {
   const heading = viewHeadings[activeView];
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+    scrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
   }, [activeView]);
 
   return (

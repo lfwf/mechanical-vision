@@ -3,6 +3,7 @@ import { AppHeader } from "./components/app/AppHeader";
 import { CatalogSidebar } from "./components/catalog/CatalogSidebar";
 import { GearControlPanel } from "./components/controls/GearControlPanel";
 import { InfoPanel } from "./components/info/InfoPanel";
+import { ExperimentQualityBadge } from "./components/quality/ExperimentQualityBadge";
 
 const GearScene = lazy(async () => {
   const module = await import("./components/gear/GearScene");
@@ -24,9 +25,12 @@ export function App() {
               <span className="lab-index">实验 01 · 传动机构</span>
               <h1>外啮合直齿圆柱齿轮</h1>
             </div>
-            <div className="lab-mode">
-              <span className="lab-mode-dot" />
-              交互实验模式
+            <div className="lab-toolbar-actions">
+              <ExperimentQualityBadge />
+              <div className="lab-mode">
+                <span className="lab-mode-dot" />
+                交互实验模式
+              </div>
             </div>
           </div>
 
@@ -42,7 +46,7 @@ export function App() {
               <GearScene />
             </Suspense>
             <div className="scene-tip">
-              拖拽旋转 · 滚轮缩放 · 点击齿轮查看零件说明
+              拖拽旋转 · 滚轮缩放 · 红线为作用线 · 红点为代表性接触点
             </div>
           </div>
 

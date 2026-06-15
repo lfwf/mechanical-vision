@@ -4,6 +4,21 @@ export const PRESSURE_ANGLE_RADIANS =
   (PRESSURE_ANGLE_DEGREES * Math.PI) / 180;
 export const STANDARD_ADDENDUM_COEFFICIENT = 1;
 export const STANDARD_DEDENDUM_COEFFICIENT = 1.25;
+export const MIN_STANDARD_TEETH = Math.ceil(
+  2 / Math.sin(PRESSURE_ANGLE_RADIANS) ** 2,
+);
+export const MAX_DEMO_TEETH = 48;
+
+export function assertValidTeeth(teeth: number): void {
+  if (!Number.isInteger(teeth)) {
+    throw new Error("齿数必须是整数");
+  }
+  if (teeth < MIN_STANDARD_TEETH || teeth > MAX_DEMO_TEETH) {
+    throw new Error(
+      `当前无变位教学模型仅允许 ${MIN_STANDARD_TEETH}–${MAX_DEMO_TEETH} 齿`,
+    );
+  }
+}
 
 export function getPitchRadius(teeth: number): number {
   return (GEAR_MODULE * teeth) / 2;
@@ -28,6 +43,10 @@ export function getRootRadius(teeth: number): number {
 
 export function getCircularPitch(): number {
   return Math.PI * GEAR_MODULE;
+}
+
+export function getBasePitch(): number {
+  return getCircularPitch() * Math.cos(PRESSURE_ANGLE_RADIANS);
 }
 
 export function getCenterDistance(driverTeeth: number, drivenTeeth: number): number {
@@ -61,6 +80,52 @@ export function rpmToRadiansPerSecond(rpm: number): number {
   return (rpm * Math.PI * 2) / 60;
 }
 
+export interface ContactGeometry {
+  approachLength: number;
+  recessLength: number;
+  pathOfContact: number;
+  basePitch: number;
+  contactRatio: number;
+}
+
+/**
+ * 标准、无变位外啮合直齿轮在端面内的理论接触路径。
+ * 该结果只用于几何教学，不包含齿宽重合度、弹性变形和制造误差。
+ */
+export function getContactGeometry(
+  driverTeeth: number,
+  drivenTeeth: number,
+): ContactGeometry {
+  const driverPitchRadius = getPitchRadius(driverTeeth);
+  const drivenPitchRadius = getPitchRadius(drivenTeeth);
+  const driverBaseRadius = getBaseRadius(driverTeeth);
+  const drivenBaseRadius = getBaseRadius(drivenTeeth);
+  const driverOuterRadius = getOuterRadius(driverTeeth);
+  const drivenOuterRadius = getOuterRadius(drivenTeeth);
+  const pressureProjection = Math.sin(PRESSURE_ANGLE_RADIANS);
+
+  const approachLength =
+    Math.sqrt(drivenOuterRadius ** 2 - drivenBaseRadius ** 2) -
+    drivenPitchRadius * pressureProjection;
+  const recessLength =
+    Math.sqrt(driverOuterRadius ** 2 - driverBaseRadius ** 2) -
+    driverPitchRadius * pressureProjection;
+  const pathOfContact = approachLength + recessLength;
+  const basePitch = getBasePitch();
+
+  return {
+    approachLength,
+    recessLength,
+    pathOfContact,
+    basePitch,
+    contactRatio: pathOfContact / basePitch,
+  };
+}
+
+export function normalizeCycle(value: number): number {
+  return ((value % 1) + 1) % 1;
+}
+
 export function formatNumber(value: number, digits = 2): string {
   return new Intl.NumberFormat("zh-CN", {
     maximumFractionDigits: digits,
@@ -80,6 +145,7 @@ export interface GearAnalysis {
   speedFactor: number;
   torqueFactor: number;
   speedChangePercent: number;
+  contactRatio: number;
   conclusion: string;
 }
 
@@ -98,14 +164,15 @@ export function analyzeGearPair(
   );
   const speedFactor = Math.abs(drivenRpm) / inputRpm;
   const speedChangePercent = (speedFactor - 1) * 100;
+  const contactRatio = getContactGeometry(driverTeeth, drivenTeeth).contactRatio;
 
   let conclusion: string;
   if (ratio > 1.001) {
-    conclusion = `从动轮齿数更多，因此系统减速并增大理想输出扭矩。`;
+    conclusion = "从动轮齿数更多，因此系统减速并提高理想输出转矩比例。";
   } else if (ratio < 0.999) {
-    conclusion = `从动轮齿数更少，因此系统增速，但理想输出扭矩相应降低。`;
+    conclusion = "从动轮齿数更少，因此系统增速，理想输出转矩比例相应降低。";
   } else {
-    conclusion = `两个齿轮齿数相同，因此转速大小保持一致，仅旋转方向相反。`;
+    conclusion = "两个齿轮齿数相同，因此转速大小保持一致，仅旋转方向相反。";
   }
 
   return {
@@ -116,6 +183,7 @@ export function analyzeGearPair(
     speedFactor,
     torqueFactor: ratio,
     speedChangePercent,
+    contactRatio,
     conclusion,
   };
 }

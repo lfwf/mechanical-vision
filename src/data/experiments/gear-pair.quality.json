@@ -1,0 +1,269 @@
+{
+  "experimentId": "gear-pair",
+  "title": "外啮合直齿圆柱齿轮",
+  "version": "0.3.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-GEAR-PAIR-001",
+    "title": "标准渐开线外啮合直齿圆柱齿轮副",
+    "version": "0.3.0",
+    "precisionLevel": "L2",
+    "precisionLabel": "运动原理级",
+    "intendedUses": [
+      "理解外啮合直齿圆柱齿轮的几何关系",
+      "观察齿数、转速、旋转方向与传动比之间的关系",
+      "学习节圆、基圆、齿顶圆、齿根圆和作用线等概念"
+    ],
+    "prohibitedUses": [
+      "加工图纸或数控加工数据生成",
+      "齿轮强度、寿命、噪声或热分析",
+      "实际设备选型、验收或安全决策"
+    ],
+    "units": "场景单位按比例缩放；公式参数采用模数制",
+    "coordinateSystem": "右手坐标系，Y 轴为齿轮轴线，X-Z 平面为端面",
+    "sourceFormat": "TypeScript 参数化几何源代码",
+    "webFormat": "Three.js ExtrudeGeometry 运行时网格",
+    "generationMethod": "按基圆渐开线方程生成齿廓，并沿齿宽方向拉伸",
+    "parameters": [
+      {
+        "symbol": "m",
+        "name": "演示模数",
+        "value": "0.145",
+        "unit": "场景单位",
+        "sourceIds": ["ISO-54-1996"]
+      },
+      {
+        "symbol": "α",
+        "name": "压力角",
+        "value": "20",
+        "unit": "°",
+        "sourceIds": ["ISO-53-1998", "ISO-21771-2007"]
+      },
+      {
+        "symbol": "h*a",
+        "name": "齿顶高系数",
+        "value": "1.0",
+        "sourceIds": ["ISO-53-1998"]
+      },
+      {
+        "symbol": "h*f",
+        "name": "齿根高系数",
+        "value": "1.25",
+        "sourceIds": ["ISO-53-1998"]
+      },
+      {
+        "symbol": "z",
+        "name": "可调齿数",
+        "value": "18–48",
+        "sourceIds": ["ISO-21771-2007"]
+      }
+    ],
+    "simplifications": [
+      "齿根过渡采用简化连接，不模拟具体滚刀刀尖圆角形成的包络曲线",
+      "未加入齿侧间隙、齿廓修形、变位、制造误差和弹性变形",
+      "轴、轮毂与材料仅用于视觉表达，不代表实际设计尺寸"
+    ],
+    "knownLimitations": [
+      "当前只验证理想刚性、平行轴、无变位外啮合关系",
+      "尚未完成全部齿数组合的独立 CAD 干涉复核",
+      "尚未完成机械专业人员的独立模型与内容审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-GEAR-PAIR-001",
+    "version": "0.3.0",
+    "audience": ["机械专业学生", "制造业新人", "设备维护与流程人员", "机械原理兴趣学习者"],
+    "learningObjectives": [
+      "区分节圆、基圆、齿顶圆和齿根圆",
+      "解释外啮合齿轮为什么反向旋转",
+      "根据齿数计算理想传动比与输出转速",
+      "识别当前模型的适用范围与工程限制",
+      "了解常见齿轮失效现象和检查思路"
+    ],
+    "scope": [
+      "标准渐开线直齿圆柱齿轮的基础几何",
+      "理想刚性运动学",
+      "基础应用、局限、失效和维护认知"
+    ],
+    "outOfScope": [
+      "ISO 6336 强度计算",
+      "齿轮精度等级和公差设计",
+      "动态载荷、振动、噪声、润滑与热平衡定量计算"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-15"
+  },
+  "sources": [
+    {
+      "id": "ISO-21771-2007",
+      "evidenceLevel": "A",
+      "title": "Gears — Cylindrical involute gears and gear pairs — Concepts and geometry",
+      "publisher": "International Organization for Standardization",
+      "edition": "ISO 21771:2007",
+      "year": 2007,
+      "locator": "ISO 21771:2007",
+      "supports": ["术语", "渐开线几何", "节圆与基圆", "齿轮副几何关系"]
+    },
+    {
+      "id": "ISO-53-1998",
+      "evidenceLevel": "A",
+      "title": "Cylindrical gears for general and heavy engineering — Standard basic rack tooth profile",
+      "publisher": "International Organization for Standardization",
+      "edition": "ISO 53:1998",
+      "year": 1998,
+      "locator": "ISO 53:1998",
+      "supports": ["基本齿条齿廓", "压力角", "齿顶高和齿根高系数"]
+    },
+    {
+      "id": "ISO-54-1996",
+      "evidenceLevel": "A",
+      "title": "Cylindrical gears for general engineering and for heavy engineering — Modules",
+      "publisher": "International Organization for Standardization",
+      "edition": "ISO 54:1996",
+      "year": 1996,
+      "locator": "ISO 54:1996",
+      "supports": ["模数制", "标准模数概念"]
+    },
+    {
+      "id": "ISO-6336-1-2019",
+      "evidenceLevel": "A",
+      "title": "Calculation of load capacity of spur and helical gears — Part 1: Basic principles, introduction and general influence factors",
+      "publisher": "International Organization for Standardization",
+      "edition": "ISO 6336-1:2019",
+      "year": 2019,
+      "locator": "ISO 6336-1:2019",
+      "supports": ["强度计算边界", "影响因素", "不将本模型用于承载能力判断"]
+    },
+    {
+      "id": "MATSUMOTO-SEGERMAN-2022",
+      "evidenceLevel": "D",
+      "title": "A mathematical overview and some applications of gear design",
+      "publisher": "arXiv",
+      "year": 2022,
+      "url": "https://arxiv.org/abs/2212.14409",
+      "supports": ["渐开线数学解释", "齿轮几何教学表达"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-GEO-001",
+      "statement": "渐开线齿廓由基圆渐开线构成。",
+      "sourceIds": ["ISO-21771-2007", "MATSUMOTO-SEGERMAN-2022"],
+      "scope": "geometry"
+    },
+    {
+      "id": "CLAIM-GEO-002",
+      "statement": "标准参考圆直径满足 d = m × z。",
+      "sourceIds": ["ISO-21771-2007", "ISO-54-1996"],
+      "scope": "geometry"
+    },
+    {
+      "id": "CLAIM-KIN-001",
+      "statement": "理想外啮合齿轮副的角速度方向相反，转速大小与齿数成反比。",
+      "sourceIds": ["ISO-21771-2007"],
+      "scope": "kinematics"
+    },
+    {
+      "id": "CLAIM-GEO-003",
+      "statement": "本模型采用 20° 压力角和全齿高基本齿条比例。",
+      "sourceIds": ["ISO-53-1998"],
+      "scope": "geometry"
+    },
+    {
+      "id": "CLAIM-FAIL-001",
+      "statement": "实际齿轮承载能力不能仅由几何和理想传动比判断。",
+      "sourceIds": ["ISO-6336-1-2019"],
+      "scope": "failure"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-GEO-001",
+      "category": "geometry",
+      "title": "关键半径公式检查",
+      "critical": true,
+      "status": "pass",
+      "method": "自动遍历 18–48 齿，检查齿根圆、基圆、节圆和齿顶圆的顺序及公式一致性",
+      "evidence": "scripts/gear-math-check.ts"
+    },
+    {
+      "id": "VERIFY-KIN-001",
+      "category": "kinematics",
+      "title": "传动比与方向检查",
+      "critical": true,
+      "status": "pass",
+      "method": "自动遍历全部齿数组合和双向输入，验证 n1 × z1 = -n2 × z2",
+      "evidence": "scripts/gear-math-check.ts"
+    },
+    {
+      "id": "VERIFY-GEO-002",
+      "category": "geometry",
+      "title": "全参数组合实体干涉检查",
+      "critical": true,
+      "status": "pending",
+      "method": "计划将生成齿廓导出到独立 CAD/几何内核，进行完整转动周期的实体布尔干涉扫描",
+      "notes": "当前网页视觉检查不能替代独立几何内核验证"
+    },
+    {
+      "id": "VERIFY-CONTENT-001",
+      "category": "content",
+      "title": "关键结论来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "所有已登记关键结论必须绑定至少一个技术来源",
+      "evidence": "scripts/quality-check.mjs"
+    },
+    {
+      "id": "VERIFY-VISUAL-001",
+      "category": "visual",
+      "title": "桌面端交互检查",
+      "critical": false,
+      "status": "pass",
+      "method": "检查旋转、缩放、暂停、重置、标签和基准几何显示",
+      "evidence": "内部人工检查记录"
+    },
+    {
+      "id": "VERIFY-PERF-001",
+      "category": "performance",
+      "title": "生产构建检查",
+      "critical": true,
+      "status": "pass",
+      "method": "TypeScript 严格检查和 Vite 生产构建",
+      "evidence": "npm run verify"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-MODEL-001",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械设计或齿轮专业审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待独立专业人员核对齿廓、齿根简化、啮合相位和适用边界"
+    },
+    {
+      "id": "REVIEW-CONTENT-001",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立机械专业内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待独立审核术语、公式、失效描述和维护建议"
+    },
+    {
+      "id": "REVIEW-INTEGRATION-001",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-15",
+      "independent": false,
+      "notes": "已完成代码结构、状态同步、构建和基本交互检查；不代表机械专业审核"
+    }
+  ]
+}

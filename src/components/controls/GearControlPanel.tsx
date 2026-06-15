@@ -69,7 +69,7 @@ export function GearControlPanel() {
         <RangeField
           label="主动轮齿数"
           value={driverTeeth}
-          min={17}
+          min={18}
           max={48}
           suffix="齿"
           onChange={setDriverTeeth}
@@ -77,7 +77,7 @@ export function GearControlPanel() {
         <RangeField
           label="从动轮齿数"
           value={drivenTeeth}
-          min={17}
+          min={18}
           max={48}
           suffix="齿"
           onChange={setDrivenTeeth}
@@ -98,9 +98,9 @@ export function GearControlPanel() {
           type="button"
           className={showPitchCircles ? "is-active" : ""}
           onClick={togglePitchCircles}
-          title="显示或隐藏节圆"
+          title="显示或隐藏齿根圆、基圆、节圆、齿顶圆与作用线"
         >
-          <CircleDashed size={16} /> 节圆
+          <CircleDashed size={16} /> 基准几何
         </button>
         <button
           type="button"

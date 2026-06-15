@@ -57,7 +57,9 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
                     className={`catalog-item ${active ? "is-active" : ""}`}
                     disabled={item.status === "planned"}
                     title={
-                      item.status === "planned" ? "该实验将在后续版本开放" : item.title
+                      item.status === "planned"
+                        ? "该实验尚未进入模型与内容审核"
+                        : item.title
                     }
                   >
                     <span className="catalog-item-icon">
@@ -67,11 +69,13 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
                       <strong>{item.title}</strong>
                       <small>{item.subtitle}</small>
                     </span>
-                    {item.status === "planned" ? (
+                    {item.status === "planned" && (
                       <span className="planned-badge">规划中</span>
-                    ) : (
-                      <ChevronRight size={16} />
                     )}
+                    {item.status === "preview" && (
+                      <span className="review-badge">审查中</span>
+                    )}
+                    {item.status === "released" && <ChevronRight size={16} />}
                   </button>
                 );
               })}
@@ -88,8 +92,8 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
       </div>
 
       <div className="sidebar-footnote">
-        <span className="status-dot" />
-        当前为基础框架版本，可继续接入 GLB 模型、动画与课程内容。
+        <span className="status-dot status-dot-review" />
+        当前齿轮实验为公开预览版。独立模型审核、内容审核和实体干涉扫描完成前，不标记为正式发布。
       </div>
     </aside>
   );

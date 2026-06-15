@@ -6,6 +6,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   getCenterDistance,
   getDrivenRpm,
+  getExternalMeshPhaseOffset,
   rpmToRadiansPerSecond,
 } from "../../lib/gearMath";
 import { useGearLabStore } from "../../store/useGearLabStore";
@@ -46,7 +47,7 @@ function GearPair() {
     }
 
     if (drivenRef.current) {
-      const phaseOffset = Math.PI / drivenTeeth;
+      const phaseOffset = getExternalMeshPhaseOffset(drivenTeeth);
       drivenRef.current.rotation.y =
         -driverAngle.current * (driverTeeth / drivenTeeth) + phaseOffset;
     }

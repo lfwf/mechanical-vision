@@ -1,25 +1,24 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { Quaternion, Vector3, type Group, type Mesh } from "three";
+import { Vector3, type Group, type Mesh } from "three";
 import { rpmToRadiansPerSecond } from "../../lib/gearMath";
 import { useExperimentStore } from "../../store/useExperimentStore";
 import { ExperimentCanvas, SceneLabel } from "./ExperimentCanvas";
 
-const UP = new Vector3(0, 1, 0);
-
-function alignRod(mesh: Mesh, start: Vector3, end: Vector3) {
-  const direction = end.clone().sub(start);
-  const length = direction.length();
-  mesh.position.copy(start.clone().add(end).multiplyScalar(0.5));
-  mesh.quaternion.copy(new Quaternion().setFromUnitVectors(UP, direction.normalize()));
-  mesh.scale.set(1, length, 1);
-}
+const ORIGIN_X = -2.8;
+const ROD_PLANE_Y = 0.48;
+const crankPoint = new Vector3();
+const sliderPoint = new Vector3();
+const midpoint = new Vector3();
 
 function SliderCrankMechanism() {
   const crankRef = useRef<Group>(null);
   const sliderRef = useRef<Group>(null);
-  const rodRef = useRef<Mesh>(null);
+  const rodBodyRef = useRef<Mesh>(null);
+  const rodEyeARef = useRef<Group>(null);
+  const rodEyeBRef = useRef<Group>(null);
   const angle = useRef(0);
+
   const speed = useExperimentStore((state) => state.speed);
   const radius = useExperimentStore((state) => state.primary);
   const lengthRatio = useExperimentStore((state) => state.secondary);
@@ -28,77 +27,103 @@ function SliderCrankMechanism() {
   const rodLength = radius * lengthRatio;
 
   useFrame((_, delta) => {
-    if (isPlaying) {
-      angle.current += rpmToRadiansPerSecond(speed * direction) * delta;
-    }
-    const crankPin = new Vector3(
-      radius * Math.cos(angle.current),
-      0,
-      -radius * Math.sin(angle.current),
-    );
-    const sliderX = crankPin.x + Math.sqrt(Math.max(rodLength ** 2 - crankPin.z ** 2, 0));
-    const sliderPin = new Vector3(sliderX, 0, 0);
+    if (isPlaying) angle.current += rpmToRadiansPerSecond(speed * direction) * delta;
+
+    const cos = Math.cos(angle.current);
+    const sin = Math.sin(angle.current);
+    crankPoint.set(ORIGIN_X + radius * cos, ROD_PLANE_Y, -radius * sin);
+    const sliderX = crankPoint.x + Math.sqrt(Math.max(rodLength ** 2 - crankPoint.z ** 2, 0));
+    sliderPoint.set(sliderX, ROD_PLANE_Y, 0);
 
     if (crankRef.current) crankRef.current.rotation.y = angle.current;
     if (sliderRef.current) sliderRef.current.position.x = sliderX;
-    if (rodRef.current) alignRod(rodRef.current, crankPin, sliderPin);
+
+    const dx = sliderPoint.x - crankPoint.x;
+    const dz = sliderPoint.z - crankPoint.z;
+    const currentLength = Math.hypot(dx, dz);
+    midpoint.copy(crankPoint).add(sliderPoint).multiplyScalar(0.5);
+
+    if (rodBodyRef.current) {
+      rodBodyRef.current.position.copy(midpoint);
+      rodBodyRef.current.rotation.set(0, -Math.atan2(dz, dx), 0);
+      rodBodyRef.current.scale.set(currentLength, 1, 1);
+    }
+    if (rodEyeARef.current) rodEyeARef.current.position.copy(crankPoint);
+    if (rodEyeBRef.current) rodEyeBRef.current.position.copy(sliderPoint);
   });
 
   return (
-    <group position={[-2.3, 0, 0]}>
-      <group ref={crankRef}>
-        <mesh castShadow receiveShadow>
-          <cylinderGeometry args={[radius * 0.72, radius * 0.72, 0.34, 64]} />
-          <meshStandardMaterial color="#c58c3b" metalness={0.7} roughness={0.23} />
+    <group>
+      <group ref={crankRef} position={[ORIGIN_X, 0, 0]}>
+        <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.42, 0.42, 0.72, 48]} />
+          <meshStandardMaterial color="#405459" metalness={0.82} roughness={0.18} />
         </mesh>
-        <mesh position={[radius, 0, 0]} castShadow>
-          <cylinderGeometry args={[0.19, 0.19, 0.78, 32]} />
-          <meshStandardMaterial color="#3c5055" metalness={0.82} roughness={0.18} />
+        <mesh position={[radius / 2, 0.06, 0]} castShadow>
+          <boxGeometry args={[radius, 0.28, 0.38]} />
+          <meshStandardMaterial color="#bd8435" metalness={0.67} roughness={0.24} />
         </mesh>
-        <mesh position={[radius / 2, 0, 0]}>
-          <boxGeometry args={[radius, 0.22, 0.2]} />
-          <meshStandardMaterial color="#a97836" metalness={0.65} roughness={0.25} />
+        <mesh position={[-0.42, 0.04, 0]} castShadow>
+          <cylinderGeometry args={[0.58, 0.58, 0.3, 56]} />
+          <meshStandardMaterial color="#9a6a2c" metalness={0.64} roughness={0.26} />
+        </mesh>
+        <mesh position={[radius, ROD_PLANE_Y / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.2, 0.2, ROD_PLANE_Y + 0.45, 36]} />
+          <meshStandardMaterial color="#32494e" metalness={0.84} roughness={0.17} />
         </mesh>
       </group>
 
-      <mesh ref={rodRef} castShadow receiveShadow>
-        <cylinderGeometry args={[0.14, 0.14, 1, 32]} />
-        <meshStandardMaterial color="#648f99" metalness={0.64} roughness={0.25} />
+      <mesh ref={rodBodyRef} castShadow receiveShadow>
+        <boxGeometry args={[1, 0.18, 0.34]} />
+        <meshStandardMaterial color="#6795a0" metalness={0.62} roughness={0.24} />
       </mesh>
+      <group ref={rodEyeARef}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <torusGeometry args={[0.27, 0.08, 18, 48]} />
+          <meshStandardMaterial color="#5e8790" metalness={0.68} roughness={0.22} />
+        </mesh>
+      </group>
+      <group ref={rodEyeBRef}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <torusGeometry args={[0.27, 0.08, 18, 48]} />
+          <meshStandardMaterial color="#5e8790" metalness={0.68} roughness={0.22} />
+        </mesh>
+      </group>
 
       <group ref={sliderRef}>
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[1.1, 0.85, 1.25]} />
-          <meshStandardMaterial color="#507d87" metalness={0.48} roughness={0.3} />
+        <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
+          <boxGeometry args={[1.2, 0.78, 1.35]} />
+          <meshStandardMaterial color="#4f7d87" metalness={0.48} roughness={0.3} />
         </mesh>
-        <mesh>
-          <cylinderGeometry args={[0.19, 0.19, 1.5, 32]} />
-          <meshStandardMaterial color="#3e5054" metalness={0.82} roughness={0.18} />
+        <mesh position={[0, ROD_PLANE_Y / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.2, 0.2, ROD_PLANE_Y + 0.46, 36]} />
+          <meshStandardMaterial color="#334b50" metalness={0.84} roughness={0.17} />
         </mesh>
       </group>
 
-      <mesh position={[3.2, -0.72, 0]} receiveShadow>
-        <boxGeometry args={[8.6, 0.3, 1.65]} />
-        <meshStandardMaterial color="#354c50" metalness={0.35} roughness={0.42} />
+      <mesh position={[1.6, -0.8, 0]} receiveShadow>
+        <boxGeometry args={[10.6, 0.3, 2.05]} />
+        <meshStandardMaterial color="#344b4f" metalness={0.35} roughness={0.42} />
       </mesh>
-      <mesh position={[3.2, -0.4, 0.72]}>
-        <boxGeometry args={[8.6, 0.22, 0.18]} />
-        <meshStandardMaterial color="#778683" metalness={0.45} roughness={0.34} />
+      <mesh position={[1.6, -0.45, 0.83]}>
+        <boxGeometry args={[10.6, 0.18, 0.18]} />
+        <meshStandardMaterial color="#7a8986" metalness={0.45} roughness={0.34} />
       </mesh>
-      <mesh position={[3.2, -0.4, -0.72]}>
-        <boxGeometry args={[8.6, 0.22, 0.18]} />
-        <meshStandardMaterial color="#778683" metalness={0.45} roughness={0.34} />
+      <mesh position={[1.6, -0.45, -0.83]}>
+        <boxGeometry args={[10.6, 0.18, 0.18]} />
+        <meshStandardMaterial color="#7a8986" metalness={0.45} roughness={0.34} />
       </mesh>
 
-      <SceneLabel position={[0, 1.7, 0]}>曲柄 · r = {radius.toFixed(1)}</SceneLabel>
-      <SceneLabel position={[3.7, 1.5, 0]}>滑块 · 往复直线运动</SceneLabel>
+      <SceneLabel position={[ORIGIN_X, 1.65, 0]}>曲柄与配重 · 独立轴向层</SceneLabel>
+      <SceneLabel position={[2.7, 1.5, 0]}>连杆</SceneLabel>
+      <SceneLabel position={[5.3, 1.5, 0]}>滑块 · 仅沿导轨移动</SceneLabel>
     </group>
   );
 }
 
 export default function SliderCrankScene() {
   return (
-    <ExperimentCanvas camera={[8, 6, 11]} target={[1.3, 0, 0]} gridY={-0.9} shadowY={-0.85}>
+    <ExperimentCanvas camera={[8.8, 6.2, 11.8]} target={[1.1, 0, 0]} gridY={-1} shadowY={-0.95} minDistance={7} maxDistance={20}>
       <SliderCrankMechanism />
     </ExperimentCanvas>
   );

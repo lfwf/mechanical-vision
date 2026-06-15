@@ -30,8 +30,12 @@ export function ExperimentControlPanel() {
   const requestCameraReset = useExperimentStore((state) => state.requestCameraReset);
   const resetCurrentExperiment = useExperimentStore((state) => state.resetCurrentExperiment);
   const definition = getExperimentDefinition(activeId);
+  const visibleControls = definition.controls.filter(
+    (control) =>
+      !control.visibleWhenVariants || control.visibleWhenVariants.includes(variant),
+  );
   const hasSpeed = definition.controls.some((control) => control.key === "speed");
-
+  const showDirection = hasSpeed && definition.showDirectionControl !== false;
   const runtimeValues = { speed, primary, secondary };
 
   return (
@@ -44,12 +48,16 @@ export function ExperimentControlPanel() {
             onClick={togglePlaying}
             aria-label={isPlaying ? "暂停机构" : "播放机构"}
           >
-            {isPlaying ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" />}
+            {isPlaying ? (
+              <Pause size={19} fill="currentColor" />
+            ) : (
+              <Play size={19} fill="currentColor" />
+            )}
             <span>{isPlaying ? "暂停" : "播放"}</span>
           </button>
         )}
 
-        {hasSpeed && (
+        {showDirection && (
           <div className="direction-control">
             <span>输入方向</span>
             <div className="segmented-control">
@@ -90,8 +98,8 @@ export function ExperimentControlPanel() {
         )}
       </div>
 
-      <div className={`control-sliders control-count-${definition.controls.length}`}>
-        {definition.controls.map((control) => (
+      <div className={`control-sliders control-count-${visibleControls.length}`}>
+        {visibleControls.map((control) => (
           <RangeField
             key={control.key}
             label={control.label}
@@ -125,7 +133,11 @@ export function ExperimentControlPanel() {
         <button type="button" onClick={requestCameraReset} title="重置相机视角">
           <ScanLine size={16} /> 视角
         </button>
-        <button type="button" onClick={resetCurrentExperiment} title="恢复当前实验默认参数">
+        <button
+          type="button"
+          onClick={resetCurrentExperiment}
+          title="恢复当前实验默认参数"
+        >
           <RotateCcw size={16} /> 重置
         </button>
       </div>

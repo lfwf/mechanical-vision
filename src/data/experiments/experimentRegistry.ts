@@ -2,6 +2,7 @@ import type { ExperimentDefinition, ExperimentId, ExperimentRuntimeValues } from
 import { componentsDefinitions } from "./definitions/components";
 import { fluidDefinitions } from "./definitions/fluid";
 import { motionDefinitions } from "./definitions/motion";
+import { thermalDefinitions } from "./definitions/thermal";
 import { transmissionDefinitions } from "./definitions/transmission";
 
 const definitions = {
@@ -9,6 +10,7 @@ const definitions = {
   ...motionDefinitions,
   ...fluidDefinitions,
   ...componentsDefinitions,
+  ...thermalDefinitions,
 } as Record<ExperimentId, ExperimentDefinition>;
 
 export const experimentDefinitions = definitions;

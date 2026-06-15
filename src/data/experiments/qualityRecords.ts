@@ -1,3 +1,4 @@
+import airConditionerJson from "./air-conditioner.quality.json";
 import bearingJson from "./bearing.quality.json";
 import camJson from "./cam.quality.json";
 import pumpJson from "./centrifugal-pump.quality.json";
@@ -21,6 +22,7 @@ const records: Record<ExperimentId, ExperimentQualityRecord> = {
   valves: valvesJson as ExperimentQualityRecord,
   bearing: bearingJson as ExperimentQualityRecord,
   seal: sealJson as ExperimentQualityRecord,
+  "air-conditioner": airConditionerJson as ExperimentQualityRecord,
 };
 
 export function getExperimentQuality(id: ExperimentId): ExperimentQualityRecord {

@@ -46,7 +46,7 @@ export function App() {
               <GearScene />
             </Suspense>
             <div className="scene-tip">
-              拖拽旋转 · 滚轮缩放 · 红线为作用线 · 红点为代表性接触点
+              拖拽旋转 · 滚轮缩放 · 点击齿轮查看对应说明
             </div>
           </div>
 

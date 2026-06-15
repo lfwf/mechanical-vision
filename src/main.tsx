@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./styles.css";
 import "./quality-styles.css";
+import "./readability-fixes.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

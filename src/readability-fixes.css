@@ -1,0 +1,440 @@
+/* Information panel readability and independent scrolling */
+
+@media (min-width: 981px) {
+  .app-shell {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .workspace {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .info-panel {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+  }
+}
+
+.info-panel-fixed {
+  flex: 0 0 auto;
+  padding: 18px 16px 13px;
+  background: rgba(249, 248, 242, 0.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+}
+
+.info-panel-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: rgba(41, 85, 91, 0.48) rgba(52, 76, 76, 0.06);
+  padding: 2px 16px 24px;
+}
+
+.info-panel-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.info-panel-scroll::-webkit-scrollbar-track {
+  background: rgba(52, 76, 76, 0.05);
+  border-radius: 999px;
+}
+
+.info-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(41, 85, 91, 0.42);
+  border: 2px solid rgba(249, 248, 242, 0.8);
+  border-radius: 999px;
+}
+
+.info-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 73, 80, 0.62);
+}
+
+/* Right panel typography: no essential text below a comfortable reading size. */
+.info-panel .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.info-panel h2 {
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.info-panel .live-badge {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.info-view-tabs {
+  gap: 5px;
+  margin-top: 14px;
+  padding: 4px;
+}
+
+.info-view-tabs button {
+  min-height: 40px;
+  gap: 6px;
+  padding: 8px 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.metric-grid {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.metric-card {
+  min-height: 106px;
+  gap: 7px 8px;
+  padding: 14px;
+}
+
+.metric-card span {
+  font-size: 12px;
+}
+
+.metric-card strong {
+  font-size: 27px;
+  line-height: 1.1;
+}
+
+.metric-card small {
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.direction-flow {
+  grid-template-columns: 1fr 82px 1fr;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 13px 10px;
+}
+
+.direction-node span,
+.direction-node small,
+.direction-link small {
+  font-size: 10.5px;
+}
+
+.direction-node strong {
+  font-size: 14px;
+}
+
+.teaching-summary,
+.part-explanation,
+.formula-card {
+  margin-top: 16px;
+  padding-top: 15px;
+}
+
+.section-title-row {
+  gap: 8px;
+}
+
+.section-title-row h3,
+.part-explanation h3 {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.teaching-summary p,
+.part-explanation p {
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.part-tabs {
+  gap: 4px;
+  margin-top: 16px;
+  padding: 4px;
+}
+
+.part-tabs button {
+  min-height: 36px;
+  padding: 7px 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.part-explanation > span,
+.formula-card > span {
+  font-size: 10px;
+}
+
+.part-explanation h3 {
+  margin-top: 6px;
+  font-size: 17px;
+}
+
+.part-explanation ul {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.part-explanation li {
+  padding-left: 15px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.formula-card {
+  padding: 14px;
+}
+
+.formula-line {
+  margin-top: 9px;
+  font-size: 19px;
+}
+
+.formula-card small {
+  margin-top: 8px;
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.scope-warning {
+  padding: 10px 11px;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+
+.knowledge-view,
+.quality-view {
+  margin-top: 14px;
+}
+
+.knowledge-intro {
+  padding: 14px;
+}
+
+.knowledge-intro p,
+.knowledge-section p,
+.quality-view p {
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+.source-chip-row {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.source-chip {
+  padding: 4px 7px;
+  font-size: 9.5px;
+}
+
+.knowledge-sections {
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.knowledge-section summary {
+  gap: 5px;
+  padding: 13px;
+}
+
+.knowledge-section summary span {
+  font-size: 14px;
+}
+
+.knowledge-section summary small {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.knowledge-items {
+  gap: 10px;
+  padding: 0 12px 12px;
+}
+
+.knowledge-items article {
+  padding: 12px;
+}
+
+.knowledge-items h4 {
+  font-size: 13px;
+}
+
+.knowledge-items p {
+  margin-top: 7px;
+}
+
+.knowledge-source-index {
+  margin-top: 16px;
+  padding-top: 15px;
+}
+
+.knowledge-source-index h3,
+.quality-section h3 {
+  font-size: 14px;
+}
+
+.knowledge-source-index li {
+  gap: 5px;
+  padding: 11px 0;
+}
+
+.knowledge-source-index li strong {
+  font-size: 10px;
+}
+
+.knowledge-source-index li span,
+.knowledge-source-index li small,
+.knowledge-source-index li a {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.release-gate-card {
+  padding: 14px;
+}
+
+.release-gate-card > div {
+  font-size: 11px;
+}
+
+.release-gate-card strong {
+  margin-top: 7px;
+  font-size: 17px;
+}
+
+.release-gate-card p {
+  margin-top: 7px;
+}
+
+.quality-section {
+  margin-top: 16px;
+  padding-top: 15px;
+}
+
+.quality-definition-list {
+  gap: 10px;
+  margin-top: 11px;
+}
+
+.quality-definition-list div {
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.quality-definition-list dt {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.quality-definition-list dd {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.quality-two-column {
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.quality-two-column > div {
+  padding: 11px;
+}
+
+.quality-list-label {
+  padding: 4px 7px;
+  font-size: 10px;
+}
+
+.quality-two-column li,
+.limitation-card li,
+.blocker-card li {
+  margin-top: 8px;
+  padding-left: 14px;
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.limitation-card,
+.blocker-card {
+  padding: 13px;
+}
+
+.verification-heading span {
+  font-size: 10px;
+}
+
+.verification-list,
+.review-list {
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.verification-item,
+.review-list article {
+  padding: 12px;
+}
+
+.verification-item strong,
+.review-list strong {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.verification-item > span,
+.review-decision {
+  margin-top: 7px;
+  padding: 3px 7px;
+  font-size: 9px;
+}
+
+.verification-item p,
+.review-list p {
+  margin-top: 8px;
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.verification-item small,
+.review-list small {
+  margin-top: 7px;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .info-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .info-panel-scroll {
+    overflow: visible;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .info-panel-fixed,
+  .info-panel-scroll {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .metric-card strong {
+    font-size: 24px;
+  }
+}

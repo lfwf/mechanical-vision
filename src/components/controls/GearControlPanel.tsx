@@ -98,7 +98,7 @@ export function GearControlPanel() {
           type="button"
           className={showPitchCircles ? "is-active" : ""}
           onClick={togglePitchCircles}
-          title="显示或隐藏齿根圆、基圆、节圆、齿顶圆与作用线"
+          title="显示或隐藏齿根圆、基圆、节圆和齿顶圆"
         >
           <CircleDashed size={16} /> 基准几何
         </button>

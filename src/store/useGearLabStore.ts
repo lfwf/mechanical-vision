@@ -53,7 +53,7 @@ export const useGearLabStore = create<GearLabState>((set) => ({
   setDrivenTeeth: (drivenTeeth) =>
     set({ drivenTeeth: normalizeTeeth(drivenTeeth) }),
   setInputRpm: (inputRpm) =>
-    set({ inputRpm: Math.min(240, Math.max(20, inputRpm)) }),
+    set({ inputRpm: Math.min(240, Math.max(1, inputRpm)) }),
   setInputDirection: (inputDirection) => set({ inputDirection }),
   togglePlaying: () => set((state) => ({ isPlaying: !state.isPlaying })),
   selectPart: (selectedPartId) => set({ selectedPartId }),

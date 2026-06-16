@@ -38,48 +38,51 @@ export function RealisticAxialFan({ fanRef }: { fanRef: React.RefObject<Group | 
       </mesh>
       <mesh position={[0, 0, -0.1]}>
         <torusGeometry args={[FAN_TIP_RADIUS + 0.04, 0.012, 8, 80]} />
-        <meshStandardMaterial color="#4b5657" transparent opacity={0.18} depthWrite={false} />
+        <meshStandardMaterial color="#4b5657" transparent opacity={0.12} depthWrite={false} />
       </mesh>
     </group>
   );
 }
 
-export function RealisticFrontGrille() {
+export function RealisticFrontGrille({ opacity = 1 }: { opacity?: number }) {
   const radius = GRILLE_CLEAR_RADIUS;
-  const horizontalBars = useMemo(() => Array.from({ length: 23 }, (_, index) => -1.18 + index * 0.107), []);
-  const verticalBars = useMemo(() => [-0.94, -0.63, -0.31, 0, 0.31, 0.63, 0.94], []);
+  const transparent = opacity < 0.99;
+  const frameOpacity = transparent ? Math.max(0.32, opacity) : 1;
+  const barOpacity = transparent ? Math.max(0.12, opacity * 0.82) : 1;
+  const horizontalBars = useMemo(() => Array.from({ length: 21 }, (_, index) => -1.16 + index * 0.116), []);
+  const verticalBars = useMemo(() => [-0.92, -0.61, -0.3, 0, 0.3, 0.61, 0.92], []);
 
   return (
-    <group>
-      <mesh position={[0, 1.38, 0]} castShadow><boxGeometry args={[2.92, 0.14, 0.16]} /><meshPhysicalMaterial color="#f1f2ee" roughness={0.34} clearcoat={0.16} /></mesh>
-      <mesh position={[0, -1.38, 0]} castShadow><boxGeometry args={[2.92, 0.14, 0.16]} /><meshPhysicalMaterial color="#f1f2ee" roughness={0.34} clearcoat={0.16} /></mesh>
-      <mesh position={[-1.39, 0, 0]} castShadow><boxGeometry args={[0.14, 2.62, 0.16]} /><meshPhysicalMaterial color="#f1f2ee" roughness={0.34} clearcoat={0.16} /></mesh>
-      <mesh position={[1.39, 0, 0]} castShadow><boxGeometry args={[0.14, 2.62, 0.16]} /><meshPhysicalMaterial color="#f1f2ee" roughness={0.34} clearcoat={0.16} /></mesh>
+    <group renderOrder={13}>
+      <mesh position={[0, 1.38, 0]} castShadow={!transparent}><boxGeometry args={[2.92, 0.12, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
+      <mesh position={[0, -1.38, 0]} castShadow={!transparent}><boxGeometry args={[2.92, 0.12, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
+      <mesh position={[-1.39, 0, 0]} castShadow={!transparent}><boxGeometry args={[0.12, 2.62, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
+      <mesh position={[1.39, 0, 0]} castShadow={!transparent}><boxGeometry args={[0.12, 2.62, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
       <mesh position={[0, 0, -0.015]}>
-        <torusGeometry args={[radius, 0.055, 16, 96]} />
-        <meshStandardMaterial color="#d9ddda" metalness={0.12} roughness={0.4} />
+        <torusGeometry args={[radius, 0.045, 14, 96]} />
+        <meshStandardMaterial color="#cfd6d3" metalness={0.12} roughness={0.4} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
       </mesh>
       {horizontalBars.map((y) => {
         const chord = Math.sqrt(Math.max(0, radius * radius - y * y));
         return (
-          <mesh key={`h-${y}`} position={[0, y, 0.08]} castShadow>
-            <boxGeometry args={[chord * 2, 0.032, 0.045]} />
-            <meshStandardMaterial color="#eceeea" metalness={0.06} roughness={0.38} />
+          <mesh key={`h-${y}`} position={[0, y, 0.08]} castShadow={!transparent}>
+            <boxGeometry args={[chord * 2, 0.022, 0.032]} />
+            <meshStandardMaterial color="#d9dfdc" metalness={0.06} roughness={0.38} transparent={transparent} opacity={barOpacity} depthWrite={!transparent} />
           </mesh>
         );
       })}
       {verticalBars.map((x) => {
         const chord = Math.sqrt(Math.max(0, radius * radius - x * x));
         return (
-          <mesh key={`v-${x}`} position={[x, 0, 0.095]} castShadow>
-            <boxGeometry args={[0.028, chord * 2, 0.05]} />
-            <meshStandardMaterial color="#e5e8e4" metalness={0.08} roughness={0.38} />
+          <mesh key={`v-${x}`} position={[x, 0, 0.095]} castShadow={!transparent}>
+            <boxGeometry args={[0.02, chord * 2, 0.034]} />
+            <meshStandardMaterial color="#d6ddda" metalness={0.08} roughness={0.38} transparent={transparent} opacity={barOpacity} depthWrite={!transparent} />
           </mesh>
         );
       })}
       <mesh position={[0, 0, 0.12]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.13, 0.13, 0.07, 36]} />
-        <meshStandardMaterial color="#dfe3df" metalness={0.12} roughness={0.36} />
+        <cylinderGeometry args={[0.12, 0.12, 0.06, 36]} />
+        <meshStandardMaterial color="#d4dad7" metalness={0.12} roughness={0.36} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
       </mesh>
     </group>
   );

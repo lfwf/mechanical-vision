@@ -11,7 +11,7 @@ export const motionDefinitions = {
     sceneTip: "调整曲柄半径和连杆长度，观察独立轴向层、行程与速度不均匀性",
     precisionLevel: "L2",
     precisionLabel: "运动原理级",
-    defaults: { speed: 60, primary: 1, secondary: 3, variant: 0, direction: -1 },
+    defaults: { speed: 35, primary: 1, secondary: 3, variant: 0, direction: -1 },
     controls: [
       { key: "primary", label: "曲柄半径", min: 0.7, max: 1.4, step: 0.1, suffix: "" },
       { key: "secondary", label: "连杆/曲柄比", min: 2.5, max: 5, step: 0.1, suffix: "" },
@@ -66,7 +66,7 @@ export const motionDefinitions = {
     sceneTip: "改变偏心量，观察滚子升程、导杆运动和弹簧压缩，固定导向件不会穿过凸轮",
     precisionLevel: "L2",
     precisionLabel: "运动原理级",
-    defaults: { speed: 50, primary: 0.45, secondary: 0.28, variant: 0, direction: -1 },
+    defaults: { speed: 30, primary: 0.45, secondary: 0.28, variant: 0, direction: -1 },
     controls: [
       { key: "primary", label: "凸轮偏心量", min: 0.15, max: 0.7, step: 0.05, suffix: "" },
       { key: "secondary", label: "滚子半径", min: 0.18, max: 0.42, step: 0.02, suffix: "" },

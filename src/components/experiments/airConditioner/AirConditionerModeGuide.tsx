@@ -78,9 +78,10 @@ export function AirConditionerModeGuide() {
       <section
         aria-label={`${guide.title}说明`}
         style={{
+          // 底部区域主要是展示台和阴影，把说明卡放这里可避免遮住室内机内部结构。
           position: "absolute",
           left: 18,
-          top: 18,
+          bottom: 18,
           width: 292,
           padding: "14px 15px",
           border: "1px solid rgba(84, 112, 116, 0.24)",
@@ -119,7 +120,7 @@ export function AirConditionerModeGuide() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 10px", marginTop: 10 }}>
           {guide.legend.map((item) => (
             <span key={item.label} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: "#536568" }}>
-              <i style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, boxShadow: `0 0 0 2px ${item.color}22` }} />
+              <i style={{ display: "inline-block", width: 8, height: 8, flex: "0 0 8px", borderRadius: "50%", background: item.color, boxShadow: `0 0 0 2px ${item.color}22` }} />
               {item.label}
             </span>
           ))}

@@ -1,4 +1,4 @@
-/* Shared styles for the additional interactive experiments. */
+/* Shared styles for interactive mechanical and appliance experiments. */
 
 .experiment-scene-label {
   min-width: max-content;
@@ -66,6 +66,82 @@
   grid-template-columns: repeat(2, minmax(180px, 1fr));
 }
 
+.assembly-control-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 11px 12px;
+  background: #edf1eb;
+  border: 1px solid rgba(42, 71, 72, 0.09);
+  border-radius: 11px;
+}
+
+.assembly-selection-copy {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #667573;
+  font-size: 10px;
+}
+
+.assembly-selection-copy strong {
+  overflow: hidden;
+  color: #304e52;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assembly-selection-copy small {
+  padding: 3px 6px;
+  color: #756036;
+  background: #f4e8cd;
+  border-radius: 999px;
+  font-size: 9px;
+}
+
+.assembly-control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.assembly-control-actions button,
+.part-manual-card header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 10px;
+  color: #38585c;
+  background: #f9f8f2;
+  border: 1px solid rgba(47, 76, 77, 0.12);
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.assembly-control-actions button:hover,
+.part-manual-card header button:hover {
+  background: #e2ece7;
+}
+
+.assembly-control-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.info-view-tabs-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .generic-metric-grid .metric-card strong {
   overflow-wrap: anywhere;
 }
@@ -124,6 +200,239 @@
   line-height: 1.6;
 }
 
+.part-manual-view {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.reference-model-card {
+  padding: 14px;
+  background: linear-gradient(145deg, #e8efea, #f6f3e8);
+  border: 1px solid rgba(47, 77, 76, 0.1);
+  border-radius: 12px;
+}
+
+.reference-model-card > span {
+  display: block;
+  color: #84918e;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.reference-model-card strong {
+  display: block;
+  margin-top: 5px;
+  color: #294d52;
+  font-size: 15px;
+}
+
+.reference-model-card small {
+  display: block;
+  margin-top: 3px;
+  color: #6f7e7c;
+  font-size: 10px;
+}
+
+.reference-model-card p {
+  margin: 8px 0 0;
+  color: #5f6f6d;
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.part-picker-section {
+  padding-top: 2px;
+}
+
+.part-picker-group {
+  margin-top: 11px;
+}
+
+.part-picker-group > span {
+  color: #75827f;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.part-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.part-picker-grid button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 7px;
+  min-height: 52px;
+  padding: 8px;
+  color: #60706e;
+  text-align: left;
+  background: rgba(239, 241, 235, 0.72);
+  border: 1px solid rgba(48, 75, 75, 0.08);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.part-picker-grid button i {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: #9a7b3f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.part-picker-grid button span {
+  overflow: hidden;
+  color: #405c5f;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.part-picker-grid button small {
+  color: #87918f;
+  font-size: 9px;
+}
+
+.part-picker-grid button.is-active {
+  background: #dfeae5;
+  border-color: rgba(48, 92, 88, 0.22);
+  box-shadow: inset 3px 0 0 #47736d;
+}
+
+.part-manual-card {
+  padding: 14px;
+  background: #f8f7f0;
+  border: 1px solid rgba(47, 75, 75, 0.11);
+  border-radius: 12px;
+}
+
+.part-manual-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.part-manual-card header span {
+  color: #87918e;
+  font-size: 9px;
+}
+
+.part-manual-card header h3 {
+  margin: 4px 0 0;
+  color: #294e52;
+  font-size: 16px;
+}
+
+.part-manual-summary {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.part-manual-summary > div {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: start;
+  gap: 5px 7px;
+  padding: 9px 10px;
+  background: #edf0e9;
+  border-radius: 9px;
+}
+
+.part-manual-summary span {
+  color: #6c7977;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.part-manual-summary p {
+  grid-column: 2 / 4;
+  margin: 0;
+  color: #526562;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.manual-list {
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px dashed rgba(48, 74, 73, 0.14);
+}
+
+.manual-list > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #456166;
+}
+
+.manual-list h4 {
+  margin: 0;
+  font-size: 12px;
+}
+
+.manual-list ul,
+.manual-list ol {
+  margin: 7px 0 0;
+  padding-left: 20px;
+}
+
+.manual-list li {
+  margin-top: 5px;
+  color: #61706e;
+  font-size: 11px;
+  line-height: 1.58;
+}
+
+.manual-list.is-warning {
+  padding: 10px;
+  background: #f4ead8;
+  border-top: 0;
+  border-radius: 9px;
+}
+
+.part-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+}
+
+.part-source-row > span {
+  color: #788482;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.part-source-row code {
+  padding: 3px 5px;
+  color: #526d70;
+  background: #e8eeea;
+  border-radius: 5px;
+  font-size: 8px;
+}
+
+.part-manual-empty {
+  margin-top: 14px;
+  padding: 16px;
+  color: #71807e;
+  background: #eef1eb;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
 @media (max-width: 1280px) {
   .experiment-control-panel .control-panel-primary {
     width: 100%;
@@ -131,6 +440,15 @@
 
   .experiment-variant-control {
     min-width: 100%;
+  }
+
+  .assembly-control-strip {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .assembly-control-actions {
+    justify-content: flex-start;
   }
 }
 
@@ -140,9 +458,13 @@
     grid-template-columns: 1fr;
   }
 
+  .experiment-variant-options,
+  .part-picker-grid {
+    grid-template-columns: 1fr;
+  }
+
   .experiment-variant-options {
     display: grid;
-    grid-template-columns: 1fr;
   }
 
   .experiment-variant-options button {
@@ -151,5 +473,19 @@
 
   .experiment-scene-label {
     font-size: 10px;
+  }
+
+  .info-view-tabs-4 button {
+    gap: 3px;
+    font-size: 11px;
+  }
+
+  .assembly-selection-copy {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .assembly-selection-copy small {
+    grid-column: 2 / 4;
+    justify-self: start;
   }
 }

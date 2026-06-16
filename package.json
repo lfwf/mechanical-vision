@@ -1,15 +1,16 @@
 {
   "name": "mechanical-vision",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "check": "tsc -b --pretty false",
     "quality:check": "node scripts/quality-check.mjs",
     "mechanics:check": "node --experimental-strip-types scripts/gear-math-check.ts",
+    "appliance:check": "node --experimental-strip-types scripts/appliance-structure-check.ts",
     "build": "tsc -b && vite build",
-    "verify": "npm run quality:check && npm run mechanics:check && npm run check && npm run build",
+    "verify": "npm run quality:check && npm run mechanics:check && npm run appliance:check && npm run check && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {

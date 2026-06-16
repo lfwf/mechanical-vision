@@ -73,9 +73,7 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
                       <strong>{item.title}</strong>
                       <small>{item.subtitle}</small>
                     </span>
-                    {item.status === "preview" && (
-                      <span className="review-badge">预览</span>
-                    )}
+                    {item.status === "preview" && <span className="review-badge">预览</span>}
                     {item.status === "released" && <ChevronRight size={16} />}
                   </button>
                 );
@@ -94,7 +92,7 @@ export function CatalogSidebar({ query, onQueryChange }: CatalogSidebarProps) {
 
       <div className="sidebar-footnote">
         <span className="status-dot status-dot-review" />
-        9 个实验均可交互查看。未完成独立模型与内容审核的实验统一标记为预览版，不作为工程设计依据。
+        {allItems.length} 个实验均可交互查看。未完成独立模型与内容审核的实验统一标记为预览版，不作为工程设计或维修依据。
       </div>
     </aside>
   );

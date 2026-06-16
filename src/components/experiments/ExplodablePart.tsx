@@ -12,7 +12,15 @@ interface ExplodablePartProps extends PropsWithChildren {
   rotation?: [number, number, number];
 }
 
-export function ExplodablePart({ id, home, exploded, assemblyEnabled, selectionRadius = 0.55, rotation = [0, 0, 0], children }: ExplodablePartProps) {
+export function ExplodablePart({
+  id,
+  home,
+  exploded,
+  assemblyEnabled,
+  selectionRadius = 0.55,
+  rotation = [0, 0, 0],
+  children,
+}: ExplodablePartProps) {
   const groupRef = useRef<Group>(null);
   const selectedPartId = useExperimentStore((state) => state.selectedPartId);
   const detached = useExperimentStore((state) => state.detachedPartIds.includes(id));
@@ -21,8 +29,9 @@ export function ExplodablePart({ id, home, exploded, assemblyEnabled, selectionR
   const target = assemblyEnabled && detached ? exploded : home;
   const selected = selectedPartId === id;
   const showIndicator = assemblyEnabled && (selected || blocked);
-  const indicatorRadius = Math.min(Math.max(selectionRadius * 0.58, 0.24), 1.15);
-  const indicatorTube = Math.min(Math.max(indicatorRadius * 0.018, 0.01), 0.024);
+
+  const indicatorRadius = Math.min(Math.max(selectionRadius * 0.42, 0.18), 0.78);
+  const indicatorTube = Math.min(Math.max(indicatorRadius * 0.015, 0.008), 0.017);
   const indicatorColor = blocked ? "#d98962" : "#55c2cd";
 
   useEffect(() => {
@@ -40,13 +49,48 @@ export function ExplodablePart({ id, home, exploded, assemblyEnabled, selectionR
   });
 
   return (
-    <group ref={groupRef} rotation={rotation} onClick={(event) => { event.stopPropagation(); selectPart(id); }} onPointerOver={(event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = "default"; }}>
+    <group
+      ref={groupRef}
+      rotation={rotation}
+      onClick={(event) => {
+        event.stopPropagation();
+        selectPart(id);
+      }}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = "default";
+      }}
+    >
       {children}
-      {showIndicator && <group renderOrder={30}>
-        <mesh><torusGeometry args={[indicatorRadius, indicatorTube, 10, 64]} /><meshBasicMaterial color={indicatorColor} transparent opacity={0.82} depthWrite={false} depthTest={false} toneMapped={false} /></mesh>
-        <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[indicatorRadius, indicatorTube, 10, 64]} /><meshBasicMaterial color={indicatorColor} transparent opacity={0.48} depthWrite={false} depthTest={false} toneMapped={false} /></mesh>
-        <mesh><sphereGeometry args={[indicatorRadius * 0.06, 16, 12]} /><meshBasicMaterial color={blocked ? "#ffd0b6" : "#b9f1f5"} transparent opacity={0.9} depthWrite={false} depthTest={false} toneMapped={false} /></mesh>
-      </group>}
+      {showIndicator && (
+        <group renderOrder={30}>
+          <mesh>
+            <torusGeometry args={[indicatorRadius, indicatorTube, 10, 48]} />
+            <meshBasicMaterial
+              color={indicatorColor}
+              transparent
+              opacity={0.68}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[indicatorRadius * 0.045, 12, 10]} />
+            <meshBasicMaterial
+              color={blocked ? "#ffd0b6" : "#b9f1f5"}
+              transparent
+              opacity={0.82}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      )}
     </group>
   );
 }

@@ -7,7 +7,7 @@ import { GearControlPanel } from "./components/controls/GearControlPanel";
 import { ExperimentSceneRouter } from "./components/experiments/ExperimentSceneRouter";
 import { InfoPanel } from "./components/info/InfoPanel";
 import { ExperimentQualityBadge } from "./components/quality/ExperimentQualityBadge";
-import { TimeTravelPage } from "./components/timeTravel/TimeTravelPage";
+import { TimeTravelPage } from "./components/timeTravel/TimeTravelEntry";
 import { getExperimentDefinition } from "./data/experiments/experimentRegistry";
 import { useExperimentStore } from "./store/useExperimentStore";
 
@@ -25,7 +25,6 @@ export function App() {
   return (
     <div className={activeSection === "mechanics" ? "app-shell" : "app-shell city-app-shell"}>
       <AppHeader query={catalogQuery} onQueryChange={setCatalogQuery} activeSection={activeSection} onSectionChange={setActiveSection} />
-
       {activeSection === "city" ? (
         <SenjerCityPage />
       ) : activeSection === "time-travel" ? (
@@ -39,11 +38,7 @@ export function App() {
               <div className="lab-toolbar-actions"><ExperimentQualityBadge experimentId={activeExperimentId} /><div className="lab-mode"><span className="lab-mode-dot" />交互实验模式</div></div>
             </div>
             <div className="scene-shell">
-              {activeExperimentId === "gear-pair" ? (
-                <Suspense fallback={<div className="scene-loading"><span />正在加载 3D 实验室…</div>}><GearScene /></Suspense>
-              ) : (
-                <ExperimentSceneRouter id={activeExperimentId} />
-              )}
+              {activeExperimentId === "gear-pair" ? <Suspense fallback={<div className="scene-loading"><span />正在加载 3D 实验室…</div>}><GearScene /></Suspense> : <ExperimentSceneRouter id={activeExperimentId} />}
               <div className="scene-tip">{definition.sceneTip}</div>
             </div>
             {activeExperimentId === "gear-pair" ? <GearControlPanel /> : <ExperimentControlPanel />}

@@ -19,11 +19,11 @@ const letterSegments: Record<SenjerLetter, Segment[]> = {
   R: [vertical(-0.32, 0, 0.88), horizontal(0.36, 0.7), horizontal(0, 0.7), vertical(0.3, 0.2, 0.42), { position: [0.12, -0.22, 0], size: [0.16, 0.52, 0.18], rotation: [0, 0, -0.62] }],
 };
 
-interface LetterProductProps extends ThreeElements["group"] {
+type LetterProductProps = ThreeElements["group"] & {
   letter: SenjerLetter;
   color?: string;
   glow?: boolean;
-}
+};
 
 export function LetterProduct({ letter, color = "#8fc7e8", glow = false, ...groupProps }: LetterProductProps) {
   return (

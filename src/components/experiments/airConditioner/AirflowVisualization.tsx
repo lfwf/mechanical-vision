@@ -3,7 +3,7 @@ import { SceneLabel } from "../ExperimentCanvas";
 import { FlowArrow, TubePath } from "../ScenePrimitives";
 import { AnimatedFlowParticles, type FlowPoint } from "./AnimatedFlowParticles";
 
-const INDOOR_AIR_PATHS: FlowPoint[][] = [-6.25, -5.25, -4.2, -3.15, -2.2].map((x) => [
+const INDOOR_AIR_PATHS: FlowPoint[][] = [-6.25, -5.25, -4.2, -3.15, -2.2].map((x): FlowPoint[] => [
   [x, 3.08, 0.92],
   [x, 2.35, 0.82],
   [x, 1.82, 0.62],
@@ -36,18 +36,11 @@ export function AirflowVisualization() {
     <>
       <TubePath points={INDOOR_GUIDE} color="#73bfe2" radius={0.026} opacity={0.22} />
       <TubePath points={OUTDOOR_GUIDE} color="#d88665" radius={0.026} opacity={0.2} />
-
       <AnimatedFlowParticles active paths={INDOOR_AIR_PATHS} startColor="#dca06a" endColor="#55b7e6" countPerPath={9} size={0.06} speedMultiplier={1.05} />
       <AnimatedFlowParticles active paths={OUTDOOR_REAR_AIR_PATHS} startColor="#6fa9b8" endColor="#e17855" countPerPath={8} size={0.06} speedMultiplier={0.92} />
       <AnimatedFlowParticles active paths={OUTDOOR_SIDE_AIR_PATHS} startColor="#6fa9b8" endColor="#e17855" countPerPath={8} size={0.06} speedMultiplier={0.92} />
-
-      {[-5.75, -4.65, -3.55, -2.45].map((x) => (
-        <FlowArrow key={`supply-${x}`} position={[x, -0.18, 1.78]} rotation={[Math.PI / 2, 0, 0]} color="#55b7e6" scale={0.68} />
-      ))}
-      {[3.05, 3.72, 4.35].map((x) => (
-        <FlowArrow key={`outdoor-${x}`} position={[x, 0.05, 2.16]} rotation={[-Math.PI / 2, 0, 0]} color="#e17855" scale={0.78} />
-      ))}
-
+      {[-5.75, -4.65, -3.55, -2.45].map((x) => <FlowArrow key={`supply-${x}`} position={[x, -0.18, 1.78]} rotation={[Math.PI / 2, 0, 0]} color="#55b7e6" scale={0.68} />)}
+      {[3.05, 3.72, 4.35].map((x) => <FlowArrow key={`outdoor-${x}`} position={[x, 0.05, 2.16]} rotation={[-Math.PI / 2, 0, 0]} color="#e17855" scale={0.78} />)}
       <SceneLabel position={[-4.2, 4.1, 0.5]}>室内空气：顶部回风 → 过滤 → 换热降温 → 贯流风轮 → 向前下方送风</SceneLabel>
       <SceneLabel position={[4.4, 3.35, 0]}>室外空气：后侧与左侧吸入 → 穿过换热器 → 风扇从正面排出热风</SceneLabel>
       <SceneLabel position={[-1.1, 2.05, 1.15]}>橙色表示进入室内机的较暖空气，蓝色表示换热后的送风</SceneLabel>

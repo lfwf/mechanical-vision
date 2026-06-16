@@ -1,2 +1,2 @@
-export { SenjerCityScene } from "./SenjerCityWorld";
-export type { SenjerCitySceneProps } from "./SenjerCityWorld";
+export { DreamySenjerCityScene as SenjerCityScene } from "./DreamySenjerCityScene";
+export type { SenjerCitySceneProps } from "./DreamySenjerCityScene";

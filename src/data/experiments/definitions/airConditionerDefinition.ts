@@ -17,10 +17,10 @@ export const airConditionerDefinition = {
     sceneTip: "切换制冷循环、送风排水和零件拆装；拆装模式可点击 27 个主要组件查看说明书",
     precisionLevel: "L2",
     precisionLabel: "实机比例、结构拓扑与装配层级级",
-    defaults: { speed: 60, primary: 0, secondary: 42, variant: 0, direction: 1 },
+    defaults: { speed: 60, primary: 0, secondary: 0, variant: 0, direction: 1 },
     controls: [
       { key: "speed", label: "演示速度", min: 20, max: 100, step: 5, suffix: "%", visibleWhenVariants: [0, 1] },
-      { key: "secondary", label: "外壳透明度", min: 18, max: 82, step: 2, suffix: "%" },
+      { key: "secondary", label: "外壳透明度", min: 0, max: 82, step: 2, suffix: "%" },
     ],
     variantLabel: "观察模式",
     variants: modes,
@@ -44,7 +44,7 @@ export const airConditionerDefinition = {
         summary: "先固定具体型号和公开尺寸，再区分已确认结构、工程拓扑与原厂未公开细节。",
         items: [
           { title: "室内机比例", description: "FTXM35R 规格段公开尺寸为高 299 mm、宽 998 mm、深 292 mm。模型据此表现进风格栅、过滤层、折弯换热器、贯流风轮、排水盘、导风机构和右侧电控区。", sourceIds: [daikinSource] },
-          { title: "室外机比例", description: "RXM35R 规格段公开尺寸为高 550 mm、宽 765 mm、深 285 mm。模型据此表现前置轴流风扇、后侧折弯换热器、压缩机舱、逆变电控和服务阀区域。", sourceIds: [daikinSource] },
+          { title: "室外机比例", description: "RXM35R 规格段公开尺寸为高 550 mm、宽 765 mm、深 285 mm。模型据此表现前置三叶轴流风扇、后侧 L 形换热器、压缩机舱、逆变电控和服务阀区域。", sourceIds: [daikinSource] },
           { title: "细节边界", description: "管路弯曲半径、翅片数量、线束固定点、卡扣和螺钉为教学级简化，不能替代服务手册。", sourceIds: [daikinSource, safetySource] },
         ],
       },
@@ -54,7 +54,7 @@ export const airConditionerDefinition = {
         summary: "空气、制冷剂和冷凝水是三条不同路径。",
         items: [
           { title: "室内空气", description: "空气从上部进入，依次经过过滤网和室内换热器；贯流风轮建立压差，处理后的空气经垂直叶片和水平导风板送出。", sourceIds: [daikinSource] },
-          { title: "室外空气", description: "轴流风扇从后侧和侧面吸入空气，使其穿过折弯换热器并从前护网排出。", sourceIds: [daikinSource] },
+          { title: "室外空气", description: "轴流风扇从后侧和左侧吸入空气，使其穿过 L 形换热器并从正面格栅排出。", sourceIds: [daikinSource] },
           { title: "冷凝水", description: "制冷时水蒸气在低温换热器表面凝结，滴入接水盘后依靠安装坡度排出。反坡、堵塞或接水盘错位会导致漏水。", sourceIds: [daikinSource] },
         ],
       },
@@ -75,7 +75,7 @@ export const airConditionerDefinition = {
         summary: "拆装顺序由遮挡、连接、承载和危险能量共同决定。",
         items: [
           { title: "室内机", description: "先处理前面板、格栅和过滤件，再处理导风、电控、传感器、排水和配管，最后接近换热器、风轮、后壳和墙板。", sourceIds: [daikinSource] },
-          { title: "室外机", description: "先移除外壳和护网，再处理电控、风扇和电机；阀件、压缩机和换热器属于制冷剂回路。", sourceIds: [daikinSource, safetySource] },
+          { title: "室外机", description: "先移除顶盖、右侧板和前格栅，再处理风扇、电机与电控；阀件、压缩机和换热器属于制冷剂回路。", sourceIds: [daikinSource, safetySource] },
           { title: "安全边界", description: "实机存在高压制冷剂、逆变直流母线、锐利翅片、重型组件和高处安装风险，模型只用于结构学习。", sourceIds: [safetySource] },
         ],
       },
@@ -88,7 +88,7 @@ export const airConditionerDefinition = {
     ],
     getConclusion: (values) => [
       "当前显示制冷工况：压缩机建立压差，室外换热器放热，电子膨胀阀节流，室内换热器吸热；颜色只表示循环阶段。",
-      "当前显示空气和冷凝水路径：室内空气经过过滤和换热后由贯流风轮送出，冷凝水落入接水盘排出；室外空气由轴流风扇拉过换热器。",
+      "当前显示空气和冷凝水路径：室内空气经过过滤和换热后由贯流风轮送出，冷凝水落入接水盘排出；室外空气由三叶轴流风扇拉过 L 形换热器并从正面格栅排出。",
       "当前进入零件拆装模式。27 个主要组件均可选择、单独拆下、装回、全部展开或全部组装；展开方向用于表达层级，不等同于原厂维修动作。",
     ][values.variant] ?? "当前显示 Daikin Perfera 空调结构。",
   },

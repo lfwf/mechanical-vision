@@ -28,7 +28,7 @@ export const transmissionDefinitions = {
     sceneTip: "观察齿轮旋转一周对应的齿条位移，并调整齿数和转速",
     precisionLevel: "L2",
     precisionLabel: "运动原理级",
-    defaults: { speed: 90, primary: 24, secondary: 0, variant: 0, direction: -1 },
+    defaults: { speed: 35, primary: 24, secondary: 0, variant: 0, direction: -1 },
     controls: [
       { key: "primary", label: "小齿轮齿数", min: 18, max: 40, step: 1, suffix: "齿" },
       { key: "speed", label: "输入转速", min: 10, max: 180, step: 5, suffix: "RPM" },
@@ -103,7 +103,7 @@ export const transmissionDefinitions = {
     sceneTip: "切换固定构件，观察太阳轮、齿圈和行星架的速度关系",
     precisionLevel: "L2",
     precisionLabel: "运动关系级",
-    defaults: { speed: 90, primary: 3, secondary: 0, variant: 0, direction: 1 },
+    defaults: { speed: 25, primary: 3, secondary: 0, variant: 0, direction: 1 },
     controls: [
       { key: "speed", label: "输入转速", min: 10, max: 180, step: 5, suffix: "RPM" },
       { key: "primary", label: "行星轮数量", min: 3, max: 4, step: 1, suffix: "个" },

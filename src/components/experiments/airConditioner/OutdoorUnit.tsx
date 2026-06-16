@@ -2,7 +2,7 @@ import type { RefObject } from "react";
 import type { Group } from "three";
 import { ExplodablePart } from "../ExplodablePart";
 import { TubePath } from "../ScenePrimitives";
-import { AxialFan, FrontGrille } from "./AirflowGeometry";
+import { RealisticAxialFan, RealisticFrontGrille } from "./OutdoorAirflowGeometry";
 import { Accumulator, FourWayValve, ServiceValves } from "./DetailGeometry";
 import { OutdoorHeatExchanger } from "./HeatExchangers";
 import {
@@ -65,11 +65,11 @@ export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUn
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-axial-fan" home={[-0.72, 0.02, 0.55]} exploded={[-2.75, 0.15, 2.72]} assemblyEnabled={assemblyEnabled} selectionRadius={1.5}>
-        <AxialFan fanRef={fanRef} />
+        <RealisticAxialFan fanRef={fanRef} />
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-front-grille" home={[-0.72, 0.02, 0.93]} exploded={[-3.65, 0.02, 3.82]} assemblyEnabled={assemblyEnabled} selectionRadius={1.7}>
-        <FrontGrille />
+        <RealisticFrontGrille />
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-control-box" home={[1.4, 0.93, -0.05]} exploded={[3.42, 2.72, 1.28]} assemblyEnabled={assemblyEnabled} selectionRadius={1.0}>

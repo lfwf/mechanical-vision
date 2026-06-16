@@ -32,7 +32,7 @@ export function PartManualView({ experimentId }: { experimentId: ExperimentId })
     return <div className="part-manual-empty">该实验暂未建立零件说明书。</div>;
   }
 
-  const systems = Array.from(new Set(manuals.map((part) => part.system));
+  const systems = Array.from(new Set(manuals.map((part) => part.system)));
 
   return (
     <div className="part-manual-view">

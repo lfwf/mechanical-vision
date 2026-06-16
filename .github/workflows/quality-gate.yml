@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   verify:
@@ -47,6 +48,38 @@ jobs:
             verify.log
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Report verification failure
+        if: github.event_name == 'pull_request' && (steps.install.outcome == 'failure' || steps.verify.outcome == 'failure')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const readTail = (file) => {
+              if (!fs.existsSync(file)) return `${file} was not created`;
+              const text = fs.readFileSync(file, 'utf8');
+              return text.slice(-12000);
+            };
+            const body = [
+              '## CI verification failed',
+              '',
+              '```text',
+              readTail('verify.log'),
+              '```',
+              '',
+              '<details><summary>Dependency installation tail</summary>',
+              '',
+              '```text',
+              readTail('install.log'),
+              '```',
+              '</details>',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
 
       - name: Fail when install or verification failed
         if: steps.install.outcome == 'failure' || steps.verify.outcome == 'failure'

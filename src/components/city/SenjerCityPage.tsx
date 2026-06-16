@@ -28,13 +28,15 @@ const districts: Array<{
   letter: string;
   icon: typeof Zap;
   status: "complete" | "active" | "locked";
+  eyebrow: string;
+  description: string;
 }> = [
-  { id: "core", name: "中央能源塔", letter: "E", icon: Zap, status: "complete" },
-  { id: "sky", name: "天空花园", letter: "S", icon: Wind, status: "active" },
-  { id: "water", name: "水路花园", letter: "J", icon: Droplets, status: "complete" },
-  { id: "transit", name: "轨道交通", letter: "N", icon: Map, status: "locked" },
-  { id: "echo", name: "回声剧场", letter: "E", icon: Sparkles, status: "locked" },
-  { id: "research", name: "天文研究院", letter: "R", icon: Moon, status: "locked" },
+  { id: "core", name: "中央能源站", letter: "E", icon: Zap, status: "complete", eyebrow: "ENERGY CORE · E", description: "连接各区域的城市能量与数据中心。" },
+  { id: "sky", name: "天空花园", letter: "S", icon: Wind, status: "active", eyebrow: "SKY GARDEN · S", description: "风能通过减速机构驱动升降平台。" },
+  { id: "water", name: "水路花园", letter: "J", icon: Droplets, status: "complete", eyebrow: "WATER GARDEN · J", description: "柔和水流连接喷泉、花园与城市水网。" },
+  { id: "transit", name: "轨道交通", letter: "N", icon: Map, status: "locked", eyebrow: "TRANSIT · N", description: "连接城市节点的轻量交通网络。" },
+  { id: "echo", name: "回声剧场", letter: "E", icon: Sparkles, status: "locked", eyebrow: "ECHO THEATER · E", description: "由节奏、光环与音律构成的城市舞台。" },
+  { id: "research", name: "天文研究院", letter: "R", icon: Moon, status: "locked", eyebrow: "RESEARCH · R", description: "观测城市时间、星轨与昼夜变化。" },
 ];
 
 export function SenjerCityPage() {
@@ -51,6 +53,7 @@ export function SenjerCityPage() {
     [inputTeeth, outputTeeth],
   );
   const taskComplete = outputRpm >= 18 && outputRpm <= 22;
+  const activeDistrictInfo = districts.find((district) => district.id === activeDistrict) ?? districts[1];
 
   return (
     <div className={night ? "city-page is-night" : "city-page"}>
@@ -116,12 +119,12 @@ export function SenjerCityPage() {
             outputRpm={outputRpm}
           />
           <div className="city-scene-overlay city-scene-title">
-            <span>SKY GARDEN · S</span>
-            <strong>天空花园</strong>
-            <p>风能通过减速机构驱动升降平台。</p>
+            <span>{activeDistrictInfo.eyebrow}</span>
+            <strong>{activeDistrictInfo.name}</strong>
+            <p>{activeDistrictInfo.description}</p>
           </div>
           <div className="city-scene-overlay city-camera-hint">
-            <Camera size={15} /> 拖拽观察 · 滚轮缩放 · 点击底部区域导航
+            <Camera size={15} /> 拖动画布 · 滚轮缩放 · 点击底部区域定位
           </div>
         </section>
 
@@ -185,7 +188,7 @@ export function SenjerCityPage() {
         </div>
         <div className="city-play-controls">
           <button onClick={() => setPlaying((value) => !value)}>{playing ? <Pause size={17} /> : <Play size={17} />}</button>
-          <button aria-label="重置当前区域"><RotateCcw size={17} /></button>
+          <button aria-label="重置当前区域" onClick={() => setActiveDistrict((current) => current === "core" ? "sky" : "core")}><RotateCcw size={17} /></button>
           <button onClick={() => setNight((value) => !value)} aria-label="切换昼夜">{night ? <Sun size={17} /> : <Moon size={17} />}</button>
         </div>
       </footer>

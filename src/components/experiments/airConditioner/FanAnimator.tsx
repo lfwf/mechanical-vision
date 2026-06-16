@@ -9,7 +9,7 @@ export function FanAnimator({ indoorFanRef, outdoorFanRef }: { indoorFanRef: Ref
   const isPlaying = useExperimentStore((state) => state.isPlaying);
 
   useFrame((_, delta) => {
-    if (!isPlaying || variant === 3) return;
+    if (!isPlaying || variant === 2 || variant === 3) return;
     const animationSpeed = 0.75 + speed / 55;
     if (indoorFanRef.current) indoorFanRef.current.rotation.x += delta * animationSpeed * 2.4;
     if (outdoorFanRef.current) outdoorFanRef.current.rotation.z -= delta * animationSpeed * 2.05;

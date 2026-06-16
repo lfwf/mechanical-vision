@@ -1,3 +1,4 @@
+import { RoundedBox } from "@react-three/drei";
 import { WashingMachineMode } from "../../../../data/experiments/washingMachineModes";
 import { ExplodablePart } from "../../ExplodablePart";
 
@@ -6,118 +7,83 @@ interface DoorAssemblyProps {
   assemblyEnabled: boolean;
 }
 
-/**
- * 门组件沿 Z 轴布置。
- * 门封外唇连接前面板，内唇连接外筒前口；两个卡箍分别压紧两侧安装槽。
- */
-export function DoorAssembly({ mode, assemblyEnabled }: DoorAssemblyProps) {
-  const visible =
-    assemblyEnabled ||
-    mode === WashingMachineMode.WashWaterPath ||
-    mode === WashingMachineMode.SpinSuspension;
+function DoorBody() {
+  return (
+    <group>
+      <mesh castShadow>
+        <torusGeometry args={[1.08, 0.16, 28, 80]} />
+        <meshStandardMaterial color="#4d5d61" metalness={0.46} roughness={0.26} />
+      </mesh>
+      <mesh position={[0, 0, 0.025]}>
+        <torusGeometry args={[0.87, 0.055, 18, 72]} />
+        <meshStandardMaterial color="#7f8c8e" metalness={0.5} roughness={0.22} />
+      </mesh>
+      <mesh position={[0, 0, 0.05]} scale={[1, 1, 0.24]}>
+        <sphereGeometry args={[0.91, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshPhysicalMaterial color="#8aaeb5" transparent opacity={0.3} transmission={0.74} roughness={0.16} depthWrite={false} side={2} />
+      </mesh>
+      <RoundedBox args={[0.24, 0.48, 0.18]} radius={0.04} smoothness={4} position={[-1.14, 0, -0.02]} castShadow>
+        <meshStandardMaterial color="#45575b" metalness={0.52} roughness={0.28} />
+      </RoundedBox>
+      <RoundedBox args={[0.16, 0.32, 0.14]} radius={0.03} smoothness={4} position={[1.12, 0, -0.02]} castShadow>
+        <meshStandardMaterial color="#9aa4a2" metalness={0.5} roughness={0.28} />
+      </RoundedBox>
+    </group>
+  );
+}
 
+function BellowBody() {
+  return (
+    <group>
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[1.13, 1.24, 0.38, 72, 1, true]} />
+        <meshStandardMaterial color="#667371" roughness={0.62} side={2} />
+      </mesh>
+      <mesh position={[0, 0, 0.19]}>
+        <torusGeometry args={[1.13, 0.13, 22, 72]} />
+        <meshStandardMaterial color="#707d7a" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0, -0.19]}>
+        <torusGeometry args={[1.24, 0.14, 22, 72]} />
+        <meshStandardMaterial color="#5f6d6a" roughness={0.64} />
+      </mesh>
+      <mesh position={[0, -1.12, 0.03]}>
+        <torusGeometry args={[0.17, 0.035, 12, 36, Math.PI]} />
+        <meshStandardMaterial color="#4f605d" roughness={0.58} />
+      </mesh>
+    </group>
+  );
+}
+
+/** 门、门封和两个卡箍沿同一 Z 轴形成连续装配链。 */
+export function DoorAssembly({ mode, assemblyEnabled }: DoorAssemblyProps) {
+  const visible = assemblyEnabled || mode === WashingMachineMode.WashWaterPath || mode === WashingMachineMode.SpinSuspension;
   if (!visible) return null;
 
   return (
     <group>
-      <ExplodablePart
-        id="wm-door"
-        home={[0, 0.25, 2.38]}
-        exploded={[-3.35, 0.25, 5.15]}
-        assemblyEnabled={assemblyEnabled}
-        selectionRadius={1.15}
-      >
-        <mesh castShadow>
-          <torusGeometry args={[1.12, 0.18, 28, 72]} />
-          <meshStandardMaterial color="#53666a" metalness={0.38} roughness={0.3} />
-        </mesh>
-        <mesh position={[0, 0, 0.035]}>
-          <circleGeometry args={[0.94, 64]} />
-          <meshPhysicalMaterial
-            color="#8eb2b9"
-            transparent
-            opacity={0.28}
-            transmission={0.72}
-            roughness={0.2}
-            depthWrite={false}
-          />
-        </mesh>
-        <mesh position={[-1.18, 0, -0.02]} castShadow>
-          <boxGeometry args={[0.26, 0.48, 0.2]} />
-          <meshStandardMaterial color="#4a5d61" metalness={0.5} roughness={0.28} />
-        </mesh>
-        <mesh position={[1.16, 0, -0.03]} castShadow>
-          <boxGeometry args={[0.18, 0.34, 0.16]} />
-          <meshStandardMaterial color="#9ba5a2" metalness={0.5} roughness={0.28} />
-        </mesh>
+      <ExplodablePart id="wm-door" home={[0, 0.24, 2.36]} exploded={[-3.15, 0.24, 4.8]} assemblyEnabled={assemblyEnabled} selectionRadius={1.08}>
+        <DoorBody />
       </ExplodablePart>
 
-      <ExplodablePart
-        id="wm-bellow-outer-clamp"
-        home={[0, 0.25, 2.16]}
-        exploded={[0, 0.25, 4.95]}
-        assemblyEnabled={assemblyEnabled}
-        selectionRadius={1.05}
-      >
-        <mesh>
-          <torusGeometry args={[1.17, 0.022, 10, 72]} />
-          <meshStandardMaterial color="#9ba6a4" metalness={0.76} roughness={0.2} />
-        </mesh>
-        <mesh position={[1.12, -0.16, 0]}>
-          <boxGeometry args={[0.16, 0.09, 0.07]} />
-          <meshStandardMaterial color="#7b8785" metalness={0.76} roughness={0.22} />
-        </mesh>
+      <ExplodablePart id="wm-bellow-outer-clamp" home={[0, 0.24, 2.11]} exploded={[0, 0.24, 4.55]} assemblyEnabled={assemblyEnabled} selectionRadius={1.0}>
+        <mesh><torusGeometry args={[1.17, 0.018, 10, 72]} /><meshStandardMaterial color="#a3acab" metalness={0.8} roughness={0.18} /></mesh>
+        <mesh position={[1.12, -0.15, 0]}><boxGeometry args={[0.14, 0.08, 0.06]} /><meshStandardMaterial color="#788482" metalness={0.76} roughness={0.2} /></mesh>
       </ExplodablePart>
 
-      <ExplodablePart
-        id="wm-door-lock"
-        home={[1.35, 0.25, 2.02]}
-        exploded={[3.2, 0.25, 4.25]}
-        assemblyEnabled={assemblyEnabled}
-        selectionRadius={0.3}
-      >
-        <mesh castShadow>
-          <boxGeometry args={[0.3, 0.56, 0.3]} />
+      <ExplodablePart id="wm-door-lock" home={[1.34, 0.24, 2.0]} exploded={[3.0, 0.24, 4.0]} assemblyEnabled={assemblyEnabled} selectionRadius={0.28}>
+        <RoundedBox args={[0.28, 0.54, 0.28]} radius={0.035} smoothness={4} castShadow>
           <meshStandardMaterial color="#52676b" metalness={0.28} roughness={0.35} />
-        </mesh>
-        <mesh position={[-0.11, 0, 0.17]}>
-          <boxGeometry args={[0.1, 0.18, 0.14]} />
-          <meshStandardMaterial color="#a4adaa" metalness={0.56} roughness={0.25} />
-        </mesh>
+        </RoundedBox>
+        <mesh position={[-0.11, 0, 0.15]}><boxGeometry args={[0.09, 0.18, 0.12]} /><meshStandardMaterial color="#a4adaa" metalness={0.56} roughness={0.25} /></mesh>
       </ExplodablePart>
 
-      <ExplodablePart
-        id="wm-bellow-inner-clamp"
-        home={[0, 0.25, 1.71]}
-        exploded={[2.8, 0.25, 3.85]}
-        assemblyEnabled={assemblyEnabled}
-        selectionRadius={1.16}
-      >
-        <mesh>
-          <torusGeometry args={[1.21, 0.025, 10, 72]} />
-          <meshStandardMaterial color="#87928f" metalness={0.72} roughness={0.24} />
-        </mesh>
+      <ExplodablePart id="wm-bellow" home={[0, 0.24, 1.88]} exploded={[3.15, 0.44, 3.25]} assemblyEnabled={assemblyEnabled} selectionRadius={1.1}>
+        <BellowBody />
       </ExplodablePart>
 
-      <ExplodablePart
-        id="wm-bellow"
-        home={[0, 0.25, 1.91]}
-        exploded={[3.3, 0.45, 3.45]}
-        assemblyEnabled={assemblyEnabled}
-        selectionRadius={1.18}
-      >
-        <mesh castShadow>
-          <torusGeometry args={[1.16, 0.22, 28, 72]} />
-          <meshStandardMaterial color="#697775" roughness={0.58} />
-        </mesh>
-        <mesh position={[0, 0, -0.12]}>
-          <torusGeometry args={[1.06, 0.08, 20, 72]} />
-          <meshStandardMaterial color="#5e6d6b" roughness={0.62} />
-        </mesh>
-        <mesh position={[0, -1.08, 0.02]}>
-          <torusGeometry args={[0.19, 0.04, 12, 36, Math.PI]} />
-          <meshStandardMaterial color="#566563" roughness={0.55} />
-        </mesh>
+      <ExplodablePart id="wm-bellow-inner-clamp" home={[0, 0.24, 1.66]} exploded={[2.62, 0.24, 3.65]} assemblyEnabled={assemblyEnabled} selectionRadius={1.1}>
+        <mesh><torusGeometry args={[1.25, 0.02, 10, 72]} /><meshStandardMaterial color="#87928f" metalness={0.76} roughness={0.22} /></mesh>
       </ExplodablePart>
     </group>
   );

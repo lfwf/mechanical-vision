@@ -3,6 +3,7 @@ import type { Group } from "three";
 import { useExperimentStore } from "../../../store/useExperimentStore";
 import { ExperimentCanvas, SceneLabel } from "../ExperimentCanvas";
 import { AirflowVisualization } from "./AirflowVisualization";
+import { ConnectionBundle } from "./ConnectionBundle";
 import { CoolingCycle } from "./CoolingCycle";
 import { FanAnimator } from "./FanAnimator";
 import { IndoorUnit } from "./IndoorUnit";
@@ -21,6 +22,7 @@ function AirConditionerAssembly() {
       <FanAnimator indoorFanRef={indoorFanRef} outdoorFanRef={outdoorFanRef} />
       <IndoorUnit assemblyEnabled={assemblyEnabled} shellOpacity={shellOpacity} fanRef={indoorFanRef} />
       <OutdoorUnit assemblyEnabled={assemblyEnabled} shellOpacity={shellOpacity} fanRef={outdoorFanRef} />
+      <ConnectionBundle variant={variant} />
       <CoolingCycle />
       <AirflowVisualization />
 
@@ -31,8 +33,8 @@ function AirConditionerAssembly() {
         </>
       ) : (
         <>
-          <SceneLabel position={[-4.2, 2.85, 0]}>FTXM35R 室内机</SceneLabel>
-          <SceneLabel position={[4.4, 2.45, 0]}>RXM35R 室外机</SceneLabel>
+          <SceneLabel position={[-4.2, 2.95, 0]}>FTXM35R 室内机</SceneLabel>
+          <SceneLabel position={[4.4, 2.55, 0]}>RXM35R 室外机</SceneLabel>
         </>
       )}
 
@@ -46,7 +48,7 @@ function AirConditionerAssembly() {
 
 export default function AirConditionerScene() {
   return (
-    <ExperimentCanvas camera={[13.8, 8.8, 17.2]} target={[0, 0.4, 0]} gridY={-2.95} shadowY={-2.91} background="#f1f3f0" minDistance={10} maxDistance={31}>
+    <ExperimentCanvas camera={[13.8, 8.8, 17.2]} target={[0, 0.35, 0]} gridY={-2.95} shadowY={-2.91} background="#f1f3f0" minDistance={10} maxDistance={31}>
       <AirConditionerAssembly />
     </ExperimentCanvas>
   );

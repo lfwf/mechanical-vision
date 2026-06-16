@@ -22,12 +22,31 @@ export function IndoorAirGrille() {
 export function CrossFlowFan({ fanRef }: { fanRef: React.RefObject<Group | null> }) {
   return (
     <group ref={fanRef}>
-      <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.32, 0.32, 4.8, 48, 1, true]} /><meshStandardMaterial color="#304b50" metalness={0.42} roughness={0.3} side={DoubleSide} /></mesh>
-      {Array.from({ length: 24 }, (_, index) => {
-        const angle = (index * Math.PI * 2) / 24;
-        return <mesh key={index} position={[0, Math.cos(angle) * 0.28, Math.sin(angle) * 0.28]} rotation={[angle + 0.18, 0, 0]}><boxGeometry args={[4.62, 0.026, 0.11]} /><meshStandardMaterial color="#6f9195" metalness={0.26} roughness={0.35} /></mesh>;
+      {Array.from({ length: 38 }, (_, index) => {
+        const angle = (index * Math.PI * 2) / 38;
+        return (
+          <mesh key={index} position={[0, Math.cos(angle) * 0.31, Math.sin(angle) * 0.31]} rotation={[angle + 0.24, 0, 0]} castShadow>
+            <boxGeometry args={[4.7, 0.018, 0.095]} />
+            <meshPhysicalMaterial color="#536f73" metalness={0.2} roughness={0.34} clearcoat={0.08} side={DoubleSide} />
+          </mesh>
+        );
       })}
-      {[-2.42, 2.42].map((x) => <mesh key={x} position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.35, 0.35, 0.07, 32]} /><meshStandardMaterial color="#3d565b" metalness={0.55} roughness={0.25} /></mesh>)}
+      {[-2.38, -1.58, -0.79, 0, 0.79, 1.58, 2.38].map((x, index) => (
+        <mesh key={x} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[index === 0 || index === 6 ? 0.34 : 0.325, 0.025, 10, 42]} />
+          <meshStandardMaterial color="#2f464a" metalness={0.46} roughness={0.28} />
+        </mesh>
+      ))}
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.1, 0.1, 4.92, 24]} />
+        <meshStandardMaterial color="#283b3e" metalness={0.55} roughness={0.25} />
+      </mesh>
+      {[-2.44, 2.44].map((x) => (
+        <mesh key={x} position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.35, 0.35, 0.08, 36]} />
+          <meshStandardMaterial color="#31484c" metalness={0.52} roughness={0.26} />
+        </mesh>
+      ))}
     </group>
   );
 }

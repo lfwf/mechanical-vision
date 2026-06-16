@@ -1,7 +1,7 @@
 import { ContactShadows, Float, OrbitControls, RoundedBox, Sparkles } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, type MutableRefObject } from "react";
-import { CatmullRomCurve3, MathUtils, Vector3, type Group } from "three";
+import { CatmullRomCurve3, MathUtils, Vector3, type Group, type OrthographicCamera } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 export interface SenjerCitySceneProps {
@@ -14,382 +14,425 @@ export interface SenjerCitySceneProps {
 
 type DistrictId = SenjerCitySceneProps["activeDistrict"];
 
-const PRESETS: Record<DistrictId, { position: [number, number, number]; target: [number, number, number] }> = {
-  core: { position: [15, 11, 18], target: [0, 2.1, 0] },
-  sky: { position: [-3, 8, 9], target: [-10.5, 2.8, -5.8] },
-  water: { position: [19, 8, 15], target: [10.8, 1.2, 6.4] },
-  transit: { position: [8, 8, 22], target: [0, 1, 12.5] },
-  echo: { position: [-21, 8, 15], target: [-12.5, 1.5, 8] },
-  research: { position: [22, 11, -14], target: [12.8, 3.6, -8.5] },
+const PALETTE = {
+  background: "#EAF5FB",
+  backgroundNight: "#CAD3E6",
+  white: "#F8FBFD",
+  coolWhite: "#EEF6FA",
+  shadow: "#C7DBE7",
+  blue: "#8CCBE8",
+  brightBlue: "#68D6F0",
+  paleBlue: "#CDEAF4",
+  pink: "#F1A9C0",
+  lavender: "#D9D1EF",
+  mint: "#D6EAE2",
+  green: "#C7DFD6",
+  warm: "#F5D7C8",
+  line: "#D3E7F1",
+  text: "#708894",
 };
 
-const COLORS = {
-  cream: "#FFF8F1",
-  pearl: "#F7FBFD",
-  mist: "#DCEFF4",
-  sky: "#CFEAF5",
-  aqua: "#9EDBE2",
-  mint: "#BFE7D4",
-  blush: "#F2D5DE",
-  lavender: "#DCCFF0",
-  lilac: "#C8B9E4",
-  peach: "#F6C9A8",
-  blue: "#8DBFD8",
-  text: "#6A7D8A",
+const CAMERA_POSITION: [number, number, number] = [20, 24, 20];
+
+const FOCUS: Record<DistrictId, { target: [number, number, number]; zoom: number }> = {
+  core: { target: [0, 1.2, 0], zoom: 36 },
+  sky: { target: [-8.5, 0.8, -5.5], zoom: 42 },
+  water: { target: [8.4, 0.4, 5.5], zoom: 42 },
+  transit: { target: [0, 0.35, 9.5], zoom: 44 },
+  echo: { target: [-9.5, 0.4, 6.8], zoom: 44 },
+  research: { target: [9.5, 0.8, -6.8], zoom: 44 },
 };
 
-function CameraTransition({
+function Matte({ color, emissive = "#000000", emissiveIntensity = 0, opacity = 1 }: { color: string; emissive?: string; emissiveIntensity?: number; opacity?: number }) {
+  return (
+    <meshStandardMaterial
+      color={color}
+      metalness={0}
+      roughness={0.82}
+      emissive={emissive}
+      emissiveIntensity={emissiveIntensity}
+      transparent={opacity < 1}
+      opacity={opacity}
+    />
+  );
+}
+
+function CameraController({
   district,
   controls,
-  active,
+  transitioning,
 }: {
   district: DistrictId;
   controls: MutableRefObject<OrbitControlsImpl | null>;
-  active: MutableRefObject<boolean>;
+  transitioning: MutableRefObject<boolean>;
 }) {
-  const camera = useThree((state) => state.camera);
-  const destination = useMemo(() => new Vector3(), []);
+  const camera = useThree((state) => state.camera) as OrthographicCamera;
   const target = useMemo(() => new Vector3(), []);
 
   useEffect(() => {
-    active.current = true;
-  }, [district, active]);
+    transitioning.current = true;
+  }, [district, transitioning]);
 
   useFrame((_, delta) => {
-    if (!active.current) return;
-    const preset = PRESETS[district];
-    destination.set(...preset.position);
+    if (!transitioning.current) return;
+    const preset = FOCUS[district];
     target.set(...preset.target);
-    const alpha = 1 - Math.exp(-delta * 3.2);
-    camera.position.lerp(destination, alpha);
+    const alpha = 1 - Math.exp(-delta * 3.5);
+
     if (controls.current) {
       controls.current.target.lerp(target, alpha);
       controls.current.update();
     }
+
+    camera.zoom = MathUtils.lerp(camera.zoom, preset.zoom, alpha);
+    camera.updateProjectionMatrix();
+
     if (
-      camera.position.distanceTo(destination) < 0.04 &&
-      (!controls.current || controls.current.target.distanceTo(target) < 0.04)
+      Math.abs(camera.zoom - preset.zoom) < 0.04 &&
+      (!controls.current || controls.current.target.distanceTo(target) < 0.03)
     ) {
-      active.current = false;
+      transitioning.current = false;
     }
   });
 
   return null;
 }
 
-function SoftMaterial({ color, emissive = "#000000", emissiveIntensity = 0 }: { color: string; emissive?: string; emissiveIntensity?: number }) {
-  return (
-    <meshStandardMaterial
-      color={color}
-      roughness={0.72}
-      metalness={0}
-      emissive={emissive}
-      emissiveIntensity={emissiveIntensity}
-    />
-  );
-}
-
-function FloatingIsland({ radius, topColor = COLORS.cream }: { radius: number; topColor?: string }) {
-  return (
-    <group>
-      <mesh castShadow receiveShadow>
-        <cylinderGeometry args={[radius - 0.15, radius, 0.58, 64]} />
-        <SoftMaterial color={COLORS.mist} />
-      </mesh>
-      <mesh position={[0, 0.34, 0]} receiveShadow>
-        <cylinderGeometry args={[radius - 0.34, radius - 0.34, 0.1, 64]} />
-        <SoftMaterial color={topColor} />
-      </mesh>
-      <mesh position={[0, -0.8, 0]}>
-        <coneGeometry args={[radius * 0.76, 1.3, 64]} />
-        <SoftMaterial color="#B9D4DE" />
-      </mesh>
-    </group>
-  );
-}
-
-function SoftTree({ position, scale = 1, color = COLORS.mint }: { position: [number, number, number]; scale?: number; color?: string }) {
-  return (
-    <group position={position} scale={scale}>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.06, 0.09, 0.34, 12]} />
-        <SoftMaterial color="#C8B59D" />
-      </mesh>
-      <mesh position={[0, 0.34, 0]} castShadow>
-        <sphereGeometry args={[0.26, 20, 16]} />
-        <SoftMaterial color={color} />
-      </mesh>
-      <mesh position={[0.18, 0.28, 0.04]} castShadow>
-        <sphereGeometry args={[0.18, 18, 14]} />
-        <SoftMaterial color={color} />
-      </mesh>
-    </group>
-  );
-}
-
-function RibbonBridge({ points, color = COLORS.pearl }: { points: Array<[number, number, number]>; color?: string }) {
+function EnergyLine({ points, color = PALETTE.brightBlue, active = true }: { points: Array<[number, number, number]>; color?: string; active?: boolean }) {
   const curve = useMemo(
     () => new CatmullRomCurve3(points.map((point) => new Vector3(...point)), false, "centripetal"),
     [points],
   );
+  const pulseRef = useRef<Group>(null);
+
+  useFrame(({ clock }) => {
+    if (!pulseRef.current || !active) return;
+    const point = curve.getPoint((clock.elapsedTime * 0.08) % 1);
+    pulseRef.current.position.copy(point);
+  });
+
   return (
     <group>
-      <mesh castShadow receiveShadow>
-        <tubeGeometry args={[curve, 72, 0.42, 12, false]} />
-        <SoftMaterial color={color} />
-      </mesh>
       <mesh>
-        <tubeGeometry args={[curve, 72, 0.045, 8, false]} />
-        <SoftMaterial color={COLORS.aqua} emissive="#BFEFF5" emissiveIntensity={0.18} />
+        <tubeGeometry args={[curve, 72, 0.035, 8, false]} />
+        <Matte color={active ? color : PALETTE.line} emissive={active ? color : "#000000"} emissiveIntensity={active ? 0.28 : 0} />
       </mesh>
-    </group>
-  );
-}
-
-function DreamCore({ playing, night }: { playing: boolean; night: boolean }) {
-  const halo = useRef<Group>(null);
-  useFrame((_, delta) => {
-    if (playing && halo.current) halo.current.rotation.y += delta * 0.08;
-  });
-
-  return (
-    <group position={[0, 0.3, 0]}>
-      <FloatingIsland radius={4.35} topColor={night ? "#D7D4EB" : COLORS.cream} />
-      <mesh position={[0, 0.85, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[2.75, 3.15, 1.05, 64]} />
-        <SoftMaterial color={COLORS.pearl} />
-      </mesh>
-      <mesh position={[0, 1.7, 0]} castShadow>
-        <cylinderGeometry args={[1.2, 1.8, 0.82, 56]} />
-        <SoftMaterial color={COLORS.lavender} />
-      </mesh>
-      <group ref={halo} position={[0, 2.55, 0]}>
-        <mesh>
-          <torusGeometry args={[1.35, 0.14, 18, 80]} />
-          <SoftMaterial color={COLORS.peach} emissive="#FFE1CC" emissiveIntensity={0.22} />
-        </mesh>
-        {[0, Math.PI * 2 / 3, Math.PI * 4 / 3].map((angle) => (
-          <mesh key={angle} position={[Math.cos(angle) * 0.9, 0, Math.sin(angle) * 0.9]}>
-            <sphereGeometry args={[0.23, 24, 18]} />
-            <SoftMaterial color={COLORS.aqua} emissive="#D7FAFF" emissiveIntensity={0.16} />
-          </mesh>
-        ))}
-      </group>
-      <Float speed={1.1} rotationIntensity={0.04} floatIntensity={0.16}>
-        <mesh position={[0, 3.85, 0]}>
-          <sphereGeometry args={[0.48, 36, 26]} />
-          <SoftMaterial color={COLORS.aqua} emissive="#D2F7FB" emissiveIntensity={night ? 0.85 : 0.32} />
-        </mesh>
-      </Float>
-      <mesh position={[0, 3.25, 0]}>
-        <cylinderGeometry args={[0.1, 0.16, 0.72, 18]} />
-        <SoftMaterial color={COLORS.lilac} />
-      </mesh>
-      <Sparkles count={18} scale={[5, 4, 5]} size={2.2} speed={0.25} color="#FFFFFF" opacity={0.55} />
-    </group>
-  );
-}
-
-function SkyGarden({ playing, bladeAngle, outputRpm }: { playing: boolean; bladeAngle: number; outputRpm: number }) {
-  const rotor = useRef<Group>(null);
-  const lift = useRef<Group>(null);
-  const ready = outputRpm >= 18 && outputRpm <= 22;
-
-  useFrame((_, delta) => {
-    if (playing && rotor.current) rotor.current.rotation.z -= delta * MathUtils.lerp(0.12, 0.3, bladeAngle / 55);
-    if (lift.current) lift.current.position.y = MathUtils.damp(lift.current.position.y, ready ? 2.15 : 0.82, 2, delta);
-  });
-
-  return (
-    <group position={[-10.5, 1.75, -5.8]}>
-      <FloatingIsland radius={4.25} topColor="#F7F4EC" />
-      <group position={[-1.25, 0.34, 0]}>
-        <RoundedBox args={[1.35, 4.7, 1.35]} radius={0.34} smoothness={8} position={[0, 2.25, 0]} castShadow>
-          <SoftMaterial color={COLORS.blush} />
-        </RoundedBox>
-        <mesh position={[0, 3.8, 0.78]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.25, 0.25, 0.7, 28]} />
-          <SoftMaterial color={COLORS.lilac} />
-        </mesh>
-        <group ref={rotor} position={[0, 3.8, 1.12]}>
+      {active && (
+        <group ref={pulseRef}>
           <mesh>
-            <sphereGeometry args={[0.28, 24, 18]} />
-            <SoftMaterial color={COLORS.aqua} />
-          </mesh>
-          {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((angle) => (
-            <group key={angle} rotation={[0, 0, angle]}>
-              <RoundedBox args={[0.34, 1.72, 0.12]} radius={0.12} smoothness={6} position={[0, 0.98, 0]} rotation={[0, 0, bladeAngle * Math.PI / 900]} castShadow>
-                <SoftMaterial color={COLORS.pearl} />
-              </RoundedBox>
-            </group>
-          ))}
-        </group>
-      </group>
-      <group position={[1.45, 0.3, 0]}>
-        <RoundedBox args={[0.72, 3.8, 0.72]} radius={0.22} smoothness={6} position={[0, 1.8, 0]} castShadow>
-          <SoftMaterial color={COLORS.sky} />
-        </RoundedBox>
-        <group ref={lift} position={[0, 0.82, 0]}>
-          <mesh castShadow receiveShadow>
-            <cylinderGeometry args={[1.08, 1.2, 0.26, 44]} />
-            <SoftMaterial color={COLORS.pearl} />
-          </mesh>
-          <mesh position={[0, 0.32, 0]}>
-            <torusGeometry args={[0.88, 0.045, 12, 56]} />
-            <SoftMaterial color={ready ? COLORS.mint : COLORS.aqua} emissive={ready ? "#D7F8E8" : "#D7F7FA"} emissiveIntensity={0.18} />
+            <sphereGeometry args={[0.11, 18, 14]} />
+            <Matte color="#FFFFFF" emissive={color} emissiveIntensity={0.8} />
           </mesh>
         </group>
-      </group>
-      <SoftTree position={[-2.8, 0.68, 1.9]} scale={1.08} color={COLORS.mint} />
-      <SoftTree position={[0.1, 0.68, -2.25]} color="#D7E9C4" />
-      <SoftTree position={[2.7, 0.68, 1.8]} color="#CDE7DA" />
+      )}
     </group>
   );
 }
 
-function WaterGarden({ playing }: { playing: boolean }) {
-  const wheel = useRef<Group>(null);
-  useFrame((_, delta) => {
-    if (playing && wheel.current) wheel.current.rotation.z += delta * 0.13;
-  });
-
+function Tree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   return (
-    <group position={[10.8, -0.1, 6.4]}>
-      <FloatingIsland radius={4.55} topColor="#F5FBF9" />
-      <mesh position={[0, 0.54, 0]} receiveShadow>
-        <cylinderGeometry args={[3.25, 3.5, 0.3, 60]} />
-        <meshStandardMaterial color={COLORS.aqua} roughness={0.24} metalness={0} transparent opacity={0.76} />
+    <group position={position} scale={scale}>
+      <mesh castShadow>
+        <cylinderGeometry args={[0.06, 0.08, 0.38, 12]} />
+        <Matte color="#D3C4B4" />
       </mesh>
-      <mesh position={[0, 0.39, 0]}>
-        <cylinderGeometry args={[3.5, 3.5, 0.38, 60]} />
-        <SoftMaterial color={COLORS.pearl} />
+      <mesh position={[0, 0.38, 0]} castShadow>
+        <coneGeometry args={[0.25, 0.58, 20]} />
+        <Matte color={PALETTE.green} />
       </mesh>
-      <group position={[-1.85, 0.92, -0.65]}>
-        <RoundedBox args={[1.75, 1.28, 1.55]} radius={0.3} smoothness={8} castShadow>
-          <SoftMaterial color={COLORS.blush} />
-        </RoundedBox>
-        <mesh position={[0, 0.78, 0]}>
-          <sphereGeometry args={[0.42, 24, 18]} />
-          <SoftMaterial color={COLORS.lavender} />
+    </group>
+  );
+}
+
+function Person({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]} scale={0.78}>
+      <mesh position={[0, 0.78, 0]} castShadow>
+        <sphereGeometry args={[0.13, 18, 14]} />
+        <Matte color={PALETTE.white} />
+      </mesh>
+      <mesh position={[0, 0.36, 0]} castShadow>
+        <capsuleGeometry args={[0.11, 0.48, 6, 12]} />
+        <Matte color={PALETTE.coolWhite} />
+      </mesh>
+      {[-0.08, 0.08].map((x) => (
+        <mesh key={x} position={[x, -0.02, 0]} rotation={[0, 0, x < 0 ? -0.08 : 0.08]} castShadow>
+          <capsuleGeometry args={[0.045, 0.34, 5, 10]} />
+          <Matte color={PALETTE.shadow} />
         </mesh>
-      </group>
-      <group ref={wheel} position={[-1.7, 1.7, 0.78]}>
-        <mesh>
-          <torusGeometry args={[0.78, 0.1, 14, 56]} />
-          <SoftMaterial color={COLORS.peach} />
+      ))}
+      {[-0.16, 0.16].map((x) => (
+        <mesh key={x} position={[x, 0.4, 0]} rotation={[0, 0, x < 0 ? 0.45 : -0.45]} castShadow>
+          <capsuleGeometry args={[0.038, 0.3, 5, 10]} />
+          <Matte color={PALETTE.white} />
         </mesh>
-        {Array.from({ length: 6 }, (_, index) => (
-          <RoundedBox key={index} args={[0.1, 1.3, 0.16]} radius={0.04} smoothness={4} rotation={[0, 0, index / 6 * Math.PI * 2]}>
-            <SoftMaterial color={COLORS.sky} />
-          </RoundedBox>
-        ))}
-      </group>
-      {[-1.4, 0, 1.4].map((x) => (
-        <group key={x} position={[x, 0.82, 1.38]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.46, 0.58, 0.36, 26]} />
-            <SoftMaterial color={COLORS.pearl} />
-          </mesh>
-          <mesh position={[0, 0.58, 0]}>
-            <cylinderGeometry args={[0.05, 0.1, 0.9, 16]} />
-            <SoftMaterial color={COLORS.aqua} emissive="#D8FAFF" emissiveIntensity={0.16} />
-          </mesh>
-        </group>
       ))}
     </group>
   );
 }
 
-function DreamDistrict({ kind, position }: { kind: "transit" | "echo" | "research"; position: [number, number, number] }) {
+function DataCrates({ position, rows = 3, columns = 3 }: { position: [number, number, number]; rows?: number; columns?: number }) {
   return (
     <group position={position}>
-      <FloatingIsland radius={3.45} topColor="#F8F5F1" />
-      {kind === "transit" && (
-        <>
-          <RoundedBox args={[3.8, 0.38, 1.85]} radius={0.28} smoothness={7} position={[0, 0.68, 0]} castShadow>
-            <SoftMaterial color={COLORS.sky} />
+      {Array.from({ length: rows * columns }, (_, index) => {
+        const row = Math.floor(index / columns);
+        const column = index % columns;
+        return (
+          <RoundedBox
+            key={index}
+            args={[0.72, 0.34, 0.72]}
+            radius={0.05}
+            smoothness={4}
+            position={[(column - (columns - 1) / 2) * 0.82, 0.18, (row - (rows - 1) / 2) * 0.82]}
+            castShadow
+          >
+            <Matte color={PALETTE.white} />
           </RoundedBox>
-          <mesh position={[0, 1.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[1.32, 0.09, 12, 52]} />
-            <SoftMaterial color={COLORS.aqua} />
-          </mesh>
-        </>
-      )}
-      {kind === "echo" && (
-        <>
-          {[0, 1, 2].map((index) => (
-            <mesh key={index} position={[-0.95 + index * 0.95, 0.82 + index * 0.34, 0]} castShadow>
-              <cylinderGeometry args={[0.42, 0.54, 1.05 + index * 0.62, 26]} />
-              <SoftMaterial color={index === 1 ? COLORS.blush : COLORS.lavender} />
-            </mesh>
-          ))}
-          <Float speed={0.8} rotationIntensity={0.03} floatIntensity={0.08}>
-            <mesh position={[0, 2.35, 0]}>
-              <torusGeometry args={[1.28, 0.09, 12, 52]} />
-              <SoftMaterial color={COLORS.peach} />
-            </mesh>
-          </Float>
-        </>
-      )}
-      {kind === "research" && (
-        <>
-          <RoundedBox args={[1.9, 3.3, 1.9]} radius={0.38} smoothness={8} position={[0, 1.88, 0]} castShadow>
-            <SoftMaterial color={COLORS.lavender} />
-          </RoundedBox>
-          <Float speed={0.7} rotationIntensity={0.05} floatIntensity={0.12}>
-            <mesh position={[0, 3.95, 0]} rotation={[0.22, 0.18, 0]}>
-              <torusGeometry args={[0.76, 0.07, 12, 52]} />
-              <SoftMaterial color={COLORS.aqua} emissive="#D8F8FB" emissiveIntensity={0.15} />
-            </mesh>
-          </Float>
-        </>
-      )}
+        );
+      })}
     </group>
   );
 }
 
-function DreamWorld({ playing, night, bladeAngle, outputRpm }: Omit<SenjerCitySceneProps, "activeDistrict">) {
+function CentralBuilding({ playing, night }: { playing: boolean; night: boolean }) {
+  const markRef = useRef<Group>(null);
+  useFrame((_, delta) => {
+    if (playing && markRef.current) markRef.current.rotation.z -= delta * 0.18;
+  });
+
+  return (
+    <group position={[0, 0, 0]}>
+      <RoundedBox args={[5.5, 0.24, 4.5]} radius={0.34} smoothness={8} position={[0, 0.12, 0]} receiveShadow>
+        <Matte color={night ? "#D8DDEC" : PALETTE.coolWhite} />
+      </RoundedBox>
+
+      <RoundedBox args={[2.45, 3.6, 2.65]} radius={0.42} smoothness={10} position={[0, 2.0, 0]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      <RoundedBox args={[1.65, 2.7, 2.45]} radius={0.38} smoothness={9} position={[-2.0, 1.55, 0]} castShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <RoundedBox args={[1.65, 2.7, 2.45]} radius={0.38} smoothness={9} position={[2.0, 1.55, 0]} castShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <RoundedBox args={[1.75, 0.5, 1.7]} radius={0.18} smoothness={6} position={[0, 4.05, 0]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      <RoundedBox args={[1.3, 0.16, 1.28]} radius={0.08} smoothness={5} position={[0, 4.34, 0]}>
+        <Matte color={PALETTE.shadow} />
+      </RoundedBox>
+
+      <group ref={markRef} position={[0, 2.4, 1.35]} rotation={[Math.PI / 2, 0, 0]}>
+        {Array.from({ length: 8 }, (_, index) => {
+          const angle = index / 8 * Math.PI * 2;
+          return (
+            <RoundedBox
+              key={index}
+              args={[0.16, 0.5, 0.08]}
+              radius={0.05}
+              smoothness={4}
+              position={[Math.cos(angle) * 0.52, Math.sin(angle) * 0.52, 0]}
+              rotation={[0, 0, angle]}
+            >
+              <Matte color={PALETTE.blue} />
+            </RoundedBox>
+          );
+        })}
+      </group>
+
+      <RoundedBox args={[1.15, 1.0, 0.25]} radius={0.12} smoothness={5} position={[0, 0.68, 1.44]}>
+        <Matte color={PALETTE.brightBlue} emissive="#BDEFFF" emissiveIntensity={0.34} />
+      </RoundedBox>
+
+      <Sparkles count={34} scale={[6.5, 2.2, 5.5]} position={[0, 0.5, 0]} size={2.5} speed={0.22} color="#9FEAFF" opacity={0.72} />
+      <EnergyLine points={[[0, 0.17, 1.9], [0.2, 0.17, 4.2], [0.4, 0.17, 6.8]]} />
+    </group>
+  );
+}
+
+function SkyNode({ playing, bladeAngle, outputRpm }: { playing: boolean; bladeAngle: number; outputRpm: number }) {
+  const rotorRef = useRef<Group>(null);
+  const ready = outputRpm >= 18 && outputRpm <= 22;
+  useFrame((_, delta) => {
+    if (playing && rotorRef.current) rotorRef.current.rotation.z -= delta * MathUtils.lerp(0.12, 0.28, bladeAngle / 55);
+  });
+
+  return (
+    <group position={[-8.5, 0, -5.5]}>
+      <RoundedBox args={[3.5, 0.18, 2.7]} radius={0.3} smoothness={8} position={[0, 0.09, 0]} receiveShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <RoundedBox args={[1.5, 3.0, 1.4]} radius={0.36} smoothness={10} position={[0, 1.58, 0]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      <group ref={rotorRef} position={[0, 2.55, 0.76]}>
+        <mesh>
+          <sphereGeometry args={[0.18, 20, 14]} />
+          <Matte color={PALETTE.blue} />
+        </mesh>
+        {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((angle) => (
+          <group key={angle} rotation={[0, 0, angle]}>
+            <RoundedBox args={[0.22, 1.25, 0.08]} radius={0.08} smoothness={5} position={[0, 0.72, 0]} rotation={[0, 0, bladeAngle * Math.PI / 1100]}>
+              <Matte color={PALETTE.white} />
+            </RoundedBox>
+          </group>
+        ))}
+      </group>
+      <mesh position={[1.05, 0.7, 0]}>
+        <sphereGeometry args={[0.36, 24, 18]} />
+        <Matte color={ready ? PALETTE.mint : PALETTE.paleBlue} emissive={ready ? "#DDF8EB" : "#000000"} emissiveIntensity={ready ? 0.22 : 0} />
+      </mesh>
+      <Tree position={[-1.25, 0.28, 0.8]} scale={0.78} />
+    </group>
+  );
+}
+
+function WaterNode({ playing }: { playing: boolean }) {
+  const pulseRef = useRef<Group>(null);
+  useFrame(({ clock }) => {
+    if (!playing || !pulseRef.current) return;
+    pulseRef.current.position.y = 0.5 + Math.sin(clock.elapsedTime * 1.6) * 0.08;
+  });
+
+  return (
+    <group position={[8.4, 0, 5.5]}>
+      <RoundedBox args={[3.8, 0.18, 3.0]} radius={0.34} smoothness={8} position={[0, 0.09, 0]} receiveShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <mesh position={[0, 0.24, 0]} receiveShadow>
+        <cylinderGeometry args={[1.25, 1.38, 0.28, 48]} />
+        <meshStandardMaterial color={PALETTE.paleBlue} roughness={0.35} metalness={0} transparent opacity={0.9} />
+      </mesh>
+      <group ref={pulseRef}>
+        {[-0.7, 0, 0.7].map((x) => (
+          <group key={x} position={[x, 0, 0]}>
+            <mesh>
+              <cylinderGeometry args={[0.05, 0.09, 0.95, 16]} />
+              <Matte color={PALETTE.brightBlue} emissive="#CBF7FF" emissiveIntensity={0.25} />
+            </mesh>
+            <mesh position={[0, 0.5, 0]}>
+              <sphereGeometry args={[0.11, 18, 14]} />
+              <Matte color="#FFFFFF" emissive={PALETTE.brightBlue} emissiveIntensity={0.5} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+      <RoundedBox args={[1.45, 1.3, 1.25]} radius={0.3} smoothness={8} position={[-1.1, 0.8, -0.55]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      <Tree position={[1.25, 0.28, -0.75]} scale={0.72} />
+    </group>
+  );
+}
+
+function TransitNode() {
+  return (
+    <group position={[0, 0, 9.5]}>
+      <RoundedBox args={[4.0, 0.18, 2.2]} radius={0.3} smoothness={8} position={[0, 0.09, 0]} receiveShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <RoundedBox args={[2.8, 0.7, 1.2]} radius={0.22} smoothness={7} position={[0, 0.5, 0]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      {[-0.65, 0, 0.65].map((x) => (
+        <RoundedBox key={x} args={[0.42, 0.18, 0.52]} radius={0.08} smoothness={4} position={[x, 0.58, 0.62]}>
+          <Matte color={PALETTE.blue} />
+        </RoundedBox>
+      ))}
+    </group>
+  );
+}
+
+function EchoNode() {
+  return (
+    <group position={[-9.5, 0, 6.8]}>
+      <RoundedBox args={[3.3, 0.18, 2.7]} radius={0.3} smoothness={8} position={[0, 0.09, 0]} receiveShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      {[0, 1, 2].map((index) => (
+        <RoundedBox
+          key={index}
+          args={[0.55, 1.1 + index * 0.45, 0.72]}
+          radius={0.2}
+          smoothness={7}
+          position={[-0.85 + index * 0.85, 0.65 + index * 0.22, 0]}
+          castShadow
+        >
+          <Matte color={index === 1 ? PALETTE.pink : PALETTE.lavender} />
+        </RoundedBox>
+      ))}
+      <Float speed={0.8} rotationIntensity={0.04} floatIntensity={0.08}>
+        <mesh position={[0, 2.15, 0]}>
+          <torusGeometry args={[0.78, 0.06, 12, 48]} />
+          <Matte color={PALETTE.pink} emissive="#F9D4DF" emissiveIntensity={0.18} />
+        </mesh>
+      </Float>
+    </group>
+  );
+}
+
+function ResearchNode() {
+  return (
+    <group position={[9.5, 0, -6.8]}>
+      <RoundedBox args={[3.2, 0.18, 2.6]} radius={0.3} smoothness={8} position={[0, 0.09, 0]} receiveShadow>
+        <Matte color={PALETTE.coolWhite} />
+      </RoundedBox>
+      <RoundedBox args={[1.55, 2.8, 1.55]} radius={0.34} smoothness={9} position={[0, 1.5, 0]} castShadow>
+        <Matte color={PALETTE.white} />
+      </RoundedBox>
+      <Float speed={0.65} rotationIntensity={0.05} floatIntensity={0.1}>
+        <mesh position={[0, 3.15, 0]} rotation={[0.25, 0.2, 0]}>
+          <torusGeometry args={[0.68, 0.06, 12, 48]} />
+          <Matte color={PALETTE.blue} emissive="#D2F0FA" emissiveIntensity={0.18} />
+        </mesh>
+      </Float>
+      <mesh position={[0, 3.15, 0]}>
+        <sphereGeometry args={[0.18, 18, 14]} />
+        <Matte color={PALETTE.pink} />
+      </mesh>
+    </group>
+  );
+}
+
+function GroundDetails() {
   return (
     <group>
-      <mesh position={[0, -3.05, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[19.8, 21.5, 3.1, 72]} />
-        <SoftMaterial color={night ? "#8895B3" : "#CFE1E5"} />
-      </mesh>
-      <mesh position={[0, -5.75, 0]}>
-        <coneGeometry args={[16.3, 5.4, 64]} />
-        <SoftMaterial color={night ? "#697792" : "#B4CED5"} />
-      </mesh>
-      <mesh position={[0, -1.47, 0]} receiveShadow>
-        <cylinderGeometry args={[19.1, 19.1, 0.14, 72]} />
-        <SoftMaterial color={night ? "#BAC1D8" : "#E8F2EF"} />
+      <DataCrates position={[4.5, 0, -5.2]} rows={3} columns={3} />
+      <DataCrates position={[-5.4, 0, 5.0]} rows={2} columns={2} />
+      <Person position={[-4.2, 0, -2.0]} rotation={0.8} />
+      <Person position={[5.2, 0, 2.4]} rotation={-0.7} />
+      <Person position={[6.0, 0, 2.8]} rotation={2.4} />
+      <Person position={[-2.2, 0, 5.2]} rotation={0.2} />
+      <Tree position={[1.6, 0, 4.5]} scale={0.75} />
+      <Tree position={[-1.8, 0, -4.0]} scale={0.8} />
+      <Tree position={[3.2, 0, 5.0]} scale={0.7} />
+      <Tree position={[-6.0, 0, -1.0]} scale={0.72} />
+    </group>
+  );
+}
+
+function IsometricWorld({ playing, night, bladeAngle, outputRpm }: Omit<SenjerCitySceneProps, "activeDistrict">) {
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} receiveShadow>
+        <planeGeometry args={[60, 48]} />
+        <Matte color={night ? PALETTE.backgroundNight : PALETTE.background} />
       </mesh>
 
-      <DreamCore playing={playing} night={night} />
-      <SkyGarden playing={playing} bladeAngle={bladeAngle} outputRpm={outputRpm} />
-      <WaterGarden playing={playing} />
-      <DreamDistrict kind="transit" position={[0, -0.2, 12.5]} />
-      <DreamDistrict kind="echo" position={[-12.5, 0.05, 8]} />
-      <DreamDistrict kind="research" position={[12.8, 2.1, -8.5]} />
+      <CentralBuilding playing={playing} night={night} />
+      <SkyNode playing={playing} bladeAngle={bladeAngle} outputRpm={outputRpm} />
+      <WaterNode playing={playing} />
+      <TransitNode />
+      <EchoNode />
+      <ResearchNode />
 
-      <RibbonBridge points={[[-7.1, 1.35, -3.9], [-4.7, 1.05, -2.5], [-3.0, 0.85, -1.2]]} />
-      <RibbonBridge points={[[3.2, 0.72, 1.45], [5.4, 0.5, 3.15], [7.55, 0.27, 4.45]]} />
-      <RibbonBridge points={[[0, 0.38, 3.6], [0.12, 0.12, 7.0], [0, -0.02, 9.1]]} />
-      <RibbonBridge points={[[-2.9, 0.7, 1.85], [-6.9, 0.46, 4.7], [-9.25, 0.3, 6.25]]} color="#F1E9F7" />
-      <RibbonBridge points={[[2.75, 0.84, -1.85], [7.3, 1.5, -4.7], [9.35, 1.9, -6.15]]} color="#E8F2FA" />
+      <EnergyLine points={[[-7.0, 0.08, -4.4], [-4.4, 0.08, -2.9], [-2.5, 0.08, -1.4]]} color={PALETTE.pink} />
+      <EnergyLine points={[[2.4, 0.08, 1.5], [5.0, 0.08, 3.4], [6.8, 0.08, 4.6]]} />
+      <EnergyLine points={[[0, 0.08, 2.4], [0, 0.08, 5.5], [0, 0.08, 7.8]]} color={PALETTE.blue} />
+      <EnergyLine points={[[-2.2, 0.08, 1.5], [-5.3, 0.08, 3.8], [-7.7, 0.08, 5.6]]} color={PALETTE.lavender} />
+      <EnergyLine points={[[2.2, 0.08, -1.4], [5.4, 0.08, -3.9], [7.7, 0.08, -5.7]]} color={PALETTE.paleBlue} />
 
-      {Array.from({ length: 18 }, (_, index) => {
-        const angle = index / 18 * Math.PI * 2;
-        const radius = 6.5 + (index % 3) * 1.35;
-        const palette = [COLORS.mint, "#D9EBCB", "#D8E3F3"];
-        return (
-          <SoftTree
-            key={index}
-            position={[Math.cos(angle) * radius, -1.18, Math.sin(angle) * radius]}
-            scale={0.7 + (index % 3) * 0.1}
-            color={palette[index % palette.length]}
-          />
-        );
-      })}
+      <GroundDetails />
     </group>
   );
 }
@@ -400,50 +443,58 @@ export function DreamySenjerCityScene(props: SenjerCitySceneProps) {
 
   return (
     <Canvas
+      orthographic
       shadows
       dpr={[1, 1.6]}
-      camera={{ position: PRESETS.sky.position, fov: 43, near: 0.3, far: 140 }}
-      gl={{ antialias: true, alpha: false, toneMappingExposure: props.night ? 0.95 : 1.08 }}
+      camera={{ position: CAMERA_POSITION, zoom: FOCUS.sky.zoom, near: 0.1, far: 120 }}
+      gl={{ antialias: true, alpha: false, toneMappingExposure: props.night ? 0.96 : 1.12 }}
     >
-      <color attach="background" args={[props.night ? "#777F9E" : "#EAF6FB"]} />
-      <fog attach="fog" args={[props.night ? "#777F9E" : "#EAF6FB", 42, 104]} />
-      <ambientLight intensity={props.night ? 0.58 : 0.92} />
-      <hemisphereLight args={[props.night ? "#D7D5F0" : "#FFF9F2", props.night ? "#6C7390" : "#BDDCE5", props.night ? 0.72 : 1.05]} />
+      <color attach="background" args={[props.night ? PALETTE.backgroundNight : PALETTE.background]} />
+      <fog attach="fog" args={[props.night ? PALETTE.backgroundNight : PALETTE.background, 34, 76]} />
+      <ambientLight intensity={props.night ? 0.85 : 1.18} />
+      <hemisphereLight
+        args={[
+          props.night ? "#E5E5F8" : "#FFFFFF",
+          props.night ? "#A7B2C9" : "#C9E0EA",
+          props.night ? 0.8 : 1.15,
+        ]}
+      />
       <directionalLight
-        position={[14, 22, 12]}
-        intensity={props.night ? 0.9 : 1.18}
-        color={props.night ? "#E4E1FF" : "#FFF4DE"}
+        position={[12, 20, 10]}
+        intensity={props.night ? 0.72 : 0.92}
+        color={props.night ? "#E8E6FF" : "#FFF7ED"}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-27}
-        shadow-camera-right={27}
-        shadow-camera-top={27}
-        shadow-camera-bottom={-27}
+        shadow-camera-left={-22}
+        shadow-camera-right={22}
+        shadow-camera-top={22}
+        shadow-camera-bottom={-22}
         shadow-camera-near={1}
-        shadow-camera-far={64}
-        shadow-bias={-0.00016}
+        shadow-camera-far={55}
+        shadow-bias={-0.00012}
       />
-      <pointLight position={[-8, 10, -5]} color="#F8DCE7" intensity={0.7} distance={30} />
-      <pointLight position={[10, 7, 8]} color="#CDEFF5" intensity={0.75} distance={28} />
+      <pointLight position={[-8, 7, -4]} color="#F8DCE7" intensity={0.45} distance={26} />
+      <pointLight position={[8, 6, 6]} color="#C9F2FA" intensity={0.55} distance={24} />
 
       <Suspense fallback={null}>
-        <DreamWorld playing={props.playing} night={props.night} bladeAngle={props.bladeAngle} outputRpm={props.outputRpm} />
+        <IsometricWorld playing={props.playing} night={props.night} bladeAngle={props.bladeAngle} outputRpm={props.outputRpm} />
       </Suspense>
 
-      <ContactShadows position={[0, -1.43, 0]} opacity={props.night ? 0.16 : 0.2} scale={48} blur={4.2} far={29} />
-      <CameraTransition district={props.activeDistrict} controls={controls} active={transitioning} />
+      <ContactShadows position={[0, -0.02, 0]} opacity={props.night ? 0.12 : 0.16} scale={42} blur={5.5} far={22} />
+      <CameraController district={props.activeDistrict} controls={controls} transitioning={transitioning} />
       <OrbitControls
         ref={controls}
         makeDefault
-        target={PRESETS.sky.target}
-        minDistance={7}
-        maxDistance={42}
-        minPolarAngle={0.42}
-        maxPolarAngle={1.4}
+        target={FOCUS.sky.target}
+        enableRotate={false}
         enablePan
-        screenSpacePanning={false}
+        enableZoom
+        screenSpacePanning
+        minZoom={24}
+        maxZoom={58}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.1}
+        mouseButtons={{ LEFT: 2, MIDDLE: 1, RIGHT: 2 }}
         onStart={() => {
           transitioning.current = false;
         }}

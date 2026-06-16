@@ -1,19 +1,19 @@
 {
   "experimentId": "air-conditioner",
   "title": "Daikin Perfera 分体式空调拆解",
-  "version": "0.5.0-preview",
+  "version": "0.5.1-preview",
   "releaseStage": "preview",
   "modelCard": {
     "modelId": "MODEL-AC-DAIKIN-PERFERA-001",
     "title": "Daikin Perfera FTXM35R / RXM35R 参考结构",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "precisionLevel": "L2",
     "precisionLabel": "实机结构拓扑与装配关系级",
     "intendedUses": [
       "理解壁挂式分体空调室内机和室外机的主要零件层级",
       "理解制冷工况的压缩、冷凝、节流和蒸发路径",
       "通过选择零件进行概念拆卸和组装",
-      "查看每个主要零件的位置、作用、连接和安全边界"
+      "查看主要零件的位置、作用、连接和安全边界"
     ],
     "prohibitedUses": [
       "作为 Daikin FTXM35R 或 RXM35R 的实际维修步骤或工时依据",
@@ -25,7 +25,7 @@
     "coordinateSystem": "右手坐标系；室内机位于场景左侧，室外机位于场景右侧",
     "sourceFormat": "TypeScript 参数化程序模型与结构化零件说明书",
     "webFormat": "Three.js 运行时网格",
-    "generationMethod": "以官方产品目录固定参考型号和外壳比例，以公开产品结构、蒸气压缩循环和维修层级建立程序化零件模型",
+    "generationMethod": "以官方产品目录固定参考型号和外壳比例，以蒸气压缩循环和公开结构建立程序化零件模型",
     "parameters": [
       {
         "symbol": "L×H×D indoor",
@@ -43,7 +43,7 @@
       }
     ],
     "simplifications": [
-      "外壳采用官方尺寸比例，内部零件没有使用制造商专有 CAD 或维修图尺寸",
+      "外壳采用官方尺寸比例，内部零件未使用制造商专有 CAD 或维修图尺寸",
       "翅片数量、管路弯曲半径、阀体细节、线束和紧固件数量经过教学简化",
       "拆卸动画沿可理解的维护方向展开，不声明与全部实机螺钉和卡扣顺序完全一致",
       "制冷剂颜色和粒子只表示循环阶段，不是温度、压力、焓值或相态计算结果",
@@ -60,7 +60,7 @@
   },
   "contentCard": {
     "contentId": "CONTENT-AC-DAIKIN-PERFERA-001",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "audience": [
       "暖通与机械专业入门学习者",
       "制造业设备和流程人员",
@@ -95,9 +95,8 @@
       "url": "https://www.daikin.eu/content/dam/document-library/catalogues/ac/split/ftxm-r/Perfera_FTXM-R_RXM-R_Product%20catalogue_ECPEN20-007_English.pdf",
       "locator": "FTXM35R / RXM35R technical data, dimensions and product features",
       "supports": [
-        "参考型号",
-        "室内外机官方尺寸",
-        "宽幅导风板、过滤和风机换热功能"
+        "参考型号与室内外机官方尺寸",
+        "导风、过滤和换热送风功能"
       ]
     },
     {
@@ -115,13 +114,13 @@
     {
       "id": "ISO-5149-1",
       "evidenceLevel": "A",
-      "title": "Refrigerating systems and heat pumps — Safety and environmental requirements — Part 1",
+      "title": "ISO 5149-1:2014 — Refrigerating systems and heat pumps — Safety and environmental requirements — Part 1",
       "publisher": "International Organization for Standardization",
       "url": "https://www.iso.org/standard/54979.html",
-      "locator": "Definitions, classification and safety selection criteria",
+      "locator": "Edition 1 with published amendments; ISO page indicates revision work in progress",
       "supports": [
-        "制冷系统安全边界",
-        "不将教学模型作为维修指导"
+        "制冷系统安全、维护和制冷剂回收边界",
+        "不将教学模型作为实际维修指导"
       ]
     }
   ],
@@ -158,17 +157,17 @@
       "title": "参考型号和外壳比例核对",
       "critical": true,
       "status": "pass",
-      "method": "将模型外壳宽高深比例与 Daikin 官方产品目录中的 FTXM35R / RXM35R 数据核对",
-      "evidence": "src/data/experiments/definitions/thermal.ts and Daikin ECPEN20-007"
+      "method": "将模型外壳宽高深比例与 Daikin 官方目录中的 FTXM35R / RXM35R 数据核对",
+      "evidence": "src/data/experiments/definitions/thermal.ts"
     },
     {
       "id": "VERIFY-AC-PART-IDS",
-      "category": "geometry",
-      "title": "零件编号、选择和拆装状态完整性检查",
+      "category": "assembly",
+      "title": "零件编号、说明书和场景映射完整性检查",
       "critical": true,
       "status": "pass",
-      "method": "自动检查零件 ID 唯一性、说明书字段、拆装状态和场景零件映射",
-      "evidence": "scripts/appliance-structure-check.ts"
+      "method": "自动检查零件 ID、编码、说明书字段、系统分类和场景映射",
+      "evidence": "scripts/appliance-structure-check.mjs"
     },
     {
       "id": "VERIFY-AC-CYCLE",
@@ -181,11 +180,11 @@
     },
     {
       "id": "VERIFY-AC-COLLISION",
-      "category": "geometry",
+      "category": "visual",
       "title": "全部零件展开后的视觉干涉检查",
       "critical": true,
       "status": "pending",
-      "method": "在桌面和移动端检查全部展开、逐件拆卸和逐件装回状态的包围盒与可见性"
+      "method": "在桌面和移动端检查全部展开、逐件拆卸和装回状态"
     },
     {
       "id": "VERIFY-AC-PROFESSIONAL",
@@ -193,7 +192,7 @@
       "title": "独立暖通专业审核",
       "critical": true,
       "status": "pending",
-      "method": "由非作者暖通或制冷专业人员逐项审核零件拓扑、循环表述和安全边界"
+      "method": "由非作者暖通或制冷专业人员审核零件拓扑、循环表述和安全边界"
     },
     {
       "id": "VERIFY-AC-CONTENT",

@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { CatmullRomCurve3, Color, MathUtils, Vector3, type Group, type Mesh, type MeshStandardMaterial } from "three";
 import { useExperimentStore } from "../../../store/useExperimentStore";
-import { ExperimentCanvas } from "../ExperimentCanvas";
+import { ExperimentCanvas, SceneLabel } from "../ExperimentCanvas";
 import { ConveyorAssembly } from "./ConveyorAssembly";
 import { InjectionMoldingMachine } from "./InjectionMoldingMachine";
 import { LetterProduct } from "./LetterProduct";
@@ -30,12 +30,16 @@ const phaseLabels: Record<ProductionPhase, string> = {
   "batch-complete": "SENJER 完成",
 };
 
-const moldPosition = new Vector3(-1.5, 0.05, 0);
-const pickPosition = new Vector3(-0.4, 0.72, 0);
+const phaseOrder = Object.keys(phaseLabels) as ProductionPhase[];
+const moldPosition = new Vector3(-2.0, 0.05, 0);
+const pickPosition = new Vector3(-0.45, 0.72, 0);
 const conveyorStart = new Vector3(0.75, -0.18, 0);
 const conveyorEnd = new Vector3(5.75, -0.18, 0);
 const warmColor = new Color("#f29a4a");
 const coolColor = new Color("#8fc7e8");
+const offColor = new Color("#000000");
+const completedPadColor = new Color("#7fc3e7");
+const waitingPadColor = new Color("#d6e4ec");
 
 function updateLetterMaterial(group: Group, warm: boolean, glow: boolean) {
   group.traverse((child) => {
@@ -45,7 +49,7 @@ function updateLetterMaterial(group: Group, warm: boolean, glow: boolean) {
     if (!material?.color) return;
     material.color.copy(warm ? warmColor : coolColor);
     if (material.emissive) {
-      material.emissive.copy(glow ? (warm ? warmColor : coolColor) : new Color("#000000"));
+      material.emissive.copy(glow ? (warm ? warmColor : coolColor) : offColor);
       material.emissiveIntensity = glow ? 0.22 : 0;
     }
   });
@@ -60,28 +64,27 @@ function ProductionLine() {
   const carriageRef = useRef<Group>(null);
   const gripperRef = useRef<Group>(null);
   const letterRefs = useRef<Array<Group | null>>([]);
-  const slotRefs = useRef<Array<Group | null>>([]);
+  const padRefs = useRef<Array<Mesh | null>>([]);
   const phaseLabelRefs = useRef<Array<Group | null>>([]);
   const batchLabelRef = useRef<Group>(null);
   const letterIndexRef = useRef(0);
   const elapsedRef = useRef(0);
-  const batchRef = useRef(1);
-  const completedCountRef = useRef(0);
 
   const speed = useExperimentStore((state) => state.speed);
   const pressure = useExperimentStore((state) => state.primary);
   const coolingShare = useExperimentStore((state) => state.secondary);
   const isPlaying = useExperimentStore((state) => state.isPlaying);
 
+  // 熔体粒子属于 InjectionMoldingMachine 的局部坐标系，因此这里使用局部路径。
   const meltCurve = useMemo(
     () =>
       new CatmullRomCurve3(
         [
-          new Vector3(-6.2, 0.18, 0),
-          new Vector3(-5.15, 0.18, 0),
-          new Vector3(-4.15, 0.18, 0),
-          new Vector3(-3.45, 0.18, 0),
-          new Vector3(-2.95, 0.18, 0),
+          new Vector3(-4.4, 0.18, 0),
+          new Vector3(-3.35, 0.18, 0),
+          new Vector3(-2.35, 0.18, 0),
+          new Vector3(-1.65, 0.18, 0),
+          new Vector3(-1.18, 0.18, 0),
         ],
         false,
         "centripetal",
@@ -100,14 +103,7 @@ function ProductionLine() {
 
     if (elapsedRef.current > totalDuration) {
       elapsedRef.current = 0;
-      if (currentIndex === lastIndex) {
-        letterIndexRef.current = 0;
-        completedCountRef.current = 0;
-        batchRef.current += 1;
-      } else {
-        letterIndexRef.current += 1;
-        completedCountRef.current = letterIndexRef.current;
-      }
+      letterIndexRef.current = currentIndex === lastIndex ? 0 : currentIndex + 1;
     }
 
     const frame = resolveProductionFrame(letterIndexRef.current, elapsedRef.current);
@@ -121,7 +117,13 @@ function ProductionLine() {
             ? 0.86
             : 0;
     const screwTravel =
-      phase === "inject" ? MathUtils.lerp(0, 1.1, phaseProgress) : phase === "hold" ? 1.1 : phase === "cool" ? 0.32 : 0;
+      phase === "inject"
+        ? MathUtils.lerp(0, 1.1, phaseProgress)
+        : phase === "hold"
+          ? 1.1
+          : phase === "cool"
+            ? 0.32
+            : 0;
     const ejectTravel = phase === "eject" ? MathUtils.smoothstep(phaseProgress, 0.08, 0.86) * 0.48 : 0;
 
     if (movingPlatenRef.current) movingPlatenRef.current.position.x = 0.15 + moldGap;
@@ -172,7 +174,7 @@ function ProductionLine() {
         return;
       }
 
-      const visible = !["close"].includes(phase) && !(phase === "inject" && phaseProgress < 0.06);
+      const visible = phase !== "close" && !(phase === "inject" && phaseProgress < 0.06);
       letterGroup.visible = visible;
       if (!visible) return;
 
@@ -197,9 +199,17 @@ function ProductionLine() {
       updateLetterMaterial(letterGroup, ["inject", "hold"].includes(phase), phase === "batch-complete");
     });
 
-    completedCountRef.current = frame.completedCount;
+    padRefs.current.forEach((pad, index) => {
+      if (!pad) return;
+      const material = pad.material as MeshStandardMaterial;
+      const completed = index < frame.completedCount;
+      material.color.copy(completed ? completedPadColor : waitingPadColor);
+      material.emissive.copy(completed ? new Color("#245a78") : offColor);
+      material.emissiveIntensity = completed ? 0.16 : 0;
+    });
+
     phaseLabelRefs.current.forEach((group, index) => {
-      if (group) group.visible = index === Object.keys(phaseLabels).indexOf(phase);
+      if (group) group.visible = index === phaseOrder.indexOf(phase);
     });
     if (batchLabelRef.current) batchLabelRef.current.position.y = 2.95 + Math.sin(elapsedRef.current * 2.4) * 0.025;
   });
@@ -215,7 +225,7 @@ function ProductionLine() {
       />
       <PickAndPlaceRobot carriageRef={carriageRef} gripperRef={gripperRef} />
       <ConveyorAssembly active={isPlaying} speed={speed} />
-      <SenjerAssemblyStation completedCount={completedCountRef.current} slotRefs={slotRefs} />
+      <SenjerAssemblyStation padRefs={padRefs} />
 
       {SENJER_SEQUENCE.map((letter, index) => (
         <group
@@ -232,26 +242,22 @@ function ProductionLine() {
       <RoundedBox args={[5.2, 0.12, 0.82]} radius={0.06} smoothness={4} position={[1.9, 3.02, 0]}>
         <meshStandardMaterial color="#f3f8fb" transparent opacity={0.92} roughness={0.28} />
       </RoundedBox>
-      {Object.values(phaseLabels).map((label, index) => (
+      {phaseOrder.map((phase, index) => (
         <group
-          key={label}
+          key={phase}
           ref={(group) => {
             phaseLabelRefs.current[index] = group;
           }}
           visible={index === 0}
         >
-          <Text position={[1.9, 3.04, 0.08]} fontSize={0.31} color="#24536d" anchorX="center" anchorY="middle">
-            当前阶段：{label}
-          </Text>
+          <SceneLabel position={[1.9, 3.04, 0.08]}>当前阶段：{phaseLabels[phase]}</SceneLabel>
         </group>
       ))}
       <group ref={batchLabelRef}>
-        <Text position={[-4.0, 2.95, 0]} fontSize={0.28} color="#2f6684" anchorX="center" anchorY="middle">
-          单机循环生产 · S → E → N → J → E → R
-        </Text>
+        <SceneLabel position={[-4.0, 2.95, 0]}>单机循环生产 · S → E → N → J → E → R</SceneLabel>
       </group>
       <Text position={[-4.0, 2.52, 0]} fontSize={0.18} color="#57798b" anchorX="center" anchorY="middle">
-        橙色：熔体 / 蓝色：冷却制品 / 冷却占比 {Math.round(coolingShare)}%
+        MELT / COOLING / ASSEMBLY
       </Text>
     </group>
   );

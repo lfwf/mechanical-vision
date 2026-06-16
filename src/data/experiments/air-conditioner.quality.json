@@ -1,31 +1,31 @@
 {
   "experimentId": "air-conditioner",
   "title": "Daikin Perfera 分体式空调拆解",
-  "version": "0.5.1-preview",
+  "version": "0.6.0-preview",
   "releaseStage": "preview",
   "modelCard": {
     "modelId": "MODEL-AC-DAIKIN-PERFERA-001",
     "title": "Daikin Perfera FTXM35R / RXM35R 参考结构",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "precisionLevel": "L2",
-    "precisionLabel": "实机结构拓扑与装配关系级",
+    "precisionLabel": "实机比例、结构拓扑与装配层级级",
     "intendedUses": [
-      "理解壁挂式分体空调室内机和室外机的主要零件层级",
-      "理解制冷工况的压缩、冷凝、节流和蒸发路径",
-      "通过选择零件进行概念拆卸和组装",
-      "查看主要零件的位置、作用、连接和安全边界"
+      "识别壁挂式分体空调室内机和室外机的主要组件",
+      "理解室内外空气路径、冷凝水排放和制冷剂循环",
+      "通过 27 个可选择组件进行概念拆卸和组装",
+      "查看零件位置、作用、连接、拆装层级和安全边界"
     ],
     "prohibitedUses": [
       "作为 Daikin FTXM35R 或 RXM35R 的实际维修步骤或工时依据",
-      "制冷剂回收、焊接、抽真空、充注、电气测量和带压作业指导",
-      "加工制造、安装尺寸、公差、配管长度或控制参数决策",
+      "用于制冷剂回收、焊接、抽真空、充注、电气测量或带压作业",
+      "用于加工制造、安装尺寸、公差、配管长度或控制参数决策",
       "替代官方安装维修手册和持证暖通专业人员"
     ],
-    "units": "外壳比例按官方毫米尺寸换算为 Three.js 场景单位；内部零件为拓扑和装配层级比例",
-    "coordinateSystem": "右手坐标系；室内机位于场景左侧，室外机位于场景右侧",
-    "sourceFormat": "TypeScript 参数化程序模型与结构化零件说明书",
+    "units": "外壳比例按官方毫米尺寸换算为 Three.js 场景单位；内部零件为结构拓扑和装配层级比例",
+    "coordinateSystem": "右手坐标系；室内机位于场景左侧，室外机位于场景右侧；爆炸方向按装配层级径向展开",
+    "sourceFormat": "TypeScript 参数化程序模型、模块化 Three.js 组件与结构化零件说明书",
     "webFormat": "Three.js 运行时网格",
-    "generationMethod": "以官方产品目录固定参考型号和外壳比例，以蒸气压缩循环和公开结构建立程序化零件模型",
+    "generationMethod": "以官方产品目录固定参考型号和外壳比例，以蒸气压缩循环和公开空调结构建立程序化零件模型",
     "parameters": [
       {
         "symbol": "L×H×D indoor",
@@ -40,47 +40,55 @@
         "value": "765×550×285",
         "unit": "mm",
         "sourceIds": ["DAIKIN-PERFERA-ECPEN20-007"]
+      },
+      {
+        "symbol": "Nparts",
+        "name": "主要可交互组件数量",
+        "value": "27",
+        "unit": "个",
+        "sourceIds": ["DAIKIN-PERFERA-ECPEN20-007", "ASHRAE-HANDBOOK-FUNDAMENTALS"]
       }
     ],
     "simplifications": [
-      "外壳采用官方尺寸比例，内部零件未使用制造商专有 CAD 或维修图尺寸",
-      "翅片数量、管路弯曲半径、阀体细节、线束和紧固件数量经过教学简化",
-      "拆卸动画沿可理解的维护方向展开，不声明与全部实机螺钉和卡扣顺序完全一致",
+      "外壳采用官方尺寸比例，内部零件未使用制造商专有 CAD 或完整服务图尺寸",
+      "翅片数量、管路弯曲半径、焊点、阀体、PCB 元件、线束和紧固件数量经过教学简化",
+      "爆炸动画用于表达遮挡和装配层级，不声明与全部实机维修动作完全一致",
       "制冷剂颜色和粒子只表示循环阶段，不是温度、压力、焓值或相态计算结果",
-      "本版只动画化制冷工况，四通阀制热换向和化霜控制未实现"
+      "制热换向、化霜控制和定量性能计算不在本版范围"
     ],
     "knownLimitations": [
-      "未获得该型号完整服务手册和原厂三维 CAD，不能验证专有内部尺寸与全部线束走向",
-      "不计算换热量、制冷剂质量流量、过热度、过冷度、能效、噪声或结构强度",
+      "未获得该型号完整服务手册和原厂三维 CAD，不能验证全部专有内部尺寸和线束走向",
+      "不计算换热量、质量流量、过热度、过冷度、能效、噪声、振动或结构强度",
       "尚未完成独立暖通工程师对模型和内容的逐项审核",
-      "不同地区、容量和生产批次的零件布局可能变化"
+      "不同地区、容量和生产批次的组件布局可能变化"
     ],
     "author": "Mechanical Vision project",
     "createdAt": "2026-06-16"
   },
   "contentCard": {
     "contentId": "CONTENT-AC-DAIKIN-PERFERA-001",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "audience": [
       "暖通与机械专业入门学习者",
       "制造业设备和流程人员",
       "家电结构兴趣学习者"
     ],
     "learningObjectives": [
-      "识别室内机和室外机主要部件",
-      "按压缩、冷凝、节流和蒸发解释制冷工况",
-      "理解零件遮挡、连接和安全条件决定拆装顺序"
+      "识别室内机 15 个和室外机 12 个主要组件",
+      "区分空气、冷凝水和制冷剂三条路径",
+      "按压缩、室外放热、节流和室内吸热解释制冷工况",
+      "理解遮挡、连接、承载和危险能量如何决定拆装顺序"
     ],
     "scope": [
       "参考型号和外壳比例",
-      "主要零件拓扑与概念装配关系",
-      "制冷工作原理",
+      "主要组件拓扑、材质和概念装配关系",
+      "制冷循环、室内外气流和冷凝水路径",
       "零件级说明书和安全边界"
     ],
     "outOfScope": [
-      "原厂维修工艺和紧固扭矩",
-      "制冷剂和电气实际维修",
-      "定量热力计算",
+      "原厂维修工艺、螺钉规格和紧固扭矩",
+      "实际制冷剂和电气维修",
+      "定量热力、流体、噪声和结构计算",
       "故障诊断和备件替代判断"
     ],
     "author": "Mechanical Vision project",
@@ -107,7 +115,7 @@
       "locator": "Thermodynamics and refrigeration-cycle fundamentals",
       "supports": [
         "蒸气压缩制冷循环",
-        "压缩机、冷凝器、节流元件和蒸发器功能",
+        "压缩机、换热器、节流元件和换向阀的系统功能",
         "系统能量平衡"
       ]
     },
@@ -117,7 +125,7 @@
       "title": "ISO 5149-1:2014 — Refrigerating systems and heat pumps — Safety and environmental requirements — Part 1",
       "publisher": "International Organization for Standardization",
       "url": "https://www.iso.org/standard/54979.html",
-      "locator": "Edition 1 with published amendments; ISO page indicates revision work in progress",
+      "locator": "Refrigerating-system safety and maintenance boundaries",
       "supports": [
         "制冷系统安全、维护和制冷剂回收边界",
         "不将教学模型作为实际维修指导"
@@ -133,15 +141,15 @@
     },
     {
       "id": "CLAIM-AC-002",
-      "statement": "制冷工况的基本循环由压缩、室外冷凝、节流和室内蒸发构成。",
+      "statement": "制冷工况的基本循环由压缩、室外放热与冷凝、节流和室内吸热与蒸发构成。",
       "sourceIds": ["ASHRAE-HANDBOOK-FUNDAMENTALS"],
       "scope": "kinematics"
     },
     {
       "id": "CLAIM-AC-003",
-      "statement": "室外侧放热量等于室内侧吸热量与压缩机输入功之和。",
-      "sourceIds": ["ASHRAE-HANDBOOK-FUNDAMENTALS"],
-      "scope": "kinematics"
+      "statement": "室内空气、室外空气、冷凝水和制冷剂属于不同流动路径。",
+      "sourceIds": ["DAIKIN-PERFERA-ECPEN20-007", "ASHRAE-HANDBOOK-FUNDAMENTALS"],
+      "scope": "definition"
     },
     {
       "id": "CLAIM-AC-004",
@@ -158,15 +166,15 @@
       "critical": true,
       "status": "pass",
       "method": "将模型外壳宽高深比例与 Daikin 官方目录中的 FTXM35R / RXM35R 数据核对",
-      "evidence": "src/data/experiments/definitions/thermal.ts"
+      "evidence": "src/data/experiments/definitions/airConditionerDefinition.ts"
     },
     {
       "id": "VERIFY-AC-PART-IDS",
       "category": "assembly",
-      "title": "零件编号、说明书和场景映射完整性检查",
+      "title": "27 个组件、说明书和场景映射完整性检查",
       "critical": true,
       "status": "pass",
-      "method": "自动检查零件 ID、编码、说明书字段、系统分类和场景映射",
+      "method": "自动检查组件 ID、编码、说明书字段、系统分类和场景映射",
       "evidence": "scripts/appliance-structure-check.mjs"
     },
     {
@@ -176,12 +184,21 @@
       "critical": true,
       "status": "pass",
       "method": "核对压缩机、室外换热器、电子膨胀阀、室内换热器并返回压缩机的路径顺序",
-      "evidence": "src/components/experiments/AirConditionerScene.tsx"
+      "evidence": "src/components/experiments/airConditioner/CoolingCycle.tsx"
+    },
+    {
+      "id": "VERIFY-AC-AIRFLOW",
+      "category": "kinematics",
+      "title": "室内外空气和冷凝水路径检查",
+      "critical": true,
+      "status": "pass",
+      "method": "核对进风、过滤、换热、贯流送风、室外轴流换热和接水盘排水关系",
+      "evidence": "src/components/experiments/airConditioner/AirflowVisualization.tsx"
     },
     {
       "id": "VERIFY-AC-COLLISION",
       "category": "visual",
-      "title": "全部零件展开后的视觉干涉检查",
+      "title": "全部组件展开后的视觉干涉检查",
       "critical": true,
       "status": "pending",
       "method": "在桌面和移动端检查全部展开、逐件拆卸和装回状态"
@@ -192,7 +209,7 @@
       "title": "独立暖通专业审核",
       "critical": true,
       "status": "pending",
-      "method": "由非作者暖通或制冷专业人员审核零件拓扑、循环表述和安全边界"
+      "method": "由非作者暖通或制冷专业人员审核组件拓扑、循环表述和安全边界"
     },
     {
       "id": "VERIFY-AC-CONTENT",
@@ -213,7 +230,7 @@
       "reviewerRole": "独立暖通或制冷系统模型审核人",
       "reviewedAt": null,
       "independent": true,
-      "notes": "等待核对参考型号、主要部件拓扑、拆装方向、循环路径和已知简化"
+      "notes": "等待核对参考型号、27 个主要组件拓扑、爆炸方向、循环路径和已知简化"
     },
     {
       "id": "REVIEW-AC-CONTENT",
@@ -233,7 +250,7 @@
       "reviewerRole": "代码与交互集成维护者",
       "reviewedAt": "2026-06-16",
       "independent": false,
-      "notes": "已完成零件选择、逐件拆装、全部展开、全部组装、说明书和制冷动画集成；不代表暖通专业批准"
+      "notes": "已完成 27 个组件选择、逐件拆装、全部展开、全部组装、说明书、制冷循环和气流排水动画集成；不代表暖通专业批准"
     }
   ]
 }

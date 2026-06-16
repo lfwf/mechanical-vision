@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, type RefObject } from "react";
 import {
   CatmullRomCurve3,
   Color,
@@ -19,57 +19,67 @@ const SOAP = new Color("#77c7d7");
 function FrontPanelFrame() {
   return (
     <group>
-      <mesh position={[0, 2.1, 0]} castShadow>
-        <boxGeometry args={[4.55, 0.75, 0.18]} />
+      <mesh position={[0, 2.05, 0]} castShadow>
+        <boxGeometry args={[4.55, 0.85, 0.18]} />
         <meshStandardMaterial color="#eceee9" roughness={0.4} />
       </mesh>
-      <mesh position={[0, -2.0, 0]} castShadow>
-        <boxGeometry args={[4.55, 1.05, 0.18]} />
+      <mesh position={[0, -1.95, 0]} castShadow>
+        <boxGeometry args={[4.55, 1.15, 0.18]} />
         <meshStandardMaterial color="#eceee9" roughness={0.4} />
       </mesh>
-      <mesh position={[-1.95, 0, 0]} castShadow>
-        <boxGeometry args={[0.65, 3.55, 0.18]} />
+      <mesh position={[-1.98, 0, 0]} castShadow>
+        <boxGeometry args={[0.6, 3.45, 0.18]} />
         <meshStandardMaterial color="#eceee9" roughness={0.4} />
       </mesh>
-      <mesh position={[1.95, 0, 0]} castShadow>
-        <boxGeometry args={[0.65, 3.55, 0.18]} />
+      <mesh position={[1.98, 0, 0]} castShadow>
+        <boxGeometry args={[0.6, 3.45, 0.18]} />
         <meshStandardMaterial color="#eceee9" roughness={0.4} />
       </mesh>
     </group>
   );
 }
 
-function InnerDrum({ drumRef }: { drumRef: React.RefObject<Group | null> }) {
+function InnerDrum({ drumRef }: { drumRef: RefObject<Group | null> }) {
   return (
     <group ref={drumRef}>
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[1.58, 1.58, 2.65, 72, 1, true]} />
-        <meshStandardMaterial color="#aab8b7" metalness={0.82} roughness={0.18} side={2} />
+        <meshStandardMaterial
+          color="#aab8b7"
+          metalness={0.82}
+          roughness={0.18}
+          side={2}
+        />
       </mesh>
       <mesh position={[0, 0, 1.32]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.42, 0.12, 20, 72]} />
         <meshStandardMaterial color="#8f9d9d" metalness={0.8} roughness={0.18} />
       </mesh>
-      {Array.from({ length: 3 }, (_, index) => (
-        <mesh
-          key={`lifter-${index}`}
-          rotation={[0, 0, (index * Math.PI * 2) / 3]}
-          position={[0, 0, 0.2]}
-          castShadow
-        >
-          <boxGeometry args={[0.22, 2.7, 1.9]} />
-          <meshStandardMaterial color="#c9d3d1" metalness={0.42} roughness={0.28} />
-        </mesh>
-      ))}
-      {Array.from({ length: 48 }, (_, index) => {
-        const angle = (index % 12) * (Math.PI * 2 / 12);
-        const z = -1.05 + Math.floor(index / 12) * 0.7;
+
+      {Array.from({ length: 3 }, (_, index) => {
+        const angle = (index * Math.PI * 2) / 3;
+        return (
+          <mesh
+            key={`lifter-${index}`}
+            position={[Math.cos(angle) * 1.27, Math.sin(angle) * 1.27, 0.15]}
+            rotation={[0, 0, angle]}
+            castShadow
+          >
+            <boxGeometry args={[0.2, 0.34, 1.95]} />
+            <meshStandardMaterial color="#c9d3d1" metalness={0.42} roughness={0.28} />
+          </mesh>
+        );
+      })}
+
+      {Array.from({ length: 60 }, (_, index) => {
+        const angle = (index % 15) * (Math.PI * 2 / 15);
+        const z = -1.05 + Math.floor(index / 15) * 0.7;
         return (
           <mesh
             key={`hole-${index}`}
             position={[Math.cos(angle) * 1.57, Math.sin(angle) * 1.57, z]}
           >
-            <sphereGeometry args={[0.045, 10, 8]} />
+            <sphereGeometry args={[0.042, 10, 8]} />
             <meshBasicMaterial color="#3b5257" />
           </mesh>
         );
@@ -78,7 +88,7 @@ function InnerDrum({ drumRef }: { drumRef: React.RefObject<Group | null> }) {
   );
 }
 
-function DirectDriveMotor({ rotorRef }: { rotorRef: React.RefObject<Group | null> }) {
+function DirectDriveMotor({ rotorRef }: { rotorRef: RefObject<Group | null> }) {
   return (
     <group>
       <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
@@ -94,14 +104,18 @@ function DirectDriveMotor({ rotorRef }: { rotorRef: React.RefObject<Group | null
           </mesh>
         );
       })}
-      <group ref={rotorRef} position={[0, 0, -0.28]}>
+      <group ref={rotorRef} position={[0, 0, -0.3]}>
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
           <cylinderGeometry args={[1.35, 1.35, 0.24, 72]} />
           <meshStandardMaterial color="#3f555a" metalness={0.72} roughness={0.2} />
         </mesh>
         <mesh position={[0.78, 0, -0.14]}>
           <boxGeometry args={[0.34, 0.12, 0.08]} />
-          <meshStandardMaterial color="#f1c760" emissive="#6f4f1b" emissiveIntensity={0.3} />
+          <meshStandardMaterial
+            color="#f1c760"
+            emissive="#6f4f1b"
+            emissiveIntensity={0.3}
+          />
         </mesh>
       </group>
     </group>
@@ -151,7 +165,10 @@ function WashingMachineAssembly() {
       ),
     [],
   );
-  const particles = useMemo(() => Array.from({ length: 34 }, (_, index) => index / 34), []);
+  const particles = useMemo(
+    () => Array.from({ length: 34 }, (_, index) => index / 34),
+    [],
+  );
 
   useFrame(({ clock }, delta) => {
     const visualSpeed = 0.35 + speed / 35;
@@ -165,13 +182,15 @@ function WashingMachineAssembly() {
         spinAngle.current += delta * visualSpeed * 0.12;
       }
     }
+
     if (drumRef.current) drumRef.current.rotation.z = spinAngle.current;
     if (rotorRef.current) rotorRef.current.rotation.z = spinAngle.current;
 
     particleRefs.current.forEach((particle, index) => {
       if (!particle) return;
-      particle.visible = !assemblyEnabled && variant !== 4;
+      particle.visible = !assemblyEnabled;
       if (assemblyEnabled) return;
+
       const progress = (particles[index] + phaseRef.current) % 1;
       const material = particle.material as MeshStandardMaterial;
       material.color.copy(index % 4 === 0 ? SOAP : WATER);

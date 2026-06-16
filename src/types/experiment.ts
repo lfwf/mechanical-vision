@@ -56,8 +56,20 @@ export interface ApplianceReferenceModel {
   manufacturer: string;
   model: string;
   productType: string;
+  capacity?: string;
+  dimensions?: string;
+  hasDryer?: boolean;
+  driveType?: "belt" | "direct-drive";
+  motorType?: string;
+  outerTubConstruction?: string;
+  sourceIds?: string[];
+  confirmedFacts?: string[];
+  engineeringInferences?: string[];
+  teachingSimplifications?: string[];
   accuracyStatement: string;
 }
+
+export type PartEvidenceStatus = "confirmed" | "engineering-inference" | "teaching-simplification";
 
 export interface PartManualDefinition {
   id: string;
@@ -69,10 +81,18 @@ export interface PartManualDefinition {
   connections: string[];
   removalOrder: number;
   removalPrerequisites: string[];
+  prerequisitePartIds?: string[];
+  blockedByPartIds?: string[];
+  removalDirection?: string;
+  assemblyGroup?: string;
   removalSteps: string[];
   installChecks: string[];
+  commonFaults?: string[];
+  faultSymptoms?: string[];
   warnings: string[];
   sourceIds: string[];
+  evidenceStatus?: PartEvidenceStatus;
+  precisionNote?: string;
   detachable?: boolean;
 }
 

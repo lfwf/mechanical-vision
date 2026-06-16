@@ -1,6 +1,6 @@
 import { RoundedBox, Text } from "@react-three/drei";
 import type { RefObject } from "react";
-import type { Group } from "three";
+import type { Mesh } from "three";
 import { SENJER_SEQUENCE } from "./injectionMoldingCycle";
 
 export const letterSlotPositions: Array<[number, number, number]> = SENJER_SEQUENCE.map((_, index) => [
@@ -10,11 +10,10 @@ export const letterSlotPositions: Array<[number, number, number]> = SENJER_SEQUE
 ]);
 
 interface SenjerAssemblyStationProps {
-  completedCount: number;
-  slotRefs: RefObject<Array<Group | null>>;
+  padRefs: RefObject<Array<Mesh | null>>;
 }
 
-export function SenjerAssemblyStation({ completedCount, slotRefs }: SenjerAssemblyStationProps) {
+export function SenjerAssemblyStation({ padRefs }: SenjerAssemblyStationProps) {
   return (
     <group>
       <RoundedBox args={[6.35, 0.34, 2.15]} radius={0.12} smoothness={5} position={[8.75, -0.88, 0]} receiveShadow castShadow>
@@ -27,27 +26,23 @@ export function SenjerAssemblyStation({ completedCount, slotRefs }: SenjerAssemb
         const position = letterSlotPositions[index];
         return (
           <group key={`${letter}-${index}`} position={position}>
-            <RoundedBox args={[0.78, 0.08, 1.02]} radius={0.05} smoothness={4} position={[0, -0.54, 0]}>
-              <meshStandardMaterial
-                color={index < completedCount ? "#7fc3e7" : "#d6e4ec"}
-                emissive={index < completedCount ? "#245a78" : "#000000"}
-                emissiveIntensity={index < completedCount ? 0.16 : 0}
-                roughness={0.34}
-              />
-            </RoundedBox>
+            <mesh
+              ref={(mesh) => {
+                padRefs.current[index] = mesh;
+              }}
+              position={[0, -0.54, 0]}
+            >
+              <boxGeometry args={[0.78, 0.08, 1.02]} />
+              <meshStandardMaterial color="#d6e4ec" roughness={0.34} />
+            </mesh>
             <Text position={[0, -0.5, 0.54]} fontSize={0.18} color="#31566a" anchorX="center" anchorY="middle">
               {index + 1}
             </Text>
-            <group
-              ref={(group) => {
-                slotRefs.current[index] = group;
-              }}
-            />
           </group>
         );
       })}
       <Text position={[8.75, 0.98, 0]} fontSize={0.34} color="#234d64" anchorX="center" anchorY="middle">
-        SENJER 生产装配台
+        SENJER ASSEMBLY
       </Text>
     </group>
   );

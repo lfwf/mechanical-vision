@@ -1,9 +1,20 @@
 import { useMemo } from "react";
 import { DoubleSide, Shape, type Group } from "three";
 
+/**
+ * 室外机轴流风扇和前格栅。
+ *
+ * FAN_TIP_RADIUS 必须小于 GRILLE_CLEAR_RADIUS，
+ * 否则风扇旋转时叶尖会穿出导风圈或前格栅。
+ */
 const FAN_TIP_RADIUS = 1.12;
 const GRILLE_CLEAR_RADIUS = 1.28;
 
+/**
+ * 创建单片三叶风扇叶片的二维轮廓。
+ * Shape 使用贝塞尔曲线描述根部、前缘、叶尖和后缘，
+ * 随后由 extrudeGeometry 拉伸成有厚度的三维叶片。
+ */
 function usePropellerBladeShape() {
   return useMemo(() => {
     const shape = new Shape();
@@ -16,18 +27,34 @@ function usePropellerBladeShape() {
   }, []);
 }
 
+/** Daikin 参考室外机的三叶轴流风扇。 */
 export function RealisticAxialFan({ fanRef }: { fanRef: React.RefObject<Group | null> }) {
   const bladeShape = usePropellerBladeShape();
+
   return (
     <group ref={fanRef}>
+      {/* 三片叶片相隔 120°，共同围绕 Z 轴旋转。 */}
       {Array.from({ length: 3 }, (_, index) => (
         <group key={index} rotation={[0, 0, (index * Math.PI * 2) / 3]}>
           <mesh position={[0, 0, -0.04]} rotation={[0.06, -0.12, -0.06]} castShadow>
-            <extrudeGeometry args={[bladeShape, { depth: 0.085, bevelEnabled: true, bevelThickness: 0.018, bevelSize: 0.014, bevelSegments: 2 }]} />
+            <extrudeGeometry
+              args={[
+                bladeShape,
+                {
+                  depth: 0.085,
+                  bevelEnabled: true,
+                  bevelThickness: 0.018,
+                  bevelSize: 0.014,
+                  bevelSegments: 2,
+                },
+              ]}
+            />
             <meshPhysicalMaterial color="#202728" roughness={0.34} metalness={0.08} clearcoat={0.16} side={DoubleSide} />
           </mesh>
         </group>
       ))}
+
+      {/* 中央轮毂与电机轴连接。 */}
       <mesh position={[0, 0, 0.015]} rotation={[Math.PI / 2, 0, 0]} castShadow>
         <cylinderGeometry args={[0.29, 0.29, 0.28, 48]} />
         <meshPhysicalMaterial color="#252e30" roughness={0.3} metalness={0.16} clearcoat={0.22} />
@@ -36,6 +63,8 @@ export function RealisticAxialFan({ fanRef }: { fanRef: React.RefObject<Group | 
         <cylinderGeometry args={[0.11, 0.14, 0.14, 32]} />
         <meshStandardMaterial color="#4c5657" metalness={0.44} roughness={0.26} />
       </mesh>
+
+      {/* 淡色圆环是叶尖包络校验线，用于检查叶片是否越过导风圈。 */}
       <mesh position={[0, 0, -0.1]}>
         <torusGeometry args={[FAN_TIP_RADIUS + 0.04, 0.012, 8, 80]} />
         <meshStandardMaterial color="#4b5657" transparent opacity={0.12} depthWrite={false} />
@@ -44,24 +73,54 @@ export function RealisticAxialFan({ fanRef }: { fanRef: React.RefObject<Group | 
   );
 }
 
+/**
+ * 室外机完整前格栅。
+ * 运行模式通常隐藏该组件，只在零件拆装模式中显示，
+ * 以免密集栅条遮挡风扇、电机和冷凝器。
+ */
 export function RealisticFrontGrille({ opacity = 1 }: { opacity?: number }) {
   const radius = GRILLE_CLEAR_RADIUS;
   const transparent = opacity < 0.99;
   const frameOpacity = transparent ? Math.max(0.32, opacity) : 1;
   const barOpacity = transparent ? Math.max(0.12, opacity * 0.82) : 1;
-  const horizontalBars = useMemo(() => Array.from({ length: 21 }, (_, index) => -1.16 + index * 0.116), []);
-  const verticalBars = useMemo(() => [-0.92, -0.61, -0.3, 0, 0.3, 0.61, 0.92], []);
+
+  // 横向栅条根据圆的弦长自动缩短，避免伸出圆形风圈。
+  const horizontalBars = useMemo(
+    () => Array.from({ length: 21 }, (_, index) => -1.16 + index * 0.116),
+    [],
+  );
+  const verticalBars = useMemo(
+    () => [-0.92, -0.61, -0.3, 0, 0.3, 0.61, 0.92],
+    [],
+  );
 
   return (
     <group renderOrder={13}>
-      <mesh position={[0, 1.38, 0]} castShadow={!transparent}><boxGeometry args={[2.92, 0.12, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
-      <mesh position={[0, -1.38, 0]} castShadow={!transparent}><boxGeometry args={[2.92, 0.12, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
-      <mesh position={[-1.39, 0, 0]} castShadow={!transparent}><boxGeometry args={[0.12, 2.62, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
-      <mesh position={[1.39, 0, 0]} castShadow={!transparent}><boxGeometry args={[0.12, 2.62, 0.14]} /><meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} /></mesh>
+      {/* 方形外框。 */}
+      <mesh position={[0, 1.38, 0]} castShadow={!transparent}>
+        <boxGeometry args={[2.92, 0.12, 0.14]} />
+        <meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
+      </mesh>
+      <mesh position={[0, -1.38, 0]} castShadow={!transparent}>
+        <boxGeometry args={[2.92, 0.12, 0.14]} />
+        <meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
+      </mesh>
+      <mesh position={[-1.39, 0, 0]} castShadow={!transparent}>
+        <boxGeometry args={[0.12, 2.62, 0.14]} />
+        <meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
+      </mesh>
+      <mesh position={[1.39, 0, 0]} castShadow={!transparent}>
+        <boxGeometry args={[0.12, 2.62, 0.14]} />
+        <meshPhysicalMaterial color="#e9ece8" roughness={0.34} clearcoat={0.16} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
+      </mesh>
+
+      {/* 圆形导风圈。 */}
       <mesh position={[0, 0, -0.015]}>
         <torusGeometry args={[radius, 0.045, 14, 96]} />
         <meshStandardMaterial color="#cfd6d3" metalness={0.12} roughness={0.4} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />
       </mesh>
+
+      {/* 横向栅条的长度按对应 Y 坐标处的圆弦计算。 */}
       {horizontalBars.map((y) => {
         const chord = Math.sqrt(Math.max(0, radius * radius - y * y));
         return (
@@ -71,6 +130,8 @@ export function RealisticFrontGrille({ opacity = 1 }: { opacity?: number }) {
           </mesh>
         );
       })}
+
+      {/* 纵向栅条同样按圆弦计算高度。 */}
       {verticalBars.map((x) => {
         const chord = Math.sqrt(Math.max(0, radius * radius - x * x));
         return (
@@ -80,6 +141,7 @@ export function RealisticFrontGrille({ opacity = 1 }: { opacity?: number }) {
           </mesh>
         );
       })}
+
       <mesh position={[0, 0, 0.12]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.12, 0.12, 0.06, 36]} />
         <meshStandardMaterial color="#d4dad7" metalness={0.12} roughness={0.36} transparent={transparent} opacity={frameOpacity} depthWrite={!transparent} />

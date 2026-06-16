@@ -8,6 +8,7 @@ import rackPinionJson from "./rack-pinion.quality.json";
 import sealJson from "./seal.quality.json";
 import sliderCrankJson from "./slider-crank.quality.json";
 import valvesJson from "./valves.quality.json";
+import washingMachineJson from "./washing-machine.quality.json";
 import { evaluateQualityGate } from "../../lib/qualityGate";
 import type { ExperimentId } from "../../types/experiment";
 import type { ExperimentQualityRecord } from "../../types/quality";
@@ -23,6 +24,7 @@ const records: Record<ExperimentId, ExperimentQualityRecord> = {
   bearing: bearingJson as ExperimentQualityRecord,
   seal: sealJson as ExperimentQualityRecord,
   "air-conditioner": airConditionerJson as ExperimentQualityRecord,
+  "washing-machine": washingMachineJson as ExperimentQualityRecord,
 };
 
 export function getExperimentQuality(id: ExperimentId): ExperimentQualityRecord {

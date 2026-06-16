@@ -1,46 +1,60 @@
-import { Activity, BookOpen, ShieldCheck } from "lucide-react";
+import { Activity, BookOpen, ShieldCheck, Wrench } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getExperimentDefinition } from "../../data/experiments/experimentRegistry";
 import {
   getExperimentQuality,
   getExperimentQualityGate,
 } from "../../data/experiments/qualityRecords";
+import { useExperimentStore } from "../../store/useExperimentStore";
 import type { ExperimentId } from "../../types/experiment";
 import { AnalysisView } from "./AnalysisView";
 import { GenericAnalysisView } from "./GenericAnalysisView";
 import { GenericKnowledgeView } from "./GenericKnowledgeView";
 import { KnowledgeView } from "./KnowledgeView";
+import { PartManualView } from "./PartManualView";
 import { QualityView } from "./QualityView";
 
-type InfoView = "analysis" | "knowledge" | "quality";
-
-const infoTabs: Array<{
-  id: InfoView;
-  label: string;
-  icon: typeof Activity;
-}> = [
-  { id: "analysis", label: "实验", icon: Activity },
-  { id: "knowledge", label: "知识", icon: BookOpen },
-  { id: "quality", label: "质量", icon: ShieldCheck },
-];
+type InfoView = "analysis" | "parts" | "knowledge" | "quality";
 
 export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
   const [activeView, setActiveView] = useState<InfoView>("analysis");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const selectedPartId = useExperimentStore((state) => state.selectedPartId);
+  const variant = useExperimentStore((state) => state.variant);
   const definition = getExperimentDefinition(experimentId);
   const quality = getExperimentQuality(experimentId);
   const gate = getExperimentQualityGate(experimentId);
+  const hasPartManuals = (definition.partManuals?.length ?? 0) > 0;
+  const assemblyMode =
+    definition.supportsPartAssembly === true &&
+    (definition.assemblyVariants?.includes(variant) ?? false);
+  const infoTabs = [
+    { id: "analysis" as const, label: "实验", icon: Activity },
+    ...(hasPartManuals
+      ? [{ id: "parts" as const, label: "零件", icon: Wrench }]
+      : []),
+    { id: "knowledge" as const, label: "知识", icon: BookOpen },
+    { id: "quality" as const, label: "质量", icon: ShieldCheck },
+  ];
 
   const heading =
     activeView === "analysis"
       ? { eyebrow: "实时分析", title: definition.title }
-      : activeView === "knowledge"
-        ? { eyebrow: "结构化知识", title: "原理与工程边界" }
-        : { eyebrow: "可信度档案", title: "模型与内容审查" };
+      : activeView === "parts"
+        ? { eyebrow: "零件说明书", title: "选择、拆解与组装" }
+        : activeView === "knowledge"
+          ? { eyebrow: "结构化知识", title: "原理与工程边界" }
+          : { eyebrow: "可信度档案", title: "模型与内容审查" };
 
   useEffect(() => {
     setActiveView("analysis");
   }, [experimentId]);
+
+  useEffect(() => {
+    if (assemblyMode && selectedPartId && hasPartManuals) {
+      setActiveView("parts");
+    }
+  }, [assemblyMode, hasPartManuals, selectedPartId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
@@ -60,7 +74,10 @@ export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
           </span>
         </div>
 
-        <nav className="info-view-tabs" aria-label="信息面板视图">
+        <nav
+          className={`info-view-tabs info-view-tabs-${infoTabs.length}`}
+          aria-label="信息面板视图"
+        >
           {infoTabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -85,6 +102,9 @@ export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
           ) : (
             <GenericAnalysisView experimentId={experimentId} />
           ))}
+        {activeView === "parts" && hasPartManuals && (
+          <PartManualView experimentId={experimentId} />
+        )}
         {activeView === "knowledge" &&
           (experimentId === "gear-pair" ? (
             <KnowledgeView />

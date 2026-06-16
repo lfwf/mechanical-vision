@@ -9,6 +9,7 @@ export const experimentIds = [
   "bearing",
   "seal",
   "air-conditioner",
+  "washing-machine",
 ] as const;
 
 export type ExperimentId = (typeof experimentIds)[number];
@@ -51,6 +52,30 @@ export interface KnowledgeSectionDefinition {
   items: KnowledgeItemDefinition[];
 }
 
+export interface ApplianceReferenceModel {
+  manufacturer: string;
+  model: string;
+  productType: string;
+  accuracyStatement: string;
+}
+
+export interface PartManualDefinition {
+  id: string;
+  name: string;
+  partCode: string;
+  system: string;
+  location: string;
+  function: string;
+  connections: string[];
+  removalOrder: number;
+  removalPrerequisites: string[];
+  removalSteps: string[];
+  installChecks: string[];
+  warnings: string[];
+  sourceIds: string[];
+  detachable?: boolean;
+}
+
 export interface ExperimentDefinition {
   id: ExperimentId;
   index: number;
@@ -65,6 +90,10 @@ export interface ExperimentDefinition {
   variantLabel?: string;
   variants?: string[];
   showDirectionControl?: boolean;
+  supportsPartAssembly?: boolean;
+  assemblyVariants?: number[];
+  referenceModel?: ApplianceReferenceModel;
+  partManuals?: PartManualDefinition[];
   quickSummary: string;
   formula?: string;
   parts: Array<{ name: string; role: string }>;

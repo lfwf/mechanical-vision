@@ -12,6 +12,8 @@ interface ExperimentStore extends ExperimentRuntimeValues {
   showLabels: boolean;
   showGrid: boolean;
   resetCameraToken: number;
+  selectedPartId: string | null;
+  detachedPartIds: string[];
   selectExperiment: (id: ExperimentId) => void;
   setValue: (key: RuntimeControlKey, value: number) => void;
   setVariant: (variant: number) => void;
@@ -21,9 +23,14 @@ interface ExperimentStore extends ExperimentRuntimeValues {
   toggleGrid: () => void;
   requestCameraReset: () => void;
   resetCurrentExperiment: () => void;
+  selectPart: (partId: string | null) => void;
+  togglePartDetached: (partId: string) => void;
+  detachAll: (partIds: string[]) => void;
+  assembleAll: () => void;
 }
 
-const initial = experimentDefinitions["gear-pair"].defaults;
+const initialDefinition = experimentDefinitions["gear-pair"];
+const initial = initialDefinition.defaults;
 
 export const useExperimentStore = create<ExperimentStore>((set, get) => ({
   activeExperimentId: "gear-pair",
@@ -32,12 +39,16 @@ export const useExperimentStore = create<ExperimentStore>((set, get) => ({
   showLabels: true,
   showGrid: true,
   resetCameraToken: 0,
+  selectedPartId: initialDefinition.partManuals?.[0]?.id ?? null,
+  detachedPartIds: [],
   selectExperiment: (activeExperimentId) => {
-    const defaults = experimentDefinitions[activeExperimentId].defaults;
+    const definition = experimentDefinitions[activeExperimentId];
     set((state) => ({
       activeExperimentId,
-      ...defaults,
+      ...definition.defaults,
       isPlaying: true,
+      selectedPartId: definition.partManuals?.[0]?.id ?? null,
+      detachedPartIds: [],
       resetCameraToken: state.resetCameraToken + 1,
     }));
   },
@@ -54,11 +65,22 @@ export const useExperimentStore = create<ExperimentStore>((set, get) => ({
   requestCameraReset: () =>
     set((state) => ({ resetCameraToken: state.resetCameraToken + 1 })),
   resetCurrentExperiment: () => {
-    const defaults = experimentDefinitions[get().activeExperimentId].defaults;
+    const definition = experimentDefinitions[get().activeExperimentId];
     set((state) => ({
-      ...defaults,
+      ...definition.defaults,
       isPlaying: true,
+      selectedPartId: definition.partManuals?.[0]?.id ?? null,
+      detachedPartIds: [],
       resetCameraToken: state.resetCameraToken + 1,
     }));
   },
+  selectPart: (selectedPartId) => set({ selectedPartId }),
+  togglePartDetached: (partId) =>
+    set((state) => ({
+      detachedPartIds: state.detachedPartIds.includes(partId)
+        ? state.detachedPartIds.filter((id) => id !== partId)
+        : [...state.detachedPartIds, partId],
+    })),
+  detachAll: (partIds) => set({ detachedPartIds: Array.from(new Set(partIds)) }),
+  assembleAll: () => set({ detachedPartIds: [] }),
 }));

@@ -1,0 +1,253 @@
+{
+  "experimentId": "washing-machine",
+  "title": "LG WM4000HWA 滚筒洗衣机拆解",
+  "version": "0.5.1-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-WM-LG-WM4000HWA-001",
+    "title": "LG WM4000HWA 参考结构",
+    "version": "0.5.1",
+    "precisionLevel": "L2",
+    "precisionLabel": "实机结构拓扑与运动关系级",
+    "intendedUses": [
+      "理解前置滚筒洗衣机的进水、洗涤、排水和脱水路径",
+      "区分旋转内筒与悬挂外筒",
+      "理解直驱电机、配重、弹簧和减振器的相对位置",
+      "通过零件选择进行概念拆卸和组装"
+    ],
+    "prohibitedUses": [
+      "作为 LG WM4000HWA 实际维修步骤、螺钉位置或工时依据",
+      "带电测量、承重筒体吊装、门锁旁路或控制板维修指导",
+      "备件适配、紧固扭矩、性能认证或故障诊断",
+      "替代 LG 官方服务资料和专业维修人员"
+    ],
+    "units": "整机采用相对比例；容量、驱动形式和内筒材料按官方资料登记",
+    "coordinateSystem": "右手坐标系；装载门位于正 Z 方向，直驱电机位于负 Z 方向",
+    "sourceFormat": "TypeScript 参数化程序模型与结构化零件说明书",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "以 LG 官方产品与支持资料固定型号、容量、直驱和不锈钢内筒边界，再建立机壳、水路、筒体、悬挂、驱动和排水拓扑",
+    "parameters": [
+      {
+        "symbol": "capacity",
+        "name": "额定容量标识",
+        "value": "4.5 cu. ft.",
+        "sourceIds": ["LG-WM4000HWA-PRODUCT"]
+      },
+      {
+        "symbol": "drive",
+        "name": "驱动形式",
+        "value": "Direct Drive Motor",
+        "sourceIds": ["LG-WM4000HWA-SUPPORT"]
+      },
+      {
+        "symbol": "drum",
+        "name": "内筒材料",
+        "value": "Stainless Steel Drum",
+        "sourceIds": ["LG-WM4000HWA-SUPPORT"]
+      }
+    ],
+    "simplifications": [
+      "未使用 LG 专有 CAD 或完整服务图纸，机壳、外筒和配重采用教学比例",
+      "内筒孔、提升筋、弹簧、减振器、软管、喷嘴和线束数量经过简化",
+      "水粒子和水位只表示路径和阶段，不是流体仿真或真实耗水量",
+      "拆卸动画沿典型服务方向展开，不声明全部卡扣、螺钉和线束顺序与实机完全一致"
+    ],
+    "knownLimitations": [
+      "不能验证全部内部尺寸、支架、线束和批次差异",
+      "不计算不平衡检测、筒体模态、减振阻尼、轴承寿命、洗净性能或剩余含水率",
+      "尚未完成独立家电维修或洗衣机结构专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-16"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-WM-LG-WM4000HWA-001",
+    "version": "0.5.1",
+    "audience": [
+      "机械与家电专业入门学习者",
+      "制造业设备和流程人员",
+      "家电结构兴趣学习者"
+    ],
+    "learningObjectives": [
+      "解释进水阀、洗涤剂分配器、外筒和排水泵形成的水路",
+      "解释低速翻滚和高速脱水的区别",
+      "识别内外筒、门封、配重、悬挂和直驱电机",
+      "理解断电、关水、排水和承重部件安全"
+    ],
+    "scope": [
+      "参考型号和官方功能边界",
+      "主要零件拓扑和运动关系",
+      "进水、洗涤、排水、脱水阶段",
+      "零件级概念拆装和安全边界"
+    ],
+    "outOfScope": [
+      "原厂维修步骤、诊断代码和紧固扭矩",
+      "实际电气维修和门锁旁路",
+      "性能认证和备件兼容性判断"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-16"
+  },
+  "sources": [
+    {
+      "id": "LG-WM4000HWA-PRODUCT",
+      "evidenceLevel": "C",
+      "title": "LG WM4000HWA 4.5 cu. ft. Smart Wi-Fi Enabled Front Load Washer",
+      "publisher": "LG Electronics USA",
+      "url": "https://www.lg.com/us/washers-dryers/lg-wm4000hwa-front-load-washer",
+      "locator": "Official product features and capacity",
+      "supports": [
+        "参考型号与容量",
+        "TurboWash 360、智能洗涤、蒸汽和钢化玻璃门"
+      ]
+    },
+    {
+      "id": "LG-WM4000HWA-SUPPORT",
+      "evidenceLevel": "C",
+      "title": "LG WM4000HWA product support",
+      "publisher": "LG Electronics USA",
+      "url": "https://www.lg.com/us/support/product/lg-WM4000HWA.ABWEUUS",
+      "locator": "Official support page and warranty component categories",
+      "supports": [
+        "Direct Drive Motor",
+        "Stainless Steel Drum",
+        "官方支持边界"
+      ]
+    },
+    {
+      "id": "IEC-60456",
+      "evidenceLevel": "A",
+      "title": "IEC 60456:2024 — Washing machines for household use — Methods for measuring the performance",
+      "publisher": "International Electrotechnical Commission",
+      "url": "https://webstore.iec.ch/en/publication/70049",
+      "locator": "Edition 6.0, published 2024-11-27",
+      "supports": [
+        "洗涤与脱水性能属于标准化试验结果",
+        "动画不能替代性能测量"
+      ]
+    },
+    {
+      "id": "IEC-60335-2-7",
+      "evidenceLevel": "A",
+      "title": "Household and similar electrical appliances — Safety — Part 2-7: Particular requirements for washing machines",
+      "publisher": "International Electrotechnical Commission",
+      "locator": "Particular safety requirements for washing machines",
+      "supports": [
+        "断电、机械、电气和用水安全边界",
+        "不将教学模型作为实际维修指导"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-WM-001",
+      "statement": "LG WM4000HWA 是 4.5 cu. ft. 前置式滚筒洗衣机，并提供 TurboWash 360、智能洗涤和蒸汽等功能。",
+      "sourceIds": ["LG-WM4000HWA-PRODUCT"],
+      "scope": "definition"
+    },
+    {
+      "id": "CLAIM-WM-002",
+      "statement": "官方支持资料将 Direct Drive Motor 和 Stainless Steel Drum 作为独立组件类别登记。",
+      "sourceIds": ["LG-WM4000HWA-SUPPORT"],
+      "scope": "geometry"
+    },
+    {
+      "id": "CLAIM-WM-003",
+      "statement": "洗涤和脱水性能需要使用标准化方法测量，动画不能替代性能试验。",
+      "sourceIds": ["IEC-60456"],
+      "scope": "application"
+    },
+    {
+      "id": "CLAIM-WM-004",
+      "statement": "实际拆机前需要断电、关水、排空残水，并控制配重、弹簧和筒体等机械风险。",
+      "sourceIds": ["IEC-60335-2-7"],
+      "scope": "maintenance"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-WM-REFERENCE",
+      "category": "geometry",
+      "title": "参考型号和官方功能边界核对",
+      "critical": true,
+      "status": "pass",
+      "method": "核对 LG 官方产品页和支持页中的型号、容量、直驱电机、不锈钢内筒和功能描述",
+      "evidence": "src/data/experiments/definitions/household.ts"
+    },
+    {
+      "id": "VERIFY-WM-PART-IDS",
+      "category": "assembly",
+      "title": "零件编号、说明书和拆装状态完整性检查",
+      "critical": true,
+      "status": "pass",
+      "method": "自动检查零件 ID、编码、说明书字段、系统分类和场景映射",
+      "evidence": "scripts/appliance-structure-check.mjs"
+    },
+    {
+      "id": "VERIFY-WM-MOTION",
+      "category": "kinematics",
+      "title": "内筒、外筒和直驱转子运动关系检查",
+      "critical": true,
+      "status": "pass",
+      "method": "洗涤与脱水模式只驱动内筒和直驱转子，外筒保持悬挂结构表达",
+      "evidence": "src/components/experiments/WashingMachineScene.tsx"
+    },
+    {
+      "id": "VERIFY-WM-COLLISION",
+      "category": "visual",
+      "title": "全部零件展开后的视觉干涉检查",
+      "critical": true,
+      "status": "pending",
+      "method": "在桌面和移动端检查全部展开、逐件拆卸和装回状态"
+    },
+    {
+      "id": "VERIFY-WM-PROFESSIONAL",
+      "category": "content",
+      "title": "独立洗衣机结构或维修专业审核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者专业人员审核水路、悬挂、筒体、直驱、电气和安全边界"
+    },
+    {
+      "id": "VERIFY-WM-CONTENT",
+      "category": "content",
+      "title": "关键结论来源映射",
+      "critical": true,
+      "status": "pass",
+      "method": "检查所有关键结论均绑定登记来源",
+      "evidence": "src/data/experiments/washing-machine.quality.json"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-WM-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立洗衣机结构或维修模型审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待核对参考机型、水路、筒体、悬挂、直驱系统和拆装方向"
+    },
+    {
+      "id": "REVIEW-WM-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立家电专业内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待核对术语、来源、运行阶段、零件说明书和安全边界"
+    },
+    {
+      "id": "REVIEW-WM-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-16",
+      "independent": false,
+      "notes": "已完成运行模式、零件选择、逐件拆装、全部展开、全部组装和说明书集成；不代表家电专业批准"
+    }
+  ]
+}

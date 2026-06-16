@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",

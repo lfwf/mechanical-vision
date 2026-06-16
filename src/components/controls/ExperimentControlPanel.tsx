@@ -1,11 +1,14 @@
 import {
   Eye,
   Grid3X3,
+  PackageCheck,
+  PackageOpen,
   Pause,
   Play,
   RotateCcw,
   RotateCw,
   ScanLine,
+  Wrench,
 } from "lucide-react";
 import { getExperimentDefinition } from "../../data/experiments/experimentRegistry";
 import { useExperimentStore } from "../../store/useExperimentStore";
@@ -21,6 +24,8 @@ export function ExperimentControlPanel() {
   const isPlaying = useExperimentStore((state) => state.isPlaying);
   const showLabels = useExperimentStore((state) => state.showLabels);
   const showGrid = useExperimentStore((state) => state.showGrid);
+  const selectedPartId = useExperimentStore((state) => state.selectedPartId);
+  const detachedPartIds = useExperimentStore((state) => state.detachedPartIds);
   const setValue = useExperimentStore((state) => state.setValue);
   const setVariant = useExperimentStore((state) => state.setVariant);
   const setDirection = useExperimentStore((state) => state.setDirection);
@@ -29,13 +34,28 @@ export function ExperimentControlPanel() {
   const toggleGrid = useExperimentStore((state) => state.toggleGrid);
   const requestCameraReset = useExperimentStore((state) => state.requestCameraReset);
   const resetCurrentExperiment = useExperimentStore((state) => state.resetCurrentExperiment);
+  const togglePartDetached = useExperimentStore((state) => state.togglePartDetached);
+  const detachAll = useExperimentStore((state) => state.detachAll);
+  const assembleAll = useExperimentStore((state) => state.assembleAll);
+
   const definition = getExperimentDefinition(activeId);
   const visibleControls = definition.controls.filter(
     (control) =>
       !control.visibleWhenVariants || control.visibleWhenVariants.includes(variant),
   );
-  const hasSpeed = definition.controls.some((control) => control.key === "speed");
+  const hasSpeed = visibleControls.some((control) => control.key === "speed");
   const showDirection = hasSpeed && definition.showDirectionControl !== false;
+  const assemblyMode =
+    definition.supportsPartAssembly === true &&
+    (definition.assemblyVariants?.includes(variant) ?? false);
+  const selectedPart = definition.partManuals?.find((part) => part.id === selectedPartId);
+  const detachableIds =
+    definition.partManuals
+      ?.filter((part) => part.detachable !== false)
+      .map((part) => part.id) ?? [];
+  const selectedDetached = selectedPartId
+    ? detachedPartIds.includes(selectedPartId)
+    : false;
   const runtimeValues = { speed, primary, secondary };
 
   return (
@@ -98,20 +118,53 @@ export function ExperimentControlPanel() {
         )}
       </div>
 
-      <div className={`control-sliders control-count-${visibleControls.length}`}>
-        {visibleControls.map((control) => (
-          <RangeField
-            key={control.key}
-            label={control.label}
-            value={runtimeValues[control.key]}
-            min={control.min}
-            max={control.max}
-            step={control.step}
-            suffix={control.suffix ?? ""}
-            onChange={(value) => setValue(control.key, value)}
-          />
-        ))}
-      </div>
+      {assemblyMode && (
+        <div className="assembly-control-strip">
+          <div className="assembly-selection-copy">
+            <Wrench size={16} />
+            <span>当前零件</span>
+            <strong>{selectedPart?.name ?? "请在模型或零件页选择"}</strong>
+            {selectedPartId && (
+              <small>{selectedDetached ? "已拆下" : "已装配"}</small>
+            )}
+          </div>
+          <div className="assembly-control-actions">
+            <button
+              type="button"
+              disabled={!selectedPartId || selectedPart?.detachable === false}
+              onClick={() => {
+                if (selectedPartId) togglePartDetached(selectedPartId);
+              }}
+            >
+              {selectedDetached ? <PackageCheck size={16} /> : <PackageOpen size={16} />}
+              {selectedDetached ? "装回当前零件" : "拆下当前零件"}
+            </button>
+            <button type="button" onClick={() => detachAll(detachableIds)}>
+              <PackageOpen size={16} /> 全部展开
+            </button>
+            <button type="button" onClick={assembleAll}>
+              <PackageCheck size={16} /> 全部组装
+            </button>
+          </div>
+        </div>
+      )}
+
+      {visibleControls.length > 0 && (
+        <div className={`control-sliders control-count-${visibleControls.length}`}>
+          {visibleControls.map((control) => (
+            <RangeField
+              key={control.key}
+              label={control.label}
+              value={runtimeValues[control.key]}
+              min={control.min}
+              max={control.max}
+              step={control.step}
+              suffix={control.suffix ?? ""}
+              onChange={(value) => setValue(control.key, value)}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="control-tools">
         <button

@@ -10,6 +10,7 @@ export const experimentIds = [
   "seal",
   "air-conditioner",
   "washing-machine",
+  "injection-molding",
 ] as const;
 
 export type ExperimentId = (typeof experimentIds)[number];

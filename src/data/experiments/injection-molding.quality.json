@@ -1,0 +1,170 @@
+{
+  "experimentId": "injection-molding",
+  "title": "注塑成型循环",
+  "version": "0.1.0-preview",
+  "releaseStage": "preview",
+  "modelCard": {
+    "modelId": "MODEL-INJECTION-MOLDING-001",
+    "title": "注塑成型循环教学模型",
+    "version": "0.1.0",
+    "precisionLevel": "L2",
+    "precisionLabel": "工艺流程与运动关系级",
+    "intendedUses": [
+      "理解注塑机主要组成",
+      "观察合模、注射、保压、冷却、开模和顶出顺序",
+      "理解螺杆、模具、冷却和顶出机构之间的协同"
+    ],
+    "prohibitedUses": [
+      "直接设定真实注塑机工艺参数",
+      "用于模具强度、锁模力、流变、翘曲或冷却水路设计",
+      "替代模流分析、设备手册或现场工艺验证"
+    ],
+    "units": "Three.js 教学比例单位；压力、速度和时间为说明参数",
+    "coordinateSystem": "右手坐标系；X 轴沿注射与开合模方向，Y 轴向上，Z 轴横向",
+    "sourceFormat": "TypeScript 参数化程序模型",
+    "webFormat": "Three.js 运行时网格",
+    "generationMethod": "按典型卧式往复螺杆注塑机建立注射单元、模具、锁模、冷却和顶出运动链",
+    "parameters": [
+      {
+        "symbol": "p",
+        "name": "注射压力",
+        "value": "40–140 MPa（教学参数）",
+        "sourceIds": ["INJECTION-MOLDING-ENGINEERING"]
+      },
+      {
+        "symbol": "tc",
+        "name": "冷却占比",
+        "value": "20–55%",
+        "sourceIds": ["INJECTION-MOLDING-ENGINEERING"]
+      }
+    ],
+    "simplifications": [
+      "料筒塑化、熔体流动和冷却以方向和阶段表达",
+      "模腔采用简单板状制品，不对应具体产品或模具",
+      "锁模机构用直线驱动教学简化，不代表特定曲肘或液压结构"
+    ],
+    "knownLimitations": [
+      "不计算熔体黏度、剪切热、模腔压力、温度场、收缩和翘曲",
+      "不计算真实锁模力、注射速度切换和螺杆计量过程",
+      "尚未完成独立注塑工艺专业审核"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-16"
+  },
+  "contentCard": {
+    "contentId": "CONTENT-INJECTION-MOLDING-001",
+    "version": "0.1.0",
+    "audience": [
+      "制造业新人",
+      "注塑工艺入门学习者",
+      "设备、质量和流程人员"
+    ],
+    "learningObjectives": [
+      "识别注塑成型六个主要阶段",
+      "理解注射与保压的区别",
+      "理解冷却与顶出的先后关系",
+      "认识注射单元、模具和锁模单元"
+    ],
+    "scope": [
+      "典型卧式注塑机结构",
+      "循环顺序",
+      "主要机构相对运动",
+      "工艺参数的趋势性说明"
+    ],
+    "outOfScope": [
+      "真实产品工艺窗口",
+      "模流分析与模具设计",
+      "设备选型和安全操作规程"
+    ],
+    "author": "Mechanical Vision project",
+    "createdAt": "2026-06-16"
+  },
+  "sources": [
+    {
+      "id": "INJECTION-MOLDING-ENGINEERING",
+      "evidenceLevel": "B",
+      "title": "Injection Molding Engineering Principles",
+      "publisher": "Mechanical Vision engineering reference",
+      "locator": "Typical reciprocating-screw injection molding cycle",
+      "supports": [
+        "合模、注射、保压、冷却、开模与顶出顺序",
+        "往复螺杆、模具、冷却和顶出机构的典型功能",
+        "教学模型的工艺边界"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-INJECTION-001",
+      "statement": "典型热塑性注塑循环依次包含合模、充模、保压、冷却、开模和顶出。",
+      "sourceIds": ["INJECTION-MOLDING-ENGINEERING"],
+      "scope": "application"
+    },
+    {
+      "id": "CLAIM-INJECTION-002",
+      "statement": "保压阶段用于在浇口冻结前补偿体积收缩，冷却后制品才具备稳定脱模条件。",
+      "sourceIds": ["INJECTION-MOLDING-ENGINEERING"],
+      "scope": "application"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VERIFY-INJECTION-STAGES",
+      "category": "kinematics",
+      "title": "六阶段顺序与运动检查",
+      "critical": true,
+      "status": "pass",
+      "method": "检查自动循环和手动阶段中的模具、螺杆、顶针和制品状态",
+      "evidence": "InjectionMoldingScene.tsx"
+    },
+    {
+      "id": "VERIFY-INJECTION-FLOW",
+      "category": "content",
+      "title": "熔体路径与冷却路径检查",
+      "critical": true,
+      "status": "pass",
+      "method": "确认熔体从料筒经喷嘴进入闭合模具，冷却路径仅在冷却阶段强调",
+      "evidence": "InjectionMoldingScene.tsx"
+    },
+    {
+      "id": "VERIFY-INJECTION-INDEPENDENT",
+      "category": "content",
+      "title": "独立注塑工艺审核",
+      "critical": true,
+      "status": "pending",
+      "method": "由非作者注塑工艺或模具专业人员复核流程、术语和简化边界"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REVIEW-INJECTION-MODEL",
+      "area": "model",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立注塑设备或模具审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员复核设备结构和动作顺序"
+    },
+    {
+      "id": "REVIEW-INJECTION-CONTENT",
+      "area": "content",
+      "decision": "pending",
+      "reviewer": null,
+      "reviewerRole": "独立注塑工艺内容审核人",
+      "reviewedAt": null,
+      "independent": true,
+      "notes": "等待专业人员复核术语和工艺边界"
+    },
+    {
+      "id": "REVIEW-INJECTION-INTEGRATION",
+      "area": "integration",
+      "decision": "approved",
+      "reviewer": "Project maintainer",
+      "reviewerRole": "代码与交互集成维护者",
+      "reviewedAt": "2026-06-16",
+      "independent": false,
+      "notes": "已完成实验注册、参数控制和基础动画集成"
+    }
+  ]
+}

@@ -1,31 +1,41 @@
 import { useExperimentStore } from "../../../store/useExperimentStore";
 import { SceneLabel } from "../ExperimentCanvas";
-import { FlowArrow, TubePath } from "../ScenePrimitives";
+import { FlowArrow } from "../ScenePrimitives";
+import { AnimatedFlowLines } from "./AnimatedFlowLines";
 import { AnimatedFlowParticles, type FlowPoint } from "./AnimatedFlowParticles";
 
-const INDOOR_AIR_PATHS: FlowPoint[][] = [-6.25, -5.25, -4.2, -3.15, -2.2].map((x): FlowPoint[] => [
-  [x, 3.08, 0.92],
-  [x, 2.35, 0.82],
-  [x, 1.82, 0.62],
-  [x, 1.28, 0.25],
-  [x, 0.72, 0.08],
-  [x, 0.22, 0.74],
-  [x + 0.25, -0.12, 1.62],
+const INDOOR_INTAKE_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x): FlowPoint[] => [
+  [x, 3.18, 0.92],
+  [x, 2.62, 0.86],
+  [x, 2.08, 0.66],
+  [x, 1.62, 0.36],
+  [x, 1.18, 0.1],
 ]);
 
-const OUTDOOR_REAR_AIR_PATHS: FlowPoint[][] = [
-  [[3.0, -0.82, -2.05], [3.0, -0.72, -0.82], [3.48, -0.38, -0.05], [3.68, -0.16, 0.88], [3.72, -0.1, 2.02]],
-  [[3.55, -0.18, -2.05], [3.55, -0.15, -0.82], [3.66, -0.08, -0.04], [3.68, -0.03, 0.9], [3.72, 0, 2.02]],
-  [[4.1, 0.62, -2.05], [4.08, 0.55, -0.82], [3.84, 0.28, -0.02], [3.7, 0.12, 0.9], [3.72, 0.05, 2.02]],
+const INDOOR_SUPPLY_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x, index): FlowPoint[] => [
+  [x, 1.18, 0.1],
+  [x, 0.78, 0.02],
+  [x, 0.34, 0.55],
+  [x + (index - 2) * 0.08, 0.02, 1.42],
+  [x + (index - 2) * 0.18, -0.48, 2.5],
+]);
+
+const OUTDOOR_REAR_INTAKE: FlowPoint[][] = [
+  [[3.0, -0.82, -2.2], [3.0, -0.72, -1.25], [3.18, -0.55, -0.62], [3.48, -0.3, 0.02], [3.68, -0.14, 0.76]],
+  [[3.55, -0.18, -2.2], [3.55, -0.15, -1.25], [3.6, -0.1, -0.58], [3.66, -0.05, 0.02], [3.68, -0.02, 0.78]],
+  [[4.1, 0.62, -2.2], [4.08, 0.55, -1.25], [3.98, 0.4, -0.58], [3.82, 0.22, 0.02], [3.7, 0.08, 0.78]],
 ];
 
-const OUTDOOR_SIDE_AIR_PATHS: FlowPoint[][] = [
-  [[1.55, -0.58, -0.3], [2.1, -0.55, -0.3], [2.72, -0.35, -0.05], [3.45, -0.16, 0.72], [3.72, -0.08, 1.98]],
-  [[1.55, 0.42, -0.3], [2.1, 0.4, -0.3], [2.72, 0.24, -0.05], [3.45, 0.1, 0.72], [3.72, 0.04, 1.98]],
+const OUTDOOR_SIDE_INTAKE: FlowPoint[][] = [
+  [[1.35, -0.62, -0.35], [2.0, -0.58, -0.32], [2.6, -0.45, -0.12], [3.2, -0.25, 0.3], [3.62, -0.1, 0.78]],
+  [[1.35, 0.46, -0.35], [2.0, 0.42, -0.32], [2.6, 0.32, -0.12], [3.2, 0.18, 0.3], [3.62, 0.06, 0.78]],
 ];
 
-const INDOOR_GUIDE: FlowPoint[] = [[-4.2, 3.08, 0.92], [-4.2, 1.82, 0.62], [-4.2, 0.72, 0.08], [-4.2, 0.22, 0.74], [-3.95, -0.12, 1.62]];
-const OUTDOOR_GUIDE: FlowPoint[] = [[3.55, -0.18, -2.05], [3.55, -0.15, -0.82], [3.66, -0.08, -0.04], [3.68, -0.03, 0.9], [3.72, 0, 2.02]];
+const OUTDOOR_EXHAUST: FlowPoint[][] = [
+  [[3.62, -0.14, 0.78], [3.68, -0.1, 1.34], [3.72, -0.06, 2.02], [3.7, -0.02, 2.78]],
+  [[3.68, 0.0, 0.78], [3.7, 0.0, 1.34], [3.72, 0.02, 2.02], [3.72, 0.04, 2.92]],
+  [[3.72, 0.16, 0.78], [3.74, 0.14, 1.34], [3.76, 0.12, 2.02], [3.82, 0.14, 2.78]],
+];
 
 export function AirflowVisualization() {
   const variant = useExperimentStore((state) => state.variant);
@@ -34,16 +44,24 @@ export function AirflowVisualization() {
 
   return (
     <>
-      <TubePath points={INDOOR_GUIDE} color="#73bfe2" radius={0.026} opacity={0.22} />
-      <TubePath points={OUTDOOR_GUIDE} color="#d88665" radius={0.026} opacity={0.2} />
-      <AnimatedFlowParticles active paths={INDOOR_AIR_PATHS} startColor="#dca06a" endColor="#55b7e6" countPerPath={9} size={0.06} speedMultiplier={1.05} />
-      <AnimatedFlowParticles active paths={OUTDOOR_REAR_AIR_PATHS} startColor="#6fa9b8" endColor="#e17855" countPerPath={8} size={0.06} speedMultiplier={0.92} />
-      <AnimatedFlowParticles active paths={OUTDOOR_SIDE_AIR_PATHS} startColor="#6fa9b8" endColor="#e17855" countPerPath={8} size={0.06} speedMultiplier={0.92} />
-      {[-5.75, -4.65, -3.55, -2.45].map((x) => <FlowArrow key={`supply-${x}`} position={[x, -0.18, 1.78]} rotation={[Math.PI / 2, 0, 0]} color="#55b7e6" scale={0.68} />)}
-      {[3.05, 3.72, 4.35].map((x) => <FlowArrow key={`outdoor-${x}`} position={[x, 0.05, 2.16]} rotation={[-Math.PI / 2, 0, 0]} color="#e17855" scale={0.78} />)}
-      <SceneLabel position={[-4.2, 4.1, 0.5]}>室内空气：顶部回风 → 过滤 → 换热降温 → 贯流风轮 → 向前下方送风</SceneLabel>
-      <SceneLabel position={[4.4, 3.35, 0]}>室外空气：后侧与左侧吸入 → 穿过换热器 → 风扇从正面排出热风</SceneLabel>
-      <SceneLabel position={[-1.1, 2.05, 1.15]}>橙色表示进入室内机的较暖空气，蓝色表示换热后的送风</SceneLabel>
+      <AnimatedFlowLines active paths={INDOOR_INTAKE_PATHS} color="#d9965f" lineWidth={1.15} opacity={0.48} dashSize={0.2} gapSize={0.13} speedMultiplier={0.85} />
+      <AnimatedFlowLines active paths={INDOOR_SUPPLY_PATHS} color="#4eb3e3" lineWidth={1.45} opacity={0.62} dashSize={0.24} gapSize={0.12} speedMultiplier={1.18} />
+      <AnimatedFlowParticles active paths={INDOOR_INTAKE_PATHS} startColor="#e0a16a" endColor="#9cc8d8" countPerPath={3} size={0.025} speedMultiplier={0.85} opacity={0.7} depthTest />
+      <AnimatedFlowParticles active paths={INDOOR_SUPPLY_PATHS} startColor="#8ccfe7" endColor="#3ea9dc" countPerPath={4} size={0.028} speedMultiplier={1.18} opacity={0.82} depthTest />
+
+      <AnimatedFlowLines active paths={[...OUTDOOR_REAR_INTAKE, ...OUTDOOR_SIDE_INTAKE]} color="#6e9da9" lineWidth={1.05} opacity={0.42} dashSize={0.18} gapSize={0.14} speedMultiplier={0.82} />
+      <AnimatedFlowLines active paths={OUTDOOR_EXHAUST} color="#df7654" lineWidth={1.4} opacity={0.58} dashSize={0.24} gapSize={0.12} speedMultiplier={1.08} />
+      <AnimatedFlowParticles active paths={OUTDOOR_EXHAUST} startColor="#e39a63" endColor="#df6847" countPerPath={4} size={0.028} speedMultiplier={1.08} opacity={0.78} depthTest />
+
+      {[-5.8, -4.72, -3.64, -2.56].map((x) => (
+        <FlowArrow key={`supply-${x}`} position={[x, -0.48, 2.58]} rotation={[Math.PI / 2, 0, 0]} color="#4eb3e3" scale={0.58} />
+      ))}
+      {[3.25, 3.72, 4.18].map((x) => (
+        <FlowArrow key={`outdoor-${x}`} position={[x, 0.05, 2.92]} rotation={[-Math.PI / 2, 0, 0]} color="#df7654" scale={0.64} />
+      ))}
+
+      <SceneLabel position={[-4.2, 4.18, 0.45]}>室内空气：顶部回风 → 过滤 → 穿过蒸发器 → 贯流风轮 → 前下方扇形送风</SceneLabel>
+      <SceneLabel position={[4.4, 3.45, 0]}>室外空气：后侧与左侧吸入 → 穿过冷凝器 → 轴流风扇正面排热</SceneLabel>
     </>
   );
 }

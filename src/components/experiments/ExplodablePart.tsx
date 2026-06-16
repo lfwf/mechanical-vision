@@ -27,6 +27,8 @@ export function ExplodablePart({
   const selectPart = useExperimentStore((state) => state.selectPart);
   const target = assemblyEnabled && detached ? exploded : home;
   const selected = selectedPartId === id;
+  const indicatorRadius = Math.min(Math.max(selectionRadius * 0.58, 0.24), 1.15);
+  const indicatorTube = Math.min(Math.max(indicatorRadius * 0.018, 0.01), 0.024);
 
   useEffect(() => {
     const group = groupRef.current;
@@ -61,16 +63,20 @@ export function ExplodablePart({
     >
       {children}
       {selected && (
-        <mesh>
-          <sphereGeometry args={[selectionRadius, 24, 18]} />
-          <meshBasicMaterial
-            color="#f1c35f"
-            wireframe
-            transparent
-            opacity={0.72}
-            depthWrite={false}
-          />
-        </mesh>
+        <group renderOrder={30}>
+          <mesh>
+            <torusGeometry args={[indicatorRadius, indicatorTube, 10, 64]} />
+            <meshBasicMaterial color="#55c2cd" transparent opacity={0.72} depthWrite={false} depthTest={false} toneMapped={false} />
+          </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[indicatorRadius, indicatorTube, 10, 64]} />
+            <meshBasicMaterial color="#55c2cd" transparent opacity={0.42} depthWrite={false} depthTest={false} toneMapped={false} />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[indicatorRadius * 0.06, 16, 12]} />
+            <meshBasicMaterial color="#b9f1f5" transparent opacity={0.9} depthWrite={false} depthTest={false} toneMapped={false} />
+          </mesh>
+        </group>
       )}
     </group>
   );

@@ -14,16 +14,27 @@ import {
   OutdoorMountingFeet,
   OutdoorValvePiping,
 } from "./OutdoorUnitGeometry";
+import { OutdoorFanSectionRing } from "./SectionViewGeometry";
 
 interface OutdoorUnitProps {
   assemblyEnabled: boolean;
   shellOpacity: number;
   fanRef: RefObject<Group | null>;
+  variant: number;
 }
 
-export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUnitProps) {
+export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef, variant }: OutdoorUnitProps) {
+  const operatingMode = variant < 3;
+  const effectiveShellOpacity = operatingMode
+    ? Math.min(shellOpacity, variant === 0 ? 0.34 : 0.22)
+    : shellOpacity;
+  const grilleOpacity = variant === 3 ? 1 : variant === 0 ? 0.28 : 0.18;
+  const grilleHome: [number, number, number] = operatingMode ? [-0.72, 0.02, 1.18] : [-0.72, 0.02, 0.93];
+
   return (
     <group position={[4.4, 0, 0]}>
+      {operatingMode && <OutdoorFanSectionRing opacity={variant === 1 ? 0.5 : 0.34} />}
+
       <ExplodablePart id="ac-outdoor-mounting-feet" home={[0, -1.82, 0]} exploded={[0, -4.15, 1.1]} assemblyEnabled={assemblyEnabled} selectionRadius={1.9}>
         <OutdoorMountingFeet />
       </ExplodablePart>
@@ -68,8 +79,8 @@ export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUn
         <RealisticAxialFan fanRef={fanRef} />
       </ExplodablePart>
 
-      <ExplodablePart id="ac-outdoor-front-grille" home={[-0.72, 0.02, 0.93]} exploded={[-3.65, 0.02, 3.82]} assemblyEnabled={assemblyEnabled} selectionRadius={1.7}>
-        <RealisticFrontGrille />
+      <ExplodablePart id="ac-outdoor-front-grille" home={grilleHome} exploded={[-3.65, 0.02, 3.82]} assemblyEnabled={assemblyEnabled} selectionRadius={1.7}>
+        <RealisticFrontGrille opacity={grilleOpacity} />
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-control-box" home={[1.4, 0.93, -0.05]} exploded={[3.42, 2.72, 1.28]} assemblyEnabled={assemblyEnabled} selectionRadius={1.0}>
@@ -77,7 +88,7 @@ export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUn
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-cabinet-panels" home={[0, 0.02, 0]} exploded={[2.72, 3.62, 2.62]} assemblyEnabled={assemblyEnabled} selectionRadius={2.8}>
-        <OutdoorCabinetPanelsCutaway opacity={shellOpacity} />
+        <OutdoorCabinetPanelsCutaway opacity={effectiveShellOpacity} />
       </ExplodablePart>
     </group>
   );

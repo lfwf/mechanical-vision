@@ -22,17 +22,17 @@ export const LIQUID_LINE_PATH: Array<[number, number, number]> = [
 ];
 
 export const DRAIN_LINE_PATH: Array<[number, number, number]> = [
-  [-0.96, 0.34, -0.28],
-  [-0.34, 0.05, -0.4],
-  [0.92, -0.35, -0.5],
-  [2.6, -0.78, -0.46],
-  [4.15, -1.12, -0.08],
-  [5.3, -1.48, 0.3],
+  [-1.36, 0.3, 0.09],
+  [-0.62, 0.04, -0.08],
+  [0.75, -0.32, -0.24],
+  [2.55, -0.72, -0.22],
+  [4.15, -1.08, 0.04],
+  [5.3, -1.46, 0.34],
 ];
 
 export const COMMUNICATION_LINE_PATH: Array<[number, number, number]> = [
-  [-0.52, 0.32, -0.2],
-  [0.1, 0.05, -0.35],
+  [-0.98, 0.44, -0.18],
+  [-0.18, 0.08, -0.32],
   [1.3, -0.2, -0.44],
   [2.9, -0.48, -0.38],
   [4.65, -0.58, -0.05],
@@ -73,8 +73,10 @@ function BundleClamp({ position, rotation = [0, 0, 0] }: { position: [number, nu
 }
 
 export function ConnectionBundle({ variant }: { variant: number }) {
-  const showLabels = variant === 1 || variant === 2;
-  const wrapOpacity = variant === 2 ? 0.12 : 0.28;
+  const showRefrigerantLabels = variant === 0 || variant === 3;
+  const showDrainLabel = variant === 2 || variant === 3;
+  const showCableLabel = variant === 3;
+  const wrapOpacity = variant === 3 ? 0.12 : variant === 0 ? 0.18 : 0.28;
 
   return (
     <group>
@@ -100,18 +102,14 @@ export function ConnectionBundle({ variant }: { variant: number }) {
       <BundleClamp position={[2.62, -0.5, -0.56]} rotation={[0.08, 0.18, -0.06]} />
       <BundleClamp position={[4.46, -0.77, -0.19]} rotation={[0.04, 0.12, -0.03]} />
 
-      <mesh position={[5.32, -1.5, 0.31]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[5.32, -1.48, 0.34]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.1, 0.1, 0.14, 24]} />
         <meshStandardMaterial color="#859a94" roughness={0.44} />
       </mesh>
 
-      {showLabels && (
-        <>
-          <SceneLabel position={[1.55, 0.48, -0.82]}>粗气管（保温） / 细液管（保温）</SceneLabel>
-          <SceneLabel position={[2.15, -1.05, -0.52]}>冷凝水排水管：保持连续下坡</SceneLabel>
-          <SceneLabel position={[4.25, 0.05, -0.22]}>室内外电源与通信线</SceneLabel>
-        </>
-      )}
+      {showRefrigerantLabels && <SceneLabel position={[1.55, 0.48, -0.82]}>粗气管（低压回气） / 细液管（高压液体）</SceneLabel>}
+      {showDrainLabel && <SceneLabel position={[2.15, -1.05, -0.52]}>冷凝水排水管：从接水盘出口持续向下排放</SceneLabel>}
+      {showCableLabel && <SceneLabel position={[4.25, 0.05, -0.22]}>室内外电源与通信线</SceneLabel>}
     </group>
   );
 }

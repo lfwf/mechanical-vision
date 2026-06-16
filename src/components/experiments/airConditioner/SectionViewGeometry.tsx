@@ -8,10 +8,12 @@ import { Edges, RoundedBox } from "@react-three/drei";
  * 也更接近技术插图常见的“切掉外板、保留截面边缘”表达方式。
  */
 
-/** 室内机前部切开后保留下来的四周截面边框。 */
-export function IndoorSectionFrame({ intensity = 1 }: { intensity?: number }) {
-  const opacity = Math.max(0.18, Math.min(0.58, intensity));
-  const material = (
+/**
+ * 室内机截面边框使用的统一材质。
+ * 每次调用都会创建独立 React 元素，避免同一个材质节点被重复挂载到多个 Mesh。
+ */
+function IndoorSectionMaterial({ opacity }: { opacity: number }) {
+  return (
     <meshStandardMaterial
       color="#91a5a3"
       metalness={0.08}
@@ -21,13 +23,26 @@ export function IndoorSectionFrame({ intensity = 1 }: { intensity?: number }) {
       depthWrite={false}
     />
   );
+}
+
+/** 室内机前部切开后保留下来的四周截面边框。 */
+export function IndoorSectionFrame({ intensity = 1 }: { intensity?: number }) {
+  const opacity = Math.max(0.18, Math.min(0.58, intensity));
 
   return (
     <group position={[0, 0.02, 0.88]} renderOrder={10}>
-      <RoundedBox args={[5.82, 0.075, 0.1]} radius={0.03} smoothness={3} position={[0, 0.76, 0]}>{material}</RoundedBox>
-      <RoundedBox args={[5.82, 0.075, 0.1]} radius={0.03} smoothness={3} position={[0, -0.72, 0]}>{material}</RoundedBox>
-      <RoundedBox args={[0.075, 1.4, 0.1]} radius={0.03} smoothness={3} position={[-2.86, 0.02, 0]}>{material}</RoundedBox>
-      <RoundedBox args={[0.075, 1.4, 0.1]} radius={0.03} smoothness={3} position={[2.86, 0.02, 0]}>{material}</RoundedBox>
+      <RoundedBox args={[5.82, 0.075, 0.1]} radius={0.03} smoothness={3} position={[0, 0.76, 0]}>
+        <IndoorSectionMaterial opacity={opacity} />
+      </RoundedBox>
+      <RoundedBox args={[5.82, 0.075, 0.1]} radius={0.03} smoothness={3} position={[0, -0.72, 0]}>
+        <IndoorSectionMaterial opacity={opacity} />
+      </RoundedBox>
+      <RoundedBox args={[0.075, 1.4, 0.1]} radius={0.03} smoothness={3} position={[-2.86, 0.02, 0]}>
+        <IndoorSectionMaterial opacity={opacity} />
+      </RoundedBox>
+      <RoundedBox args={[0.075, 1.4, 0.1]} radius={0.03} smoothness={3} position={[2.86, 0.02, 0]}>
+        <IndoorSectionMaterial opacity={opacity} />
+      </RoundedBox>
     </group>
   );
 }

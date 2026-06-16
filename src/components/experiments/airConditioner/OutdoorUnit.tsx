@@ -2,12 +2,12 @@ import type { RefObject } from "react";
 import type { Group } from "three";
 import { ExplodablePart } from "../ExplodablePart";
 import { TubePath } from "../ScenePrimitives";
-import { RealisticAxialFan, RealisticFrontGrille } from "./OutdoorAirflowGeometry";
+import { OutdoorCabinetPanelsCutaway } from "./CutawayShellGeometry";
 import { Accumulator, FourWayValve, ServiceValves } from "./DetailGeometry";
 import { OutdoorHeatExchanger } from "./HeatExchangers";
+import { RealisticAxialFan, RealisticFrontGrille } from "./OutdoorAirflowGeometry";
 import {
   OutdoorBasePan,
-  OutdoorCabinetPanels,
   OutdoorCompressor,
   OutdoorControlAssembly,
   OutdoorFanMotorAssembly,
@@ -64,7 +64,7 @@ export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUn
         <OutdoorFanMotorAssembly />
       </ExplodablePart>
 
-      <ExplodablePart id="ac-outdoor-axial-fan" home={[-0.72, 0.02, 0.55]} exploded={[-2.75, 0.15, 2.72]} assemblyEnabled={assemblyEnabled} selectionRadius={1.5}>
+      <ExplodablePart id="ac-outdoor-axial-fan" home={[-0.72, 0.02, 0.55]} exploded={[-2.75, 0.15, 2.72]} assemblyEnabled={assemblyEnabled} selectionRadius={1.35}>
         <RealisticAxialFan fanRef={fanRef} />
       </ExplodablePart>
 
@@ -77,7 +77,7 @@ export function OutdoorUnit({ assemblyEnabled, shellOpacity, fanRef }: OutdoorUn
       </ExplodablePart>
 
       <ExplodablePart id="ac-outdoor-cabinet-panels" home={[0, 0.02, 0]} exploded={[2.72, 3.62, 2.62]} assemblyEnabled={assemblyEnabled} selectionRadius={2.8}>
-        <OutdoorCabinetPanels opacity={shellOpacity} />
+        <OutdoorCabinetPanelsCutaway opacity={shellOpacity} />
       </ExplodablePart>
     </group>
   );

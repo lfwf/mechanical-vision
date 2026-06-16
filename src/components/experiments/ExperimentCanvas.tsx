@@ -62,7 +62,7 @@ function CanvasContent({ children, camera, target, cameraKey, gridY, shadowY, ba
       <Suspense fallback={null}>{children}<Environment preset="warehouse" environmentIntensity={0.48} /></Suspense>
       {showGrid && <Grid position={[0, gridY, 0]} args={[26, 26]} cellSize={0.5} cellThickness={0.65} cellColor="#bdc4bd" sectionSize={2} sectionThickness={1} sectionColor="#8fa09c" fadeDistance={20} fadeStrength={1.4} infiniteGrid />}
       <ContactShadows position={[0, shadowY, 0]} opacity={0.24} scale={20} blur={3.2} far={10} />
-      <SmoothOrbitControls controlsRef={controlsRef} resetToken={resetToken} minDistance={minDistance} maxDistance={maxDistance} />
+      <SmoothOrbitControls controlsRef={controlsRef} resetToken={resetToken} cameraKey={cameraKey} minDistance={minDistance} maxDistance={maxDistance} />
       <CameraReset position={camera} target={target} resetToken={resetToken} cameraKey={cameraKey} controlsRef={controlsRef} />
     </>
   );

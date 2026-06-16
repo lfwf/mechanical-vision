@@ -3,6 +3,7 @@ import bearingJson from "./bearing.quality.json";
 import camJson from "./cam.quality.json";
 import pumpJson from "./centrifugal-pump.quality.json";
 import gearPairJson from "./gear-pair.quality.json";
+import injectionMoldingJson from "./injection-molding.quality.json";
 import planetaryJson from "./planetary-gear.quality.json";
 import rackPinionJson from "./rack-pinion.quality.json";
 import sealJson from "./seal.quality.json";
@@ -25,6 +26,7 @@ const records: Record<ExperimentId, ExperimentQualityRecord> = {
   seal: sealJson as ExperimentQualityRecord,
   "air-conditioner": airConditionerJson as ExperimentQualityRecord,
   "washing-machine": washingMachineJson as ExperimentQualityRecord,
+  "injection-molding": injectionMoldingJson as ExperimentQualityRecord,
 };
 
 export function getExperimentQuality(id: ExperimentId): ExperimentQualityRecord {

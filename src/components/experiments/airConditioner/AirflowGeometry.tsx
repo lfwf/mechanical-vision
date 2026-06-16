@@ -32,7 +32,7 @@ export function CrossFlowFan({ fanRef }: { fanRef: React.RefObject<Group | null>
         );
       })}
       {[-2.38, -1.58, -0.79, 0, 0.79, 1.58, 2.38].map((x, index) => (
-        <mesh key={x} position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh key={x} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[index === 0 || index === 6 ? 0.34 : 0.325, 0.025, 10, 42]} />
           <meshStandardMaterial color="#2f464a" metalness={0.46} roughness={0.28} />
         </mesh>

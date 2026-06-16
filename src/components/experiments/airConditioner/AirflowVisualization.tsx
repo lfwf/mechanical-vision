@@ -4,6 +4,15 @@ import { FlowArrow } from "../ScenePrimitives";
 import { AnimatedFlowLines } from "./AnimatedFlowLines";
 import { AnimatedFlowParticles, type FlowPoint } from "./AnimatedFlowParticles";
 
+/**
+ * 送风模式的空气路径。
+ *
+ * 重要概念：室内循环空气与室外换热空气是两套独立气流，二者不会通过空调互相交换。
+ * - 室内侧：房间空气循环经过过滤网和蒸发器；
+ * - 室外侧：室外空气穿过冷凝器，带走制冷剂释放的热量。
+ */
+
+// 室内顶部回风路径：从机身顶部进入，依次靠近过滤网和蒸发器。
 const INDOOR_INTAKE_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x): FlowPoint[] => [
   [x, 3.18, 0.92],
   [x, 2.62, 0.86],
@@ -12,6 +21,7 @@ const INDOOR_INTAKE_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x
   [x, 1.18, 0.1],
 ]);
 
+// 室内送风路径：穿过换热器后进入贯流风轮，再从底部出风口向前下方扩散。
 const INDOOR_SUPPLY_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x, index): FlowPoint[] => [
   [x, 1.18, 0.1],
   [x, 0.78, 0.02],
@@ -20,17 +30,20 @@ const INDOOR_SUPPLY_PATHS: FlowPoint[][] = [-6.2, -5.2, -4.2, -3.2, -2.2].map((x
   [x + (index - 2) * 0.18, -0.48, 2.5],
 ]);
 
+// 室外机后侧进风：空气先穿过后侧冷凝器，再进入轴流风扇入口。
 const OUTDOOR_REAR_INTAKE: FlowPoint[][] = [
   [[3.0, -0.82, -2.2], [3.0, -0.72, -1.25], [3.18, -0.55, -0.62], [3.48, -0.3, 0.02], [3.68, -0.14, 0.76]],
   [[3.55, -0.18, -2.2], [3.55, -0.15, -1.25], [3.6, -0.1, -0.58], [3.66, -0.05, 0.02], [3.68, -0.02, 0.78]],
   [[4.1, 0.62, -2.2], [4.08, 0.55, -1.25], [3.98, 0.4, -0.58], [3.82, 0.22, 0.02], [3.7, 0.08, 0.78]],
 ];
 
+// 室外机左侧进风：对应 L 形冷凝器的侧面换热区域。
 const OUTDOOR_SIDE_INTAKE: FlowPoint[][] = [
   [[1.35, -0.62, -0.35], [2.0, -0.58, -0.32], [2.6, -0.45, -0.12], [3.2, -0.25, 0.3], [3.62, -0.1, 0.78]],
   [[1.35, 0.46, -0.35], [2.0, 0.42, -0.32], [2.6, 0.32, -0.12], [3.2, 0.18, 0.3], [3.62, 0.06, 0.78]],
 ];
 
+// 轴流风扇正面排风。路径末端略微分散，表达排出气流的扩散范围。
 const OUTDOOR_EXHAUST: FlowPoint[][] = [
   [[3.62, -0.14, 0.78], [3.68, -0.1, 1.34], [3.72, -0.06, 2.02], [3.7, -0.02, 2.78]],
   [[3.68, 0.0, 0.78], [3.7, 0.0, 1.34], [3.72, 0.02, 2.02], [3.72, 0.04, 2.92]],
@@ -44,15 +57,18 @@ export function AirflowVisualization() {
 
   return (
     <>
+      {/* 室内回风使用暖色，换热后的送风使用冷色。 */}
       <AnimatedFlowLines active paths={INDOOR_INTAKE_PATHS} color="#d9965f" lineWidth={1.15} opacity={0.48} dashSize={0.2} gapSize={0.13} speedMultiplier={0.85} />
       <AnimatedFlowLines active paths={INDOOR_SUPPLY_PATHS} color="#4eb3e3" lineWidth={1.45} opacity={0.62} dashSize={0.24} gapSize={0.12} speedMultiplier={1.18} />
       <AnimatedFlowParticles active paths={INDOOR_INTAKE_PATHS} startColor="#e0a16a" endColor="#9cc8d8" countPerPath={3} size={0.025} speedMultiplier={0.85} opacity={0.7} depthTest />
       <AnimatedFlowParticles active paths={INDOOR_SUPPLY_PATHS} startColor="#8ccfe7" endColor="#3ea9dc" countPerPath={4} size={0.028} speedMultiplier={1.18} opacity={0.82} depthTest />
 
+      {/* 室外进风用低饱和蓝灰色，排出的热空气用橙红色。 */}
       <AnimatedFlowLines active paths={[...OUTDOOR_REAR_INTAKE, ...OUTDOOR_SIDE_INTAKE]} color="#6e9da9" lineWidth={1.05} opacity={0.42} dashSize={0.18} gapSize={0.14} speedMultiplier={0.82} />
       <AnimatedFlowLines active paths={OUTDOOR_EXHAUST} color="#df7654" lineWidth={1.4} opacity={0.58} dashSize={0.24} gapSize={0.12} speedMultiplier={1.08} />
       <AnimatedFlowParticles active paths={OUTDOOR_EXHAUST} startColor="#e39a63" endColor="#df6847" countPerPath={4} size={0.028} speedMultiplier={1.08} opacity={0.78} depthTest />
 
+      {/* 出口箭头用于强调最终排出方向，不承担连续流动动画。 */}
       {[-5.8, -4.72, -3.64, -2.56].map((x) => (
         <FlowArrow key={`supply-${x}`} position={[x, -0.48, 2.58]} rotation={[Math.PI / 2, 0, 0]} color="#4eb3e3" scale={0.58} />
       ))}

@@ -1,12 +1,19 @@
 import { RoundedBox } from "@react-three/drei";
 import { TubePath } from "../ScenePrimitives";
 
+/**
+ * 室外机低层级零件几何体。
+ *
+ * OutdoorUnit.tsx 负责零件装配位置，本文件只负责零件自身形状和材质。
+ * 尺寸均为场景单位下的比例化表达，不可直接作为维修测量尺寸。
+ */
 const CASING = "#eeefeb";
 const CASING_EDGE = "#d8ddd9";
 const STEEL = "#7f8b88";
 const DARK_STEEL = "#4c5957";
 const COPPER = "#b66f2f";
 
+/** 两条室外机安装脚，包含橡胶减振垫和固定螺栓。 */
 export function OutdoorMountingFeet() {
   return (
     <group>
@@ -31,6 +38,7 @@ export function OutdoorMountingFeet() {
   );
 }
 
+/** 室外机底盘、边缘翻边、舱室隔板和排水孔。 */
 export function OutdoorBasePan() {
   return (
     <group>
@@ -49,6 +57,7 @@ export function OutdoorBasePan() {
   );
 }
 
+/** 轴流风扇电机、三臂支架、导风圈和电机线束。 */
 export function OutdoorFanMotorAssembly() {
   return (
     <group>
@@ -75,6 +84,10 @@ export function OutdoorFanMotorAssembly() {
   );
 }
 
+/**
+ * 全封闭变频压缩机。
+ * 上部铜管为排气管，下部较粗铜管为吸气管，底部四个橡胶脚用于减振。
+ */
 export function OutdoorCompressor() {
   return (
     <group>
@@ -106,6 +119,7 @@ export function OutdoorCompressor() {
   );
 }
 
+/** 逆变电控盒、PCB、功率器件和出线。 */
 export function OutdoorControlAssembly() {
   return (
     <group>
@@ -125,6 +139,11 @@ export function OutdoorControlAssembly() {
   );
 }
 
+/**
+ * 早期版本的完整室外机钣金外壳。
+ * 当前拆装模式主要使用 CutawayShellGeometry 中的 OutdoorCabinetPanelsCutaway，
+ * 该组件保留作为不带轮廓线的基础版本。
+ */
 export function OutdoorCabinetPanels({ opacity }: { opacity: number }) {
   const transparent = opacity < 0.98;
   return (
@@ -164,13 +183,17 @@ export function OutdoorCabinetPanels({ opacity }: { opacity: number }) {
   );
 }
 
+/** 四通阀、压缩机和服务阀之间的简化铜管连接。 */
 export function OutdoorValvePiping() {
   return (
     <group>
       <TubePath points={[[-0.45, -0.34, -0.2], [-0.18, -0.6, -0.32], [0.18, -0.72, -0.26], [0.5, -0.58, -0.08]]} color={COPPER} radius={0.055} />
       <TubePath points={[[0.12, 0.26, -0.12], [0.52, 0.48, -0.18], [0.78, 0.3, -0.28], [0.9, -0.12, -0.3]]} color={COPPER} radius={0.045} />
       <TubePath points={[[0.5, -0.58, -0.08], [0.88, -0.76, 0.08], [1.18, -0.78, 0.24]]} color={COPPER} radius={0.07} />
-      <mesh position={[0.78, -0.38, -0.18]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.12, 0.12, 0.42, 24]} /><meshStandardMaterial color={DARK_STEEL} metalness={0.52} roughness={0.28} /></mesh>
+      <mesh position={[0.78, -0.38, -0.18]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.12, 0.12, 0.42, 24]} />
+        <meshStandardMaterial color={DARK_STEEL} metalness={0.52} roughness={0.28} />
+      </mesh>
     </group>
   );
 }

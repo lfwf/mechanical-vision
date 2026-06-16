@@ -3,11 +3,22 @@ import { DoubleSide } from "three";
 import { TubePath } from "../ScenePrimitives";
 import { Fasteners, StepperMotor } from "./DetailGeometry";
 
+/**
+ * 室内机低层级零件几何体。
+ *
+ * IndoorUnit.tsx 决定每个零件的安装位置和爆炸位置，本文件只描述零件自身形状。
+ * 常量用于统一 ABS、金属、铜管等材质颜色，避免每个组件重复定义。
+ */
 const WHITE_ABS = "#f1f2ee";
 const INNER_ABS = "#cbd2ce";
 const DARK_PLASTIC = "#334346";
 const COPPER = "#b56f31";
 
+/**
+ * 室内机后壳的基础版本。
+ * 当前剖视模式主要使用 CutawayShellGeometry 中带轮廓线的版本，
+ * 这里保留为普通透明材质版本，便于其他场景复用。
+ */
 export function IndoorRearChassis({ opacity }: { opacity: number }) {
   const transparent = opacity < 0.98;
   return (
@@ -36,6 +47,7 @@ export function IndoorRearChassis({ opacity }: { opacity: number }) {
   );
 }
 
+/** 室内机完整前面板的基础版本，包含显示窗和简化品牌装饰。 */
 export function IndoorFrontPanel({ opacity }: { opacity: number }) {
   const transparent = opacity < 0.98;
   return (
@@ -66,6 +78,7 @@ export function IndoorFrontPanel({ opacity }: { opacity: number }) {
   );
 }
 
+/** 顶部进风格栅，29 根栅条下方带半透明防护网。 */
 export function IndoorIntakeGrille() {
   return (
     <group>
@@ -89,6 +102,7 @@ export function IndoorIntakeGrille() {
   );
 }
 
+/** 单块主过滤网：透明网面、纵横加强筋和四周滤框。 */
 function FilterGrid({ width, height }: { width: number; height: number }) {
   return (
     <group>
@@ -124,6 +138,7 @@ function FilterGrid({ width, height }: { width: number; height: number }) {
   );
 }
 
+/** 左右两块可拆卸主过滤网。 */
 export function IndoorFilterCassettes() {
   return (
     <group>
@@ -133,6 +148,7 @@ export function IndoorFilterCassettes() {
   );
 }
 
+/** 两块功能滤网模块，用不同颜色区分不同滤材。 */
 export function IndoorFineFilterModules() {
   return (
     <group>
@@ -152,6 +168,10 @@ export function IndoorFineFilterModules() {
   );
 }
 
+/**
+ * 蒸发器下方接水盘。
+ * 盘底略带坡度，冷凝水向右侧排水口汇集。
+ */
 export function IndoorDrainPan() {
   return (
     <group>
@@ -178,6 +198,7 @@ export function IndoorDrainPan() {
   );
 }
 
+/** 贯流风轮右侧电机、传动轴、固定支架和接线盒。 */
 export function IndoorFanMotor() {
   return (
     <group>
@@ -201,6 +222,7 @@ export function IndoorFanMotor() {
   );
 }
 
+/** 室内机电控盒、PCB、功率器件、散热片和端子排。 */
 export function IndoorControlAssembly() {
   return (
     <group>
@@ -229,6 +251,7 @@ export function IndoorControlAssembly() {
   );
 }
 
+/** 温度传感器、线束、分支线和固定卡扣。 */
 export function IndoorSensorHarness() {
   return (
     <group>
@@ -251,6 +274,7 @@ export function IndoorSensorHarness() {
   );
 }
 
+/** 室内机右侧的粗气管、细液管、排水口、喇叭口螺母和辅助线。 */
 export function IndoorPipeTerminals() {
   return (
     <group>
@@ -268,6 +292,7 @@ export function IndoorPipeTerminals() {
   );
 }
 
+/** 垂直导风叶片、联动横杆和右侧步进电机。 */
 export function IndoorVerticalVanes() {
   return (
     <group>
@@ -286,6 +311,7 @@ export function IndoorVerticalVanes() {
   );
 }
 
+/** 宽幅水平导风板及左右转轴，用于控制上下送风角度。 */
 export function IndoorHorizontalLouver() {
   return (
     <group>

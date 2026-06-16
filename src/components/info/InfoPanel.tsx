@@ -5,6 +5,7 @@ import {
   getExperimentQuality,
   getExperimentQualityGate,
 } from "../../data/experiments/qualityRecords";
+import { useExperimentStore } from "../../store/useExperimentStore";
 import type { ExperimentId } from "../../types/experiment";
 import { AnalysisView } from "./AnalysisView";
 import { GenericAnalysisView } from "./GenericAnalysisView";
@@ -18,10 +19,15 @@ type InfoView = "analysis" | "parts" | "knowledge" | "quality";
 export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
   const [activeView, setActiveView] = useState<InfoView>("analysis");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const selectedPartId = useExperimentStore((state) => state.selectedPartId);
+  const variant = useExperimentStore((state) => state.variant);
   const definition = getExperimentDefinition(experimentId);
   const quality = getExperimentQuality(experimentId);
   const gate = getExperimentQualityGate(experimentId);
   const hasPartManuals = (definition.partManuals?.length ?? 0) > 0;
+  const assemblyMode =
+    definition.supportsPartAssembly === true &&
+    (definition.assemblyVariants?.includes(variant) ?? false);
   const infoTabs = [
     { id: "analysis" as const, label: "实验", icon: Activity },
     ...(hasPartManuals
@@ -43,6 +49,12 @@ export function InfoPanel({ experimentId }: { experimentId: ExperimentId }) {
   useEffect(() => {
     setActiveView("analysis");
   }, [experimentId]);
+
+  useEffect(() => {
+    if (assemblyMode && selectedPartId && hasPartManuals) {
+      setActiveView("parts");
+    }
+  }, [assemblyMode, hasPartManuals, selectedPartId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "auto" });

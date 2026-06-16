@@ -5,6 +5,7 @@ import { ExperimentCanvas, SceneLabel } from "../ExperimentCanvas";
 import { AirflowVisualization } from "./AirflowVisualization";
 import { ConnectionBundle } from "./ConnectionBundle";
 import { CoolingCycle } from "./CoolingCycle";
+import { DrainageVisualization } from "./DrainageVisualization";
 import { FanAnimator } from "./FanAnimator";
 import { IndoorUnit } from "./IndoorUnit";
 import { OutdoorUnit } from "./OutdoorUnit";
@@ -12,10 +13,11 @@ import { OutdoorUnit } from "./OutdoorUnit";
 function AirConditionerAssembly() {
   const indoorFanRef = useRef<Group>(null);
   const outdoorFanRef = useRef<Group>(null);
-  const transparency = useExperimentStore((state) => state.secondary);
+  const cutawayPercent = useExperimentStore((state) => state.secondary);
   const variant = useExperimentStore((state) => state.variant);
-  const assemblyEnabled = variant === 2;
-  const shellOpacity = Math.max(0.12, 1 - transparency / 100);
+  const assemblyEnabled = variant === 3;
+  const cutaway = Math.min(1, Math.max(0, cutawayPercent / 100));
+  const shellOpacity = 1 - 0.86 * Math.pow(cutaway, 0.68);
 
   return (
     <group>
@@ -25,6 +27,7 @@ function AirConditionerAssembly() {
       <ConnectionBundle variant={variant} />
       <CoolingCycle />
       <AirflowVisualization />
+      <DrainageVisualization />
 
       {assemblyEnabled ? (
         <>

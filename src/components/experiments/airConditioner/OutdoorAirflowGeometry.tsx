@@ -1,14 +1,17 @@
 import { useMemo } from "react";
 import { DoubleSide, Shape, type Group } from "three";
 
+const FAN_TIP_RADIUS = 1.12;
+const GRILLE_CLEAR_RADIUS = 1.28;
+
 function usePropellerBladeShape() {
   return useMemo(() => {
     const shape = new Shape();
-    shape.moveTo(0.18, -0.1);
-    shape.bezierCurveTo(0.44, -0.31, 1.02, -0.49, 1.45, -0.27);
-    shape.bezierCurveTo(1.7, -0.14, 1.78, 0.14, 1.58, 0.35);
-    shape.bezierCurveTo(1.28, 0.59, 0.72, 0.47, 0.34, 0.18);
-    shape.bezierCurveTo(0.23, 0.1, 0.18, 0, 0.18, -0.1);
+    shape.moveTo(0.2, -0.08);
+    shape.bezierCurveTo(0.38, -0.22, 0.72, -0.34, 0.98, -0.22);
+    shape.bezierCurveTo(FAN_TIP_RADIUS, -0.14, FAN_TIP_RADIUS + 0.02, 0.08, 1.03, 0.23);
+    shape.bezierCurveTo(0.84, 0.39, 0.53, 0.32, 0.29, 0.15);
+    shape.bezierCurveTo(0.22, 0.09, 0.19, 0, 0.2, -0.08);
     return shape;
   }, []);
 }
@@ -19,26 +22,30 @@ export function RealisticAxialFan({ fanRef }: { fanRef: React.RefObject<Group | 
     <group ref={fanRef}>
       {Array.from({ length: 3 }, (_, index) => (
         <group key={index} rotation={[0, 0, (index * Math.PI * 2) / 3]}>
-          <mesh position={[0, 0, -0.04]} rotation={[0.08, -0.17, -0.08]} castShadow>
-            <extrudeGeometry args={[bladeShape, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.018, bevelSegments: 2 }]} />
+          <mesh position={[0, 0, -0.04]} rotation={[0.06, -0.12, -0.06]} castShadow>
+            <extrudeGeometry args={[bladeShape, { depth: 0.085, bevelEnabled: true, bevelThickness: 0.018, bevelSize: 0.014, bevelSegments: 2 }]} />
             <meshPhysicalMaterial color="#202728" roughness={0.34} metalness={0.08} clearcoat={0.16} side={DoubleSide} />
           </mesh>
         </group>
       ))}
-      <mesh position={[0, 0, 0.02]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.34, 0.34, 0.32, 48]} />
+      <mesh position={[0, 0, 0.015]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.29, 0.29, 0.28, 48]} />
         <meshPhysicalMaterial color="#252e30" roughness={0.3} metalness={0.16} clearcoat={0.22} />
       </mesh>
-      <mesh position={[0, 0, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.13, 0.16, 0.16, 32]} />
+      <mesh position={[0, 0, 0.17]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.11, 0.14, 0.14, 32]} />
         <meshStandardMaterial color="#4c5657" metalness={0.44} roughness={0.26} />
+      </mesh>
+      <mesh position={[0, 0, -0.1]}>
+        <torusGeometry args={[FAN_TIP_RADIUS + 0.04, 0.012, 8, 80]} />
+        <meshStandardMaterial color="#4b5657" transparent opacity={0.18} depthWrite={false} />
       </mesh>
     </group>
   );
 }
 
 export function RealisticFrontGrille() {
-  const radius = 1.28;
+  const radius = GRILLE_CLEAR_RADIUS;
   const horizontalBars = useMemo(() => Array.from({ length: 23 }, (_, index) => -1.18 + index * 0.107), []);
   const verticalBars = useMemo(() => [-0.94, -0.63, -0.31, 0, 0.31, 0.63, 0.94], []);
 

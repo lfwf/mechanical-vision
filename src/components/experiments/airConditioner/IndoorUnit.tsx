@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import type { Group } from "three";
 import { ExplodablePart } from "../ExplodablePart";
 import { CrossFlowFan } from "./AirflowGeometry";
+import { IndoorFrontPanelCutaway, IndoorRearChassisCutaway } from "./CutawayShellGeometry";
 import { WallPlate } from "./DetailGeometry";
 import { IndoorHeatExchanger } from "./HeatExchangers";
 import {
@@ -10,11 +11,9 @@ import {
   IndoorFanMotor,
   IndoorFilterCassettes,
   IndoorFineFilterModules,
-  IndoorFrontPanel,
   IndoorHorizontalLouver,
   IndoorIntakeGrille,
   IndoorPipeTerminals,
-  IndoorRearChassis,
   IndoorSensorHarness,
   IndoorVerticalVanes,
 } from "./IndoorUnitGeometry";
@@ -33,7 +32,7 @@ export function IndoorUnit({ assemblyEnabled, shellOpacity, fanRef }: IndoorUnit
       </ExplodablePart>
 
       <ExplodablePart id="ac-indoor-rear-chassis" home={[0, 0, -0.72]} exploded={[0, 3.35, -1.55]} assemblyEnabled={assemblyEnabled} selectionRadius={2.85}>
-        <IndoorRearChassis opacity={shellOpacity} />
+        <IndoorRearChassisCutaway opacity={shellOpacity} />
       </ExplodablePart>
 
       <ExplodablePart id="ac-indoor-heat-exchanger" home={[0, 0.25, -0.1]} exploded={[0, 3.15, -0.1]} assemblyEnabled={assemblyEnabled} selectionRadius={2.65}>
@@ -85,7 +84,7 @@ export function IndoorUnit({ assemblyEnabled, shellOpacity, fanRef }: IndoorUnit
       </ExplodablePart>
 
       <ExplodablePart id="ac-indoor-front-panel" home={[0, 0.03, 1.02]} exploded={[0, 0.78, 4.18]} assemblyEnabled={assemblyEnabled} selectionRadius={2.9}>
-        <IndoorFrontPanel opacity={shellOpacity} />
+        <IndoorFrontPanelCutaway opacity={shellOpacity} />
       </ExplodablePart>
     </group>
   );

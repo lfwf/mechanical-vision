@@ -4,6 +4,7 @@ import { fluidDefinitions } from "./definitions/fluid";
 import { householdDefinitions } from "./definitions/household";
 import { motionDefinitions } from "./definitions/motion";
 import { airConditionerDefinition } from "./definitions/airConditionerDefinition";
+import { manufacturingDefinitions } from "./definitions/manufacturing";
 import { transmissionDefinitions } from "./definitions/transmission";
 
 const definitions = {
@@ -13,6 +14,7 @@ const definitions = {
   ...componentsDefinitions,
   ...airConditionerDefinition,
   ...householdDefinitions,
+  ...manufacturingDefinitions,
 } as Record<ExperimentId, ExperimentDefinition>;
 
 export const experimentDefinitions = definitions;

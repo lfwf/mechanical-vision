@@ -3,7 +3,7 @@ import { componentsDefinitions } from "./definitions/components";
 import { fluidDefinitions } from "./definitions/fluid";
 import { householdDefinitions } from "./definitions/household";
 import { motionDefinitions } from "./definitions/motion";
-import { thermalDefinitions } from "./definitions/thermal";
+import { airConditionerDefinition } from "./definitions/airConditionerDefinition";
 import { transmissionDefinitions } from "./definitions/transmission";
 
 const definitions = {
@@ -11,7 +11,7 @@ const definitions = {
   ...motionDefinitions,
   ...fluidDefinitions,
   ...componentsDefinitions,
-  ...thermalDefinitions,
+  ...airConditionerDefinition,
   ...householdDefinitions,
 } as Record<ExperimentId, ExperimentDefinition>;
 
@@ -21,9 +21,6 @@ export function getExperimentDefinition(id: ExperimentId): ExperimentDefinition 
   return definitions[id];
 }
 
-export function getExperimentMetrics(
-  id: ExperimentId,
-  values: ExperimentRuntimeValues,
-) {
+export function getExperimentMetrics(id: ExperimentId, values: ExperimentRuntimeValues) {
   return definitions[id].getMetrics(values);
 }

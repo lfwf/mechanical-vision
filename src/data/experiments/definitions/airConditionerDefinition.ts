@@ -5,7 +5,7 @@ import { airConditionerParts } from "../parts/airConditionerParts";
 const daikinSource = "DAIKIN-PERFERA-ECPEN20-007";
 const ashraeSource = "ASHRAE-HANDBOOK-FUNDAMENTALS";
 const safetySource = "ISO-5149-1";
-const modes = ["制冷循环", "送风与排水", "零件拆装"];
+const modes = ["制冷循环", "送风路径", "排水路径", "零件拆装"];
 
 export const airConditionerDefinition = {
   "air-conditioner": {
@@ -14,19 +14,19 @@ export const airConditionerDefinition = {
     category: "家用设备",
     title: "Daikin Perfera 分体式空调拆解",
     subtitle: "FTXM35R / RXM35R 参考结构、气流路径与制冷循环",
-    sceneTip: "切换制冷循环、送风排水和零件拆装；拆装模式可点击 27 个主要组件查看说明书",
+    sceneTip: "分别查看制冷剂、室内外空气和冷凝水的运动路径；外壳剖视程度越高，内部结构越清晰",
     precisionLevel: "L2",
     precisionLabel: "实机比例、结构拓扑与装配层级级",
     defaults: { speed: 60, primary: 0, secondary: 0, variant: 0, direction: 1 },
     controls: [
-      { key: "speed", label: "演示速度", min: 20, max: 100, step: 5, suffix: "%", visibleWhenVariants: [0, 1] },
-      { key: "secondary", label: "外壳透明度", min: 0, max: 82, step: 2, suffix: "%" },
+      { key: "speed", label: "流动与风扇速度", min: 20, max: 100, step: 5, suffix: "%", visibleWhenVariants: [0, 1, 2] },
+      { key: "secondary", label: "外壳剖视程度", min: 0, max: 100, step: 5, suffix: "%" },
     ],
-    variantLabel: "观察模式",
+    variantLabel: "演示模式",
     variants: modes,
     showDirectionControl: false,
     supportsPartAssembly: true,
-    assemblyVariants: [2],
+    assemblyVariants: [3],
     referenceModel: {
       manufacturer: "Daikin",
       model: "Perfera FTXM35R + RXM35R",
@@ -82,13 +82,24 @@ export const airConditionerDefinition = {
     ],
     getMetrics: (values) => [
       { label: "参考机型", value: "FTXM35R / RXM35R", note: "Daikin Perfera" },
-      { label: "当前模式", value: modes[values.variant] ?? modes[0], note: values.variant === 0 ? "压缩→冷凝→节流→蒸发" : values.variant === 1 ? "进风→过滤→换热→送风 / 排水" : "27 个主要组件可独立拆装" },
+      {
+        label: "当前模式",
+        value: modes[values.variant] ?? modes[0],
+        note: values.variant === 0
+          ? "压缩→室外放热→节流→室内吸热"
+          : values.variant === 1
+            ? "室内回风与送风 / 室外换热气流"
+            : values.variant === 2
+              ? "换热器凝水→接水盘→重力排水"
+              : "27 个主要组件可独立拆装",
+      },
       { label: "室内机", value: "15 个组件", note: "299×998×292 mm 比例" },
-      { label: "室外机", value: "12 个组件", note: `550×765×285 mm 比例 · 外壳透明度 ${number(values.secondary, 0)}%` },
+      { label: "室外机", value: "12 个组件", note: `550×765×285 mm 比例 · 外壳剖视 ${number(values.secondary, 0)}%` },
     ],
     getConclusion: (values) => [
-      "当前显示制冷工况：压缩机建立压差，室外换热器放热，电子膨胀阀节流，室内换热器吸热；颜色只表示循环阶段。",
-      "当前显示空气和冷凝水路径：室内空气经过过滤和换热后由贯流风轮送出，冷凝水落入接水盘排出；室外空气由三叶轴流风扇拉过 L 形换热器并从正面格栅排出。",
+      "当前显示制冷工况：红色表示压缩后的高温气体，橙色表示室外放热后的高压液体，蓝色表示节流后的低温混合物，青色表示室内吸热后的低压回气。",
+      "当前显示送风路径：室内空气从顶部进入，经过过滤和换热后由贯流风轮向前下方送出；室外空气从后侧与左侧穿过换热器，再由三叶轴流风扇从正面排出。",
+      "当前显示排水路径：水蒸气先在室内换热器翅片上凝结，水滴落入接水盘并汇集到排水口，最后依靠排水管持续下坡排到室外。",
       "当前进入零件拆装模式。27 个主要组件均可选择、单独拆下、装回、全部展开或全部组装；展开方向用于表达层级，不等同于原厂维修动作。",
     ][values.variant] ?? "当前显示 Daikin Perfera 空调结构。",
   },

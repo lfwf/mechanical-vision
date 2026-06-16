@@ -1,3 +1,4 @@
+import { RoundedBox } from "@react-three/drei";
 import { WashingMachineMode } from "../../../../data/experiments/washingMachineModes";
 import { ExplodablePart } from "../../ExplodablePart";
 
@@ -6,41 +7,115 @@ interface CabinetAssemblyProps {
   assemblyEnabled: boolean;
 }
 
+const sheetColor = "#e7e9e5";
+const innerSheetColor = "#b9c0bd";
+
 function FrontPanelFrame() {
   return (
     <group>
-      <mesh position={[0, 2.05, 0]} castShadow><boxGeometry args={[4.58, 0.86, 0.16]} /><meshStandardMaterial color="#eceee9" roughness={0.42} /></mesh>
-      <mesh position={[0, -1.95, 0]} castShadow><boxGeometry args={[4.58, 1.14, 0.16]} /><meshStandardMaterial color="#eceee9" roughness={0.42} /></mesh>
-      <mesh position={[-2.02, 0, 0]} castShadow><boxGeometry args={[0.54, 3.45, 0.16]} /><meshStandardMaterial color="#eceee9" roughness={0.42} /></mesh>
-      <mesh position={[2.02, 0, 0]} castShadow><boxGeometry args={[0.54, 3.45, 0.16]} /><meshStandardMaterial color="#eceee9" roughness={0.42} /></mesh>
-      <mesh position={[-1.68, -1.75, 0.1]}><boxGeometry args={[0.72, 0.42, 0.08]} /><meshStandardMaterial color="#d9ded9" roughness={0.45} /></mesh>
+      <RoundedBox args={[4.46, 0.68, 0.12]} radius={0.05} smoothness={4} position={[0, 2.03, 0]} castShadow><meshStandardMaterial color={sheetColor} metalness={0.16} roughness={0.38} /></RoundedBox>
+      <RoundedBox args={[4.46, 1.02, 0.12]} radius={0.05} smoothness={4} position={[0, -1.94, 0]} castShadow><meshStandardMaterial color={sheetColor} metalness={0.16} roughness={0.38} /></RoundedBox>
+      <RoundedBox args={[0.48, 3.38, 0.12]} radius={0.045} smoothness={4} position={[-1.99, 0.04, 0]} castShadow><meshStandardMaterial color={sheetColor} metalness={0.16} roughness={0.38} /></RoundedBox>
+      <RoundedBox args={[0.48, 3.38, 0.12]} radius={0.045} smoothness={4} position={[1.99, 0.04, 0]} castShadow><meshStandardMaterial color={sheetColor} metalness={0.16} roughness={0.38} /></RoundedBox>
+      <mesh position={[0, 0.24, -0.015]}><torusGeometry args={[1.5, 0.11, 18, 72]} /><meshStandardMaterial color="#d7dbd7" metalness={0.18} roughness={0.4} /></mesh>
+      <RoundedBox args={[0.72, 0.4, 0.08]} radius={0.04} smoothness={4} position={[-1.62, -1.7, 0.08]}><meshStandardMaterial color="#d3d7d3" roughness={0.44} /></RoundedBox>
+    </group>
+  );
+}
+
+function CabinetShell({ assemblyEnabled }: { assemblyEnabled: boolean }) {
+  return (
+    <group>
+      <RoundedBox args={[4.62, 0.24, 4.22]} radius={0.06} smoothness={4} position={[0, -2.54, 0]} receiveShadow castShadow>
+        <meshStandardMaterial color="#6e7b7d" metalness={0.42} roughness={0.34} />
+      </RoundedBox>
+
+      {assemblyEnabled ? (
+        <>
+          {[-2.23, 2.23].map((x) => (
+            <group key={x} position={[x, 0, 0]}>
+              <RoundedBox args={[0.12, 4.92, 4.0]} radius={0.035} smoothness={3} castShadow>
+                <meshStandardMaterial color={innerSheetColor} metalness={0.26} roughness={0.4} side={2} />
+              </RoundedBox>
+              <mesh position={[x < 0 ? 0.07 : -0.07, 0, 0]}><boxGeometry args={[0.025, 4.55, 3.7]} /><meshStandardMaterial color="#d5d9d5" metalness={0.12} roughness={0.5} /></mesh>
+            </group>
+          ))}
+          <RoundedBox args={[4.44, 0.12, 4.0]} radius={0.04} smoothness={3} position={[0, 2.48, 0]} castShadow>
+            <meshStandardMaterial color={innerSheetColor} metalness={0.28} roughness={0.38} />
+          </RoundedBox>
+        </>
+      ) : (
+        <>
+          {[-2.16, 2.16].map((x) => (
+            <group key={x}>
+              <RoundedBox args={[0.1, 4.72, 0.28]} radius={0.03} smoothness={3} position={[x, 0, -1.86]} castShadow>
+                <meshStandardMaterial color="#9da8a5" metalness={0.34} roughness={0.36} />
+              </RoundedBox>
+              <RoundedBox args={[0.1, 4.72, 0.22]} radius={0.03} smoothness={3} position={[x, 0, 1.86]} castShadow>
+                <meshStandardMaterial color="#b8c0bd" metalness={0.24} roughness={0.42} />
+              </RoundedBox>
+            </group>
+          ))}
+          <RoundedBox args={[4.34, 0.1, 0.3]} radius={0.03} smoothness={3} position={[0, 2.42, -1.82]} castShadow>
+            <meshStandardMaterial color="#9da8a5" metalness={0.34} roughness={0.36} />
+          </RoundedBox>
+          <RoundedBox args={[4.34, 0.1, 0.24]} radius={0.03} smoothness={3} position={[0, 2.42, 1.82]} castShadow>
+            <meshStandardMaterial color="#b8c0bd" metalness={0.24} roughness={0.42} />
+          </RoundedBox>
+        </>
+      )}
+
+      {[-1.55, 1.55].map((x) => (
+        <mesh key={x} position={[x, -2.42, 1.58]}><boxGeometry args={[0.42, 0.18, 0.5]} /><meshStandardMaterial color="#4b5a5d" metalness={0.45} roughness={0.32} /></mesh>
+      ))}
+      {[-1.55, 1.55].map((x) => (
+        <mesh key={`rear-${x}`} position={[x, -2.42, -1.58]}><boxGeometry args={[0.42, 0.18, 0.5]} /><meshStandardMaterial color="#4b5a5d" metalness={0.45} roughness={0.32} /></mesh>
+      ))}
     </group>
   );
 }
 
 export function CabinetAssembly({ mode, assemblyEnabled }: CabinetAssemblyProps) {
   const showUpperControls = assemblyEnabled || mode === WashingMachineMode.WashWaterPath;
+
   return (
     <group>
-      <ExplodablePart id="wm-cabinet-frame" home={[0, 0, 0]} exploded={[0, 0, 0]} assemblyEnabled={assemblyEnabled} selectionRadius={2.4}>
-        <mesh position={[0, -2.62, 0]} receiveShadow><boxGeometry args={[4.72, 0.24, 4.34]} /><meshStandardMaterial color="#46595d" metalness={0.34} roughness={0.4} /></mesh>
-        {[-2.2, 2.2].flatMap((x) => [-1.98, 1.98].map((z) => <mesh key={`${x}-${z}`} position={[x, 0, z]}><boxGeometry args={[0.14, 5.15, 0.14]} /><meshStandardMaterial color="#83908e" metalness={0.38} roughness={0.36} /></mesh>))}
-        {[-1.98, 1.98].map((z) => <mesh key={z} position={[0, 2.48, z]}><boxGeometry args={[4.5, 0.14, 0.14]} /><meshStandardMaterial color="#83908e" metalness={0.38} roughness={0.36} /></mesh>)}
-        {[-2.2, 2.2].map((x) => <mesh key={x} position={[x, 2.48, 0]}><boxGeometry args={[0.14, 0.14, 4.0]} /><meshStandardMaterial color="#83908e" metalness={0.38} roughness={0.36} /></mesh>)}
+      <ExplodablePart id="wm-cabinet-frame" home={[0, 0, 0]} exploded={[0, 0, 0]} assemblyEnabled={assemblyEnabled} selectionRadius={2.25}>
+        <CabinetShell assemblyEnabled={assemblyEnabled} />
       </ExplodablePart>
 
-      {assemblyEnabled && <>
-        <ExplodablePart id="wm-top-cover" home={[0, 2.72, 0]} exploded={[0, 4.5, -0.7]} assemblyEnabled selectionRadius={2.1}><mesh castShadow><boxGeometry args={[4.64, 0.18, 4.22]} /><meshStandardMaterial color="#f1f2ed" roughness={0.38} /></mesh></ExplodablePart>
-        <ExplodablePart id="wm-front-panel" home={[0, -0.05, 2.16]} exploded={[0, -0.05, 5.2]} assemblyEnabled selectionRadius={2.4}><FrontPanelFrame /></ExplodablePart>
-        <ExplodablePart id="wm-rear-cover" home={[0, 0, -2.16]} exploded={[0, 0, -5.25]} assemblyEnabled selectionRadius={2.35}><mesh castShadow><boxGeometry args={[4.48, 4.92, 0.14]} /><meshStandardMaterial color="#dce1dc" metalness={0.1} roughness={0.42} /></mesh><mesh position={[0, 0, -0.09]}><cylinderGeometry args={[1.55, 1.55, 0.05, 64]} /><meshStandardMaterial color="#bfc8c5" roughness={0.45} /></mesh></ExplodablePart>
-      </>}
+      {assemblyEnabled && (
+        <>
+          <ExplodablePart id="wm-top-cover" home={[0, 2.68, 0]} exploded={[0, 4.2, -0.55]} assemblyEnabled selectionRadius={1.95}>
+            <RoundedBox args={[4.58, 0.16, 4.16]} radius={0.08} smoothness={5} castShadow><meshStandardMaterial color="#f0f1ed" metalness={0.12} roughness={0.34} /></RoundedBox>
+          </ExplodablePart>
+          <ExplodablePart id="wm-front-panel" home={[0, -0.05, 2.13]} exploded={[0, -0.05, 4.85]} assemblyEnabled selectionRadius={2.1}><FrontPanelFrame /></ExplodablePart>
+          <ExplodablePart id="wm-rear-cover" home={[0, 0, -2.11]} exploded={[0, 0, -4.85]} assemblyEnabled selectionRadius={2.1}>
+            <RoundedBox args={[4.4, 4.82, 0.1]} radius={0.05} smoothness={4} castShadow><meshStandardMaterial color="#d9ddd9" metalness={0.16} roughness={0.4} /></RoundedBox>
+            <mesh position={[0, 0, -0.06]}><torusGeometry args={[1.55, 0.05, 12, 64]} /><meshStandardMaterial color="#b6bfbc" metalness={0.28} roughness={0.35} /></mesh>
+          </ExplodablePart>
+        </>
+      )}
 
-      {showUpperControls && <>
-        <ExplodablePart id="wm-control-panel" home={[0, 2.08, 2.12]} exploded={[0, 3.8, 3.75]} assemblyEnabled={assemblyEnabled} selectionRadius={2.0}><mesh castShadow><boxGeometry args={[4.5, 0.78, 0.3]} /><meshStandardMaterial color="#e9ebe7" roughness={0.4} /></mesh><mesh position={[0.35, 0, 0.19]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.34, 0.34, 0.14, 40]} /><meshStandardMaterial color="#52696e" metalness={0.45} roughness={0.28} /></mesh><mesh position={[1.45, 0, 0.18]}><boxGeometry args={[1.15, 0.32, 0.06]} /><meshStandardMaterial color="#253d42" emissive="#4ca0b1" emissiveIntensity={0.12} /></mesh></ExplodablePart>
-        <ExplodablePart id="wm-detergent-drawer" home={[-1.42, 2.08, 2.28]} exploded={[-1.42, 2.08, 4.65]} assemblyEnabled={assemblyEnabled} selectionRadius={0.62}><mesh castShadow><boxGeometry args={[1.2, 0.5, 0.72]} /><meshStandardMaterial color="#edf0eb" roughness={0.4} /></mesh><mesh position={[0, 0, 0.39]}><boxGeometry args={[1.08, 0.38, 0.06]} /><meshStandardMaterial color="#c8d2ce" roughness={0.44} /></mesh></ExplodablePart>
-      </>}
+      {showUpperControls && (
+        <>
+          <ExplodablePart id="wm-control-panel" home={[0, 2.04, 2.1]} exploded={[0, 3.65, 3.5]} assemblyEnabled={assemblyEnabled} selectionRadius={1.75}>
+            <RoundedBox args={[4.38, 0.68, 0.28]} radius={0.08} smoothness={5} castShadow><meshStandardMaterial color="#e8eae6" metalness={0.12} roughness={0.34} /></RoundedBox>
+            <mesh position={[0.25, 0, 0.17]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.3, 0.3, 0.12, 40]} /><meshStandardMaterial color="#52696e" metalness={0.45} roughness={0.28} /></mesh>
+            <RoundedBox args={[1.08, 0.28, 0.05]} radius={0.025} smoothness={3} position={[1.38, 0, 0.17]}><meshStandardMaterial color="#253d42" emissive="#4ca0b1" emissiveIntensity={0.12} /></RoundedBox>
+          </ExplodablePart>
+          <ExplodablePart id="wm-detergent-drawer" home={[-1.42, 2.04, 2.28]} exploded={[-1.42, 2.04, 4.35]} assemblyEnabled={assemblyEnabled} selectionRadius={0.55}>
+            <RoundedBox args={[1.12, 0.44, 0.66]} radius={0.05} smoothness={4} castShadow><meshStandardMaterial color="#edf0eb" roughness={0.38} /></RoundedBox>
+          </ExplodablePart>
+        </>
+      )}
 
-      {(assemblyEnabled || mode === WashingMachineMode.DriveCutaway) && <ExplodablePart id="wm-main-pcb" home={[1.35, 1.95, -1.58]} exploded={[3.75, 3.25, -3.15]} assemblyEnabled={assemblyEnabled} selectionRadius={0.78}><mesh castShadow><boxGeometry args={[1.35, 0.88, 0.58]} /><meshStandardMaterial color="#4a6267" metalness={0.28} roughness={0.35} /></mesh><mesh position={[0, 0, 0.31]}><boxGeometry args={[1.05, 0.64, 0.04]} /><meshStandardMaterial color="#6ba079" roughness={0.45} /></mesh></ExplodablePart>}
+      {(assemblyEnabled || mode === WashingMachineMode.DriveCutaway) && (
+        <ExplodablePart id="wm-main-pcb" home={[1.35, 1.9, -1.55]} exploded={[3.4, 3.0, -3.0]} assemblyEnabled={assemblyEnabled} selectionRadius={0.7}>
+          <RoundedBox args={[1.25, 0.82, 0.52]} radius={0.05} smoothness={4} castShadow><meshStandardMaterial color="#4a6267" metalness={0.28} roughness={0.35} /></RoundedBox>
+          <mesh position={[0, 0, 0.28]}><boxGeometry args={[0.98, 0.58, 0.035]} /><meshStandardMaterial color="#6ba079" roughness={0.45} /></mesh>
+        </ExplodablePart>
+      )}
     </group>
   );
 }

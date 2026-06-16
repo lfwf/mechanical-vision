@@ -55,4 +55,17 @@ export const labCatalog: LabCategory[] = [
       { id: "washing-machine", title: "滚筒洗衣机", subtitle: "水路、悬挂、直驱与拆装", status: "preview", icon: WashingMachine },
     ],
   },
+  {
+    id: "manufacturing",
+    title: "制造工艺",
+    items: [
+      {
+        id: "injection-molding",
+        title: "注塑成型循环",
+        subtitle: "合模、注射、取件与输送",
+        status: "preview",
+        icon: Cog,
+      },
+    ],
+  },
 ];

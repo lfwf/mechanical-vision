@@ -23,13 +23,14 @@ function BundleClamp({ position, rotation = [0, 0, 0] }: { position: [number, nu
 }
 
 export function ConnectionBundle({ variant }: { variant: number }) {
-  const refrigerantOpacity = variant === 0 || variant === 3 ? 0.96 : 0.28;
-  const drainOpacity = variant === 2 || variant === 3 ? 0.96 : 0.3;
-  const cableOpacity = variant === 3 ? 0.96 : 0.28;
+  const refrigerantOpacity = variant === 0 || variant === 3 ? 0.96 : 0.08;
+  const drainOpacity = variant === 2 || variant === 3 ? 0.96 : 0.08;
+  const cableOpacity = variant === 3 ? 0.96 : 0.06;
   const showRefrigerantLabels = variant === 0 || variant === 3;
   const showDrainLabel = variant === 2 || variant === 3;
   const showCableLabel = variant === 3;
-  const wrapOpacity = variant === 3 ? 0.12 : variant === 0 ? 0.18 : 0.28;
+  const showInstallationHardware = variant === 0 || variant === 3;
+  const wrapOpacity = variant === 3 ? 0.12 : variant === 0 ? 0.16 : 0.06;
 
   return (
     <group>
@@ -43,9 +44,26 @@ export function ConnectionBundle({ variant }: { variant: number }) {
       <TubePath points={[[-1.0, 0.67, -0.6], [-0.78, 0.56, -0.67], [-0.55, 0.43, -0.72]]} color="#b57031" radius={0.039} opacity={refrigerantOpacity} />
       <TubePath points={[[6.18, -0.84, 0.12], [6.42, -0.82, 0.2], [6.65, -0.78, 0.28]]} color="#b57031" radius={0.061} opacity={refrigerantOpacity} />
       <TubePath points={[[6.08, -0.72, 0.02], [6.34, -0.68, 0.12], [6.55, -0.63, 0.2]]} color="#b57031" radius={0.039} opacity={refrigerantOpacity} />
-      <HexNut position={[-1.08, 0.59, -0.49]} radius={0.12} /><HexNut position={[-0.97, 0.68, -0.6]} radius={0.085} /><HexNut position={[6.62, -0.78, 0.27]} radius={0.12} /><HexNut position={[6.52, -0.63, 0.19]} radius={0.085} />
-      <BundleClamp position={[0.82, -0.11, -0.61]} rotation={[0.12, 0.18, -0.08]} /><BundleClamp position={[2.62, -0.5, -0.56]} rotation={[0.08, 0.18, -0.06]} /><BundleClamp position={[4.46, -0.77, -0.19]} rotation={[0.04, 0.12, -0.03]} />
-      <mesh position={[5.32, -1.48, 0.34]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.1, 0.1, 0.14, 24]} /><meshStandardMaterial color="#859a94" roughness={0.44} /></mesh>
+
+      {showInstallationHardware && (
+        <>
+          <HexNut position={[-1.08, 0.59, -0.49]} radius={0.12} />
+          <HexNut position={[-0.97, 0.68, -0.6]} radius={0.085} />
+          <HexNut position={[6.62, -0.78, 0.27]} radius={0.12} />
+          <HexNut position={[6.52, -0.63, 0.19]} radius={0.085} />
+          <BundleClamp position={[0.82, -0.11, -0.61]} rotation={[0.12, 0.18, -0.08]} />
+          <BundleClamp position={[2.62, -0.5, -0.56]} rotation={[0.08, 0.18, -0.06]} />
+          <BundleClamp position={[4.46, -0.77, -0.19]} rotation={[0.04, 0.12, -0.03]} />
+        </>
+      )}
+
+      {(variant === 2 || variant === 3) && (
+        <mesh position={[5.32, -1.48, 0.34]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.14, 24]} />
+          <meshStandardMaterial color="#859a94" roughness={0.44} />
+        </mesh>
+      )}
+
       {showRefrigerantLabels && <SceneLabel position={[1.55, 0.48, -0.82]}>粗气管（低压回气） / 细液管（高压液体）</SceneLabel>}
       {showDrainLabel && <SceneLabel position={[2.15, -1.05, -0.52]}>冷凝水排水管：从接水盘出口持续向下排放</SceneLabel>}
       {showCableLabel && <SceneLabel position={[4.25, 0.05, -0.22]}>室内外电源与通信线</SceneLabel>}

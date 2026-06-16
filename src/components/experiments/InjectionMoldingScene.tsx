@@ -7,14 +7,17 @@ import { ExperimentCanvas, SceneLabel } from "./ExperimentCanvas";
 import { TubePath } from "./ScenePrimitives";
 
 const STAGES = ["合模", "注射", "保压", "冷却", "开模", "顶出"] as const;
-const stageDurations = [0.14, 0.16, 0.14, 0.28, 0.14, 0.14];
+const STAGE_DURATIONS = [0.14, 0.16, 0.14, 0.28, 0.14, 0.14];
 
 function getStageState(progress: number) {
   let cursor = 0;
-  for (let index = 0; index < stageDurations.length; index += 1) {
-    const next = cursor + stageDurations[index];
-    if (progress <= next || index === stageDurations.length - 1) {
-      return { stage: index, local: MathUtils.clamp((progress - cursor) / stageDurations[index], 0, 1) };
+  for (let index = 0; index < STAGE_DURATIONS.length; index += 1) {
+    const next = cursor + STAGE_DURATIONS[index];
+    if (progress <= next || index === STAGE_DURATIONS.length - 1) {
+      return {
+        stage: index,
+        local: MathUtils.clamp((progress - cursor) / STAGE_DURATIONS[index], 0, 1),
+      };
     }
     cursor = next;
   }
@@ -23,50 +26,10 @@ function getStageState(progress: number) {
 
 function manualStageState(variant: number) {
   const stage = MathUtils.clamp(variant - 1, 0, STAGES.length - 1);
-  return { stage, local: stage === 0 || stage === 4 ? 0.72 : stage === 5 ? 0.9 : 0.65 };
-}
-
-function MeltFlow({ active, progress, pressure }: { active: boolean; progress: number; pressure: number }) {
-  const refs = useRef<Array<Mesh | null>>([]);
-  const flowPath = useMemo(
-    () =>
-      new CatmullRomCurve3([
-        new Vector3(-2.55, 0.12, 0),
-        new Vector3(-1.55, 0.12, 0),
-        new Vector3(-0.75, 0.12, 0),
-        new Vector3(-0.12, 0.12, 0),
-        new Vector3(0.28, 0.12, 0),
-      ]),
-    [],
-  );
-
-  useFrame(() => {
-    refs.current.forEach((mesh, index) => {
-      if (!mesh) return;
-      mesh.visible = active;
-      if (!active) return;
-      const t = MathUtils.clamp(progress * 1.35 - index * 0.06, 0, 1);
-      mesh.position.copy(flowPath.getPoint(t));
-      const material = mesh.material as MeshStandardMaterial;
-      material.emissiveIntensity = 0.18 + pressure / 500;
-    });
-  });
-
-  return (
-    <>
-      {Array.from({ length: 12 }, (_, index) => (
-        <mesh
-          key={index}
-          ref={(mesh) => {
-            refs.current[index] = mesh;
-          }}
-        >
-          <sphereGeometry args={[0.055, 12, 10]} />
-          <meshStandardMaterial color="#e68a38" emissive="#8d3f11" emissiveIntensity={0.25} />
-        </mesh>
-      ))}
-    </>
-  );
+  return {
+    stage,
+    local: stage === 0 || stage === 4 ? 0.72 : stage === 5 ? 0.9 : 0.65,
+  };
 }
 
 function Screw() {
@@ -112,7 +75,9 @@ function InjectionMoldingMechanism() {
   const screwRef = useRef<Group>(null);
   const ejectorRef = useRef<Group>(null);
   const partRef = useRef<Group>(null);
-  const statusLabelRef = useRef<Group>(null);
+  const coolingRef = useRef<Group>(null);
+  const stageLabelRefs = useRef<Array<Group | null>>([]);
+  const meltRefs = useRef<Array<Mesh | null>>([]);
   const progressRef = useRef(0);
 
   const speed = useExperimentStore((state) => state.speed);
@@ -128,6 +93,10 @@ function InjectionMoldingMechanism() {
     [0.1, 0.12, 0],
     [0.35, 0.12, 0],
   ];
+  const meltCurve = useMemo(
+    () => new CatmullRomCurve3(materialPath.map((point) => new Vector3(...point)), false, "centripetal"),
+    [],
+  );
 
   useFrame((_, delta) => {
     if (variant === 0 && isPlaying) {
@@ -135,9 +104,7 @@ function InjectionMoldingMechanism() {
       progressRef.current = (progressRef.current + delta * cycleRate) % 1;
     }
 
-    const state = variant === 0 ? getStageState(progressRef.current) : manualStageState(variant);
-    const { stage, local } = state;
-
+    const { stage, local } = variant === 0 ? getStageState(progressRef.current) : manualStageState(variant);
     let moldGap = 0;
     let screwTravel = 0;
     let ejectTravel = 0;
@@ -160,7 +127,7 @@ function InjectionMoldingMechanism() {
     if (movingPlatenRef.current) movingPlatenRef.current.position.x = 1.05 + moldGap;
     if (screwRef.current) {
       screwRef.current.position.x = -2.45 + screwTravel;
-      screwRef.current.rotation.x += isPlaying && (stage === 0 || stage === 3) ? delta * 2.2 : 0;
+      if (isPlaying && (stage === 0 || stage === 3)) screwRef.current.rotation.x += delta * 2.2;
     }
     if (ejectorRef.current) ejectorRef.current.position.x = 1.72 - ejectTravel;
     if (partRef.current) {
@@ -168,15 +135,23 @@ function InjectionMoldingMechanism() {
       partRef.current.position.x = 0.82 + partOffset;
       partRef.current.position.y = stage === 5 ? -partOffset * 0.35 : 0;
     }
-    if (statusLabelRef.current) statusLabelRef.current.position.y = 2.35 + Math.sin(progressRef.current * Math.PI * 2) * 0.02;
-  });
+    if (coolingRef.current) coolingRef.current.visible = stage === 3;
 
-  const stageState = variant === 0 ? getStageState(progressRef.current) : manualStageState(variant);
-  const stage = stageState.stage;
-  const local = stageState.local;
-  const flowActive = stage === 1 || stage === 2;
-  const flowProgress = stage === 1 ? local : 1;
-  const coolingActive = stage === 3;
+    stageLabelRefs.current.forEach((label, index) => {
+      if (label) label.visible = index === stage;
+    });
+
+    const flowActive = stage === 1 || stage === 2;
+    const flowProgress = stage === 1 ? local : 1;
+    meltRefs.current.forEach((mesh, index) => {
+      if (!mesh) return;
+      mesh.visible = flowActive;
+      if (!flowActive) return;
+      const t = MathUtils.clamp(flowProgress * 1.35 - index * 0.06, 0, 1);
+      mesh.position.copy(meltCurve.getPoint(t));
+      (mesh.material as MeshStandardMaterial).emissiveIntensity = 0.18 + pressure / 500;
+    });
+  });
 
   return (
     <group>
@@ -188,7 +163,7 @@ function InjectionMoldingMechanism() {
         <RoundedBox args={[3.8, 1.22, 1.38]} radius={0.16} smoothness={6} castShadow>
           <meshStandardMaterial color="#435f66" metalness={0.42} roughness={0.34} />
         </RoundedBox>
-        <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.46, 0.46, 3.9, 56]} />
           <meshStandardMaterial color="#5c7075" metalness={0.58} roughness={0.28} />
         </mesh>
@@ -206,7 +181,7 @@ function InjectionMoldingMechanism() {
       </group>
 
       <group position={[0.35, 0, 0]}>
-        <RoundedBox args={[0.52, 2.65, 3.1]} radius={0.08} smoothness={5} position={[0, 0, 0]} castShadow>
+        <RoundedBox args={[0.52, 2.65, 3.1]} radius={0.08} smoothness={5} castShadow>
           <meshStandardMaterial color="#6a797b" metalness={0.46} roughness={0.34} />
         </RoundedBox>
         <RoundedBox args={[0.52, 2.2, 2.65]} radius={0.06} smoothness={4} position={[0.42, 0, 0]} castShadow>
@@ -258,8 +233,13 @@ function InjectionMoldingMechanism() {
       </group>
 
       <TubePath points={materialPath} color="#9a5a28" radius={0.045} opacity={0.55} />
-      <MeltFlow active={flowActive} progress={flowProgress} pressure={pressure} />
-      <group visible={coolingActive}>
+      {Array.from({ length: 12 }, (_, index) => (
+        <mesh key={index} ref={(mesh) => { meltRefs.current[index] = mesh; }} visible={false}>
+          <sphereGeometry args={[0.055, 12, 10]} />
+          <meshStandardMaterial color="#e68a38" emissive="#8d3f11" emissiveIntensity={0.25} />
+        </mesh>
+      ))}
+      <group ref={coolingRef} visible={false}>
         <CoolingCircuit />
       </group>
 
@@ -271,9 +251,11 @@ function InjectionMoldingMechanism() {
         <meshStandardMaterial color="#617579" metalness={0.56} roughness={0.3} />
       </mesh>
 
-      <group ref={statusLabelRef}>
-        <SceneLabel position={[0.75, 2.35, 0]}>{STAGES[stage]}</SceneLabel>
-      </group>
+      {STAGES.map((label, index) => (
+        <group key={label} ref={(group) => { stageLabelRefs.current[index] = group; }} visible={index === 0}>
+          <SceneLabel position={[0.75, 2.35, 0]}>{label}</SceneLabel>
+        </group>
+      ))}
       <SceneLabel position={[-3.6, 2.0, 0]}>塑化与注射单元</SceneLabel>
       <SceneLabel position={[0.7, 1.75, 0]}>定模 / 动模</SceneLabel>
       <SceneLabel position={[3.6, 1.35, 0]}>锁模与顶出单元</SceneLabel>

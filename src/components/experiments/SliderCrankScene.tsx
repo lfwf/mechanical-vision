@@ -1,3 +1,4 @@
+import { RoundedBox } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { Vector3, type Group, type Mesh } from "three";
@@ -6,10 +7,28 @@ import { useExperimentStore } from "../../store/useExperimentStore";
 import { ExperimentCanvas, SceneLabel } from "./ExperimentCanvas";
 
 const ORIGIN_X = -2.8;
-const ROD_PLANE_Y = 0.48;
+const ROD_PLANE_Y = 0.52;
 const crankPoint = new Vector3();
 const sliderPoint = new Vector3();
 const midpoint = new Vector3();
+
+function BearingPedestal({ x }: { x: number }) {
+  return (
+    <group position={[x, -0.12, 0]}>
+      <RoundedBox args={[1.28, 0.72, 1.5]} radius={0.12} smoothness={5} castShadow>
+        <meshStandardMaterial color="#355157" metalness={0.4} roughness={0.34} />
+      </RoundedBox>
+      <mesh position={[0, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <torusGeometry args={[0.36, 0.12, 18, 52]} />
+        <meshStandardMaterial color="#8a9998" metalness={0.72} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.24, 0.24, 1.72, 36]} />
+        <meshStandardMaterial color="#273c42" metalness={0.86} roughness={0.16} />
+      </mesh>
+    </group>
+  );
+}
 
 function SliderCrankMechanism() {
   const crankRef = useRef<Group>(null);
@@ -54,76 +73,79 @@ function SliderCrankMechanism() {
 
   return (
     <group>
-      <group ref={crankRef} position={[ORIGIN_X, 0, 0]}>
-        <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[0.42, 0.42, 0.72, 48]} />
-          <meshStandardMaterial color="#405459" metalness={0.82} roughness={0.18} />
+      <RoundedBox args={[11.4, 0.42, 3.0]} radius={0.12} smoothness={5} position={[1.25, -0.92, 0]} receiveShadow castShadow>
+        <meshStandardMaterial color="#2f484d" metalness={0.32} roughness={0.44} />
+      </RoundedBox>
+
+      <BearingPedestal x={ORIGIN_X} />
+
+      <group ref={crankRef} position={[ORIGIN_X, 0.18, 0]}>
+        <mesh castShadow receiveShadow>
+          <cylinderGeometry args={[0.58, 0.58, 0.34, 64]} />
+          <meshStandardMaterial color="#9c6728" metalness={0.66} roughness={0.25} />
         </mesh>
-        <mesh position={[radius / 2, 0.06, 0]} castShadow>
-          <boxGeometry args={[radius, 0.28, 0.38]} />
-          <meshStandardMaterial color="#bd8435" metalness={0.67} roughness={0.24} />
-        </mesh>
-        <mesh position={[-0.42, 0.04, 0]} castShadow>
-          <cylinderGeometry args={[0.58, 0.58, 0.3, 56]} />
-          <meshStandardMaterial color="#9a6a2c" metalness={0.64} roughness={0.26} />
+        <RoundedBox args={[radius, 0.32, 0.42]} radius={0.11} smoothness={5} position={[radius / 2, 0.03, 0]} castShadow>
+          <meshStandardMaterial color="#c18531" metalness={0.68} roughness={0.22} />
+        </RoundedBox>
+        <mesh position={[-0.45, -0.02, 0]} castShadow>
+          <cylinderGeometry args={[0.72, 0.72, 0.26, 64]} />
+          <meshStandardMaterial color="#8b5b24" metalness={0.62} roughness={0.27} />
         </mesh>
         <mesh position={[radius, ROD_PLANE_Y / 2, 0]} castShadow>
-          <cylinderGeometry args={[0.2, 0.2, ROD_PLANE_Y + 0.45, 36]} />
-          <meshStandardMaterial color="#32494e" metalness={0.84} roughness={0.17} />
+          <cylinderGeometry args={[0.18, 0.18, ROD_PLANE_Y + 0.44, 36]} />
+          <meshStandardMaterial color="#263f45" metalness={0.86} roughness={0.16} />
         </mesh>
       </group>
 
       <mesh ref={rodBodyRef} castShadow receiveShadow>
-        <boxGeometry args={[1, 0.18, 0.34]} />
-        <meshStandardMaterial color="#6795a0" metalness={0.62} roughness={0.24} />
+        <boxGeometry args={[1, 0.16, 0.28]} />
+        <meshStandardMaterial color="#6f9aa3" metalness={0.64} roughness={0.23} />
       </mesh>
-      <group ref={rodEyeARef}>
-        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <torusGeometry args={[0.27, 0.08, 18, 48]} />
-          <meshStandardMaterial color="#5e8790" metalness={0.68} roughness={0.22} />
-        </mesh>
-      </group>
-      <group ref={rodEyeBRef}>
-        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <torusGeometry args={[0.27, 0.08, 18, 48]} />
-          <meshStandardMaterial color="#5e8790" metalness={0.68} roughness={0.22} />
-        </mesh>
-      </group>
+      {[rodEyeARef, rodEyeBRef].map((ref, index) => (
+        <group key={index} ref={ref}>
+          <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <torusGeometry args={[0.24, 0.07, 18, 48]} />
+            <meshStandardMaterial color="#638b94" metalness={0.7} roughness={0.21} />
+          </mesh>
+        </group>
+      ))}
 
       <group ref={sliderRef}>
-        <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.2, 0.78, 1.35]} />
-          <meshStandardMaterial color="#4f7d87" metalness={0.48} roughness={0.3} />
-        </mesh>
+        <RoundedBox args={[1.36, 0.82, 1.42]} radius={0.1} smoothness={5} position={[0, -0.02, 0]} castShadow receiveShadow>
+          <meshStandardMaterial color="#4c7882" metalness={0.5} roughness={0.3} />
+        </RoundedBox>
         <mesh position={[0, ROD_PLANE_Y / 2, 0]} castShadow>
-          <cylinderGeometry args={[0.2, 0.2, ROD_PLANE_Y + 0.46, 36]} />
-          <meshStandardMaterial color="#334b50" metalness={0.84} roughness={0.17} />
+          <cylinderGeometry args={[0.18, 0.18, ROD_PLANE_Y + 0.44, 36]} />
+          <meshStandardMaterial color="#2d474d" metalness={0.86} roughness={0.16} />
         </mesh>
+        {[-0.54, 0.54].map((z) => (
+          <RoundedBox key={z} args={[1.12, 0.12, 0.18]} radius={0.03} smoothness={3} position={[0, -0.48, z]}>
+            <meshStandardMaterial color="#84928f" metalness={0.5} roughness={0.3} />
+          </RoundedBox>
+        ))}
       </group>
 
-      <mesh position={[1.6, -0.8, 0]} receiveShadow>
-        <boxGeometry args={[10.6, 0.3, 2.05]} />
-        <meshStandardMaterial color="#344b4f" metalness={0.35} roughness={0.42} />
-      </mesh>
-      <mesh position={[1.6, -0.45, 0.83]}>
-        <boxGeometry args={[10.6, 0.18, 0.18]} />
-        <meshStandardMaterial color="#7a8986" metalness={0.45} roughness={0.34} />
-      </mesh>
-      <mesh position={[1.6, -0.45, -0.83]}>
-        <boxGeometry args={[10.6, 0.18, 0.18]} />
-        <meshStandardMaterial color="#7a8986" metalness={0.45} roughness={0.34} />
-      </mesh>
+      {[-0.86, 0.86].map((z) => (
+        <group key={z}>
+          <RoundedBox args={[10.7, 0.16, 0.18]} radius={0.035} smoothness={3} position={[1.45, -0.44, z]} castShadow>
+            <meshStandardMaterial color="#879491" metalness={0.5} roughness={0.3} />
+          </RoundedBox>
+          <RoundedBox args={[10.7, 0.12, 0.12]} radius={0.025} smoothness={3} position={[1.45, -0.64, z]}>
+            <meshStandardMaterial color="#56676a" metalness={0.42} roughness={0.36} />
+          </RoundedBox>
+        </group>
+      ))}
 
-      <SceneLabel position={[ORIGIN_X, 1.65, 0]}>曲柄与配重 · 独立轴向层</SceneLabel>
-      <SceneLabel position={[2.7, 1.5, 0]}>连杆</SceneLabel>
-      <SceneLabel position={[5.3, 1.5, 0]}>滑块 · 仅沿导轨移动</SceneLabel>
+      <SceneLabel position={[ORIGIN_X, 1.55, 0]}>曲柄、配重与主轴</SceneLabel>
+      <SceneLabel position={[2.1, 1.35, -0.1]}>锻造连杆</SceneLabel>
+      <SceneLabel position={[5.2, 1.35, 0]}>滑块与双导轨</SceneLabel>
     </group>
   );
 }
 
 export default function SliderCrankScene() {
   return (
-    <ExperimentCanvas camera={[8.8, 6.2, 11.8]} target={[1.1, 0, 0]} gridY={-1} shadowY={-0.95} minDistance={7} maxDistance={20}>
+    <ExperimentCanvas camera={[8.4, 5.4, 10.8]} target={[1, 0, 0]} gridY={-1.18} shadowY={-1.12} minDistance={7} maxDistance={20}>
       <SliderCrankMechanism />
     </ExperimentCanvas>
   );

@@ -11,6 +11,7 @@ const BearingScene = lazy(() => import("./BearingScene"));
 const MechanicalSealScene = lazy(() => import("./MechanicalSealScene"));
 const AirConditionerScene = lazy(() => import("./AirConditionerScene"));
 const WashingMachineScene = lazy(() => import("./WashingMachineScene"));
+const InjectionMoldingScene = lazy(() => import("./InjectionMoldingScene"));
 
 const scenes: Partial<Record<ExperimentId, LazyExoticComponent<ComponentType>>> = {
   "rack-pinion": RackPinionScene,
@@ -23,6 +24,7 @@ const scenes: Partial<Record<ExperimentId, LazyExoticComponent<ComponentType>>> 
   seal: MechanicalSealScene,
   "air-conditioner": AirConditionerScene,
   "washing-machine": WashingMachineScene,
+  "injection-molding": InjectionMoldingScene,
 };
 
 export function ExperimentSceneRouter({ id }: { id: ExperimentId }) {

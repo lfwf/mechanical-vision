@@ -2,6 +2,7 @@ import { ContactShadows, Float, OrbitControls, RoundedBox } from "@react-three/d
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useMemo, useRef } from "react";
 import { MathUtils, Vector3, type Group } from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 interface SenjerCitySceneProps {
   activeDistrict: "core" | "sky" | "water" | "transit" | "echo" | "research";
@@ -22,12 +23,7 @@ const cameraPresets: Record<DistrictId, { position: [number, number, number]; ta
   research: { position: [29, 16, -18], target: [16.5, 4.8, -11] },
 };
 
-interface ControlsHandle {
-  target: Vector3;
-  update: () => void;
-}
-
-function CameraRig({ activeDistrict, controlsRef }: { activeDistrict: DistrictId; controlsRef: React.RefObject<ControlsHandle | null> }) {
+function CameraRig({ activeDistrict, controlsRef }: { activeDistrict: DistrictId; controlsRef: React.RefObject<OrbitControlsImpl | null> }) {
   const camera = useThree((state) => state.camera);
   const destination = useMemo(() => new Vector3(), []);
   const target = useMemo(() => new Vector3(), []);
@@ -87,7 +83,8 @@ function Bridge({ from, to, width = 1.35 }: { from: [number, number, number]; to
         </RoundedBox>
       ))}
       {Array.from({ length: Math.max(3, Math.floor(length / 2.4)) }, (_, index) => {
-        const x = -length / 2 + 1.1 + index * ((length - 2.2) / Math.max(1, Math.floor(length / 2.4) - 1));
+        const supportCount = Math.max(3, Math.floor(length / 2.4));
+        const x = -length / 2 + 1.1 + index * ((length - 2.2) / Math.max(1, supportCount - 1));
         return (
           <mesh key={index} position={[x, -0.8, 0]} castShadow>
             <cylinderGeometry args={[0.13, 0.2, 1.5, 18]} />
@@ -375,7 +372,7 @@ function CityWorld({ playing, night, bladeAngle, outputRpm }: Omit<SenjerCitySce
 }
 
 export function SenjerCityScene(props: SenjerCitySceneProps) {
-  const controlsRef = useRef<ControlsHandle | null>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   return (
     <Canvas

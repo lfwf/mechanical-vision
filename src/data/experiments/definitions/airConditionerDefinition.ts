@@ -2,9 +2,17 @@ import type { ExperimentDefinition } from "../../../types/experiment";
 import { number } from "../definitionUtils";
 import { airConditionerParts } from "../parts/airConditionerParts";
 
+/**
+ * 空调实验的元数据和界面配置。
+ *
+ * 三维几何体放在 components/experiments/airConditioner 下，
+ * 本文件只定义标题、控制项、模式名称、知识说明、指标和结论。
+ */
 const daikinSource = "DAIKIN-PERFERA-ECPEN20-007";
 const ashraeSource = "ASHRAE-HANDBOOK-FUNDAMENTALS";
 const safetySource = "ISO-5149-1";
+
+// variant 的索引必须与场景组件中的判断保持一致：0 制冷、1 送风、2 排水、3 拆装。
 const modes = ["制冷循环", "送风路径", "排水路径", "零件拆装"];
 
 export const airConditionerDefinition = {
@@ -14,29 +22,41 @@ export const airConditionerDefinition = {
     category: "家用设备",
     title: "Daikin Perfera 分体式空调拆解",
     subtitle: "FTXM35R / RXM35R 参考结构、气流路径与制冷循环",
-    sceneTip: "分别查看制冷剂、室内外空气和冷凝水的运动路径；外壳剖视程度越高，内部结构越清晰",
+    sceneTip: "运行模式自动打开剖视结构；零件拆装模式可调整外壳剖视程度并逐件拆装",
     precisionLevel: "L2",
     precisionLabel: "实机比例、结构拓扑与装配层级级",
+
+    // 进入实验时的默认运行参数。
     defaults: { speed: 60, primary: 0, secondary: 0, variant: 0, direction: 1 },
+
+    // speed 只影响三个运行动画；外壳剖视程度只在零件拆装模式显示。
     controls: [
       { key: "speed", label: "流动与风扇速度", min: 20, max: 100, step: 5, suffix: "%", visibleWhenVariants: [0, 1, 2] },
-      { key: "secondary", label: "外壳剖视程度", min: 0, max: 100, step: 5, suffix: "%" },
+      { key: "secondary", label: "外壳剖视程度", min: 0, max: 100, step: 5, suffix: "%", visibleWhenVariants: [3] },
     ],
+
     variantLabel: "演示模式",
     variants: modes,
     showDirectionControl: false,
+
+    // 只有 variant=3 时启用单零件拆下、装回、全部展开等操作。
     supportsPartAssembly: true,
     assemblyVariants: [3],
+
     referenceModel: {
       manufacturer: "Daikin",
       model: "Perfera FTXM35R + RXM35R",
       productType: "壁挂式室内机与单联室外热泵机组",
       accuracyStatement: "外壳比例依据公开目录中的 299×998×292 mm 室内机和 550×765×285 mm 室外机尺寸。模型拆分为室内机 15 个、室外机 12 个主要组件，重点保证进风、过滤、换热、送风、排水、制冷剂循环和承载关系正确；不声称复刻原厂专有 CAD、紧固件数量、线束长度或维修尺寸。",
     },
+
+    // 零件说明书由 airConditionerParts 统一维护，场景中的零件 id 必须与说明书 id 一致。
     partManuals: airConditionerParts,
     quickSummary: "室内空气依次经过进风格栅、主过滤网、功能滤网和室内换热器，再由贯流风轮从导风机构送回房间；冷凝水进入接水盘并经排水管排出。制冷剂在变频压缩机、室外换热器、电子膨胀阀和室内换热器之间循环，四通阀用于冷暖换向。",
     formula: "Qout = Qin + Wcompressor",
     parts: airConditionerParts.map((part) => ({ name: part.name, role: part.function })),
+
+    // 信息面板中的知识章节。
     knowledge: [
       {
         id: "reference",
@@ -80,6 +100,8 @@ export const airConditionerDefinition = {
         ],
       },
     ],
+
+    // 右侧指标卡根据当前模式动态生成。
     getMetrics: (values) => [
       { label: "参考机型", value: "FTXM35R / RXM35R", note: "Daikin Perfera" },
       {
@@ -94,8 +116,10 @@ export const airConditionerDefinition = {
               : "27 个主要组件可独立拆装",
       },
       { label: "室内机", value: "15 个组件", note: "299×998×292 mm 比例" },
-      { label: "室外机", value: "12 个组件", note: `550×765×285 mm 比例 · 外壳剖视 ${number(values.secondary, 0)}%` },
+      { label: "室外机", value: "12 个组件", note: values.variant === 3 ? `550×765×285 mm 比例 · 外壳剖视 ${number(values.secondary, 0)}%` : "550×765×285 mm 比例" },
     ],
+
+    // 结论区按 variant 索引取对应说明。
     getConclusion: (values) => [
       "当前显示制冷工况：红色表示压缩后的高温气体，橙色表示室外放热后的高压液体，蓝色表示节流后的低温混合物，青色表示室内吸热后的低压回气。",
       "当前显示送风路径：室内空气从顶部进入，经过过滤和换热后由贯流风轮向前下方送出；室外空气从后侧与左侧穿过换热器，再由三叶轴流风扇从正面排出。",

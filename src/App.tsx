@@ -7,6 +7,7 @@ import { GearControlPanel } from "./components/controls/GearControlPanel";
 import { ExperimentSceneRouter } from "./components/experiments/ExperimentSceneRouter";
 import { InfoPanel } from "./components/info/InfoPanel";
 import { ExperimentQualityBadge } from "./components/quality/ExperimentQualityBadge";
+import { ShaderGalleryPage } from "./components/shaderGallery/ShaderGalleryEntry";
 import { TimeTravelPage } from "./components/timeTravel/TimeTravelEntry";
 import { getExperimentDefinition } from "./data/experiments/experimentRegistry";
 import { useExperimentStore } from "./store/useExperimentStore";
@@ -29,6 +30,8 @@ export function App() {
         <SenjerCityPage />
       ) : activeSection === "time-travel" ? (
         <TimeTravelPage />
+      ) : activeSection === "shader-gallery" ? (
+        <ShaderGalleryPage />
       ) : (
         <main className="workspace">
           <CatalogSidebar query={catalogQuery} onQueryChange={setCatalogQuery} />

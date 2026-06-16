@@ -7,6 +7,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 interface SmoothOrbitControlsProps {
   controlsRef: RefObject<OrbitControlsImpl | null>;
   resetToken: number;
+  cameraKey?: string | number;
   minDistance?: number;
   maxDistance?: number;
   wheelSensitivity?: number;
@@ -21,6 +22,7 @@ const scratchPosition = new Vector3();
 export function SmoothOrbitControls({
   controlsRef,
   resetToken,
+  cameraKey = "default",
   minDistance = 5.5,
   maxDistance = 22,
   wheelSensitivity = 0.0008,
@@ -71,7 +73,7 @@ export function SmoothOrbitControls({
       );
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [camera, controlsRef, maxDistance, minDistance, resetToken]);
+  }, [camera, controlsRef, maxDistance, minDistance, resetToken, cameraKey]);
 
   useFrame((_, delta) => {
     const controls = controlsRef.current;

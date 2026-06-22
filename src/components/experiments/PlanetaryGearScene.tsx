@@ -1,3 +1,4 @@
+import { RoundedBox } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import type { Group } from "three";
@@ -45,17 +46,14 @@ function PlanetaryMechanism() {
   const variant = useExperimentStore((state) => state.variant);
   const planetCount = useExperimentStore((state) => Math.round(state.primary));
   const isPlaying = useExperimentStore((state) => state.isPlaying);
-  const sunGeometry = useMemo(() => createGearGeometry(SUN_TEETH, 0.42), []);
-  const planetGeometry = useMemo(() => createGearGeometry(PLANET_TEETH, 0.42), []);
+  const sunGeometry = useMemo(() => createGearGeometry(SUN_TEETH, 0.44), []);
+  const planetGeometry = useMemo(() => createGearGeometry(PLANET_TEETH, 0.44), []);
   const speeds = getSpeeds(speed, direction, variant);
 
-  useEffect(
-    () => () => {
-      sunGeometry.dispose();
-      planetGeometry.dispose();
-    },
-    [planetGeometry, sunGeometry],
-  );
+  useEffect(() => () => {
+    sunGeometry.dispose();
+    planetGeometry.dispose();
+  }, [planetGeometry, sunGeometry]);
 
   useFrame((_, delta) => {
     if (isPlaying) {
@@ -73,24 +71,34 @@ function PlanetaryMechanism() {
     });
   });
 
-  const planets = Array.from({ length: planetCount }, (_, index) =>
-    (index * Math.PI * 2) / planetCount,
-  );
+  const planets = Array.from({ length: planetCount }, (_, index) => (index * Math.PI * 2) / planetCount);
 
   return (
     <group>
+      <RoundedBox args={[9.5, 0.34, 9.5]} radius={0.16} smoothness={5} position={[0, -0.92, 0]} receiveShadow castShadow>
+        <meshStandardMaterial color="#2f484d" metalness={0.28} roughness={0.46} />
+      </RoundedBox>
+      <mesh position={[0, -0.7, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <cylinderGeometry args={[4.7, 4.7, 0.18, 96]} />
+        <meshStandardMaterial color="#40585e" metalness={0.38} roughness={0.38} />
+      </mesh>
+
       <group ref={ringRef}>
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
-          <torusGeometry args={[RING_PITCH_RADIUS + 0.3, 0.34, 28, 120]} />
-          <meshStandardMaterial color="#476f78" metalness={0.62} roughness={0.28} />
+          <torusGeometry args={[RING_PITCH_RADIUS + 0.28, 0.3, 28, 144]} />
+          <meshStandardMaterial color="#3f6871" metalness={0.66} roughness={0.26} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.24, 0]}>
+          <torusGeometry args={[RING_PITCH_RADIUS + 0.28, 0.11, 18, 144]} />
+          <meshStandardMaterial color="#789096" metalness={0.6} roughness={0.25} />
         </mesh>
         {Array.from({ length: RING_TEETH }, (_, index) => {
           const angle = (index * Math.PI * 2) / RING_TEETH;
           return (
             <group key={index} rotation={[0, -angle, 0]}>
               <mesh position={[RING_PITCH_RADIUS - 0.12, 0, 0]} castShadow>
-                <boxGeometry args={[0.28, 0.42, 0.1]} />
-                <meshStandardMaterial color="#5c8993" metalness={0.62} roughness={0.25} />
+                <boxGeometry args={[0.24, 0.46, 0.115]} />
+                <meshStandardMaterial color="#5f8790" metalness={0.64} roughness={0.24} />
               </mesh>
             </group>
           );
@@ -99,21 +107,36 @@ function PlanetaryMechanism() {
 
       <group ref={sunRef}>
         <mesh geometry={sunGeometry} castShadow receiveShadow>
-          <meshStandardMaterial color="#d19a46" metalness={0.7} roughness={0.2} />
+          <meshStandardMaterial color="#c98c37" metalness={0.72} roughness={0.2} />
         </mesh>
-        <mesh>
-          <cylinderGeometry args={[0.23, 0.23, 1.2, 36]} />
-          <meshStandardMaterial color="#394a4f" metalness={0.82} roughness={0.18} />
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.22, 0.22, 1.25, 40]} />
+          <meshStandardMaterial color="#2c4147" metalness={0.86} roughness={0.16} />
+        </mesh>
+        <mesh position={[0, 0.28, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.29, 0.055, 14, 40]} />
+          <meshStandardMaterial color="#84908e" metalness={0.65} roughness={0.22} />
         </mesh>
       </group>
 
       <group ref={carrierRef}>
+        <mesh position={[0, -0.4, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.72, 0.72, 0.18, 64]} />
+          <meshStandardMaterial color="#53676a" metalness={0.55} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.42, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.62, 0.62, 0.14, 64]} />
+          <meshStandardMaterial color="#6f7f7d" metalness={0.5} roughness={0.3} />
+        </mesh>
+
         {planets.map((angle, index) => (
           <group key={index} rotation={[0, -angle, 0]}>
-            <mesh position={[PLANET_RADIUS / 2, -0.3, 0]}>
-              <boxGeometry args={[PLANET_RADIUS, 0.12, 0.18]} />
-              <meshStandardMaterial color="#7a8583" metalness={0.55} roughness={0.3} />
-            </mesh>
+            <RoundedBox args={[PLANET_RADIUS, 0.14, 0.28]} radius={0.06} smoothness={4} position={[PLANET_RADIUS / 2, -0.38, 0]} castShadow>
+              <meshStandardMaterial color="#6d7b79" metalness={0.55} roughness={0.3} />
+            </RoundedBox>
+            <RoundedBox args={[PLANET_RADIUS, 0.11, 0.22]} radius={0.05} smoothness={4} position={[PLANET_RADIUS / 2, 0.4, 0]} castShadow>
+              <meshStandardMaterial color="#889491" metalness={0.48} roughness={0.31} />
+            </RoundedBox>
             <group
               ref={(node) => {
                 planetRefs.current[index] = node;
@@ -121,31 +144,32 @@ function PlanetaryMechanism() {
               position={[PLANET_RADIUS, 0, 0]}
             >
               <mesh geometry={planetGeometry} castShadow receiveShadow>
-                <meshStandardMaterial color="#78a7ad" metalness={0.66} roughness={0.23} />
+                <meshStandardMaterial color="#6f9da5" metalness={0.68} roughness={0.22} />
               </mesh>
-              <mesh>
-                <cylinderGeometry args={[0.18, 0.18, 0.9, 32]} />
-                <meshStandardMaterial color="#46565a" metalness={0.8} roughness={0.2} />
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.17, 0.17, 1.0, 36]} />
+                <meshStandardMaterial color="#3f5257" metalness={0.84} roughness={0.18} />
+              </mesh>
+              <mesh position={[0, 0.28, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.22, 0.045, 14, 36]} />
+                <meshStandardMaterial color="#919b98" metalness={0.65} roughness={0.22} />
               </mesh>
             </group>
           </group>
         ))}
-        <mesh position={[0, -0.34, 0]}>
-          <cylinderGeometry args={[0.48, 0.48, 0.18, 48]} />
-          <meshStandardMaterial color="#667371" metalness={0.58} roughness={0.28} />
-        </mesh>
       </group>
 
-      <SceneLabel position={[0, 1.15, 0]}>太阳轮</SceneLabel>
-      <SceneLabel position={[4.5, 0.8, 0]}>内齿圈</SceneLabel>
-      <SceneLabel position={[2.8, 1.15, 0]}>行星轮 × {planetCount}</SceneLabel>
+      <SceneLabel position={[0, 1.25, 0]}>太阳轮</SceneLabel>
+      <SceneLabel position={[4.65, 0.75, -0.2]}>内齿圈</SceneLabel>
+      <SceneLabel position={[2.7, 1.15, 0]}>行星轮 × {planetCount}</SceneLabel>
+      <SceneLabel position={[-2.6, 0.9, -0.2]}>双侧行星架</SceneLabel>
     </group>
   );
 }
 
 export default function PlanetaryGearScene() {
   return (
-    <ExperimentCanvas camera={[8.5, 8.5, 10.5]} target={[0, 0, 0]} gridY={-0.55} shadowY={-0.5}>
+    <ExperimentCanvas camera={[8.8, 7.2, 10.2]} target={[0, -0.05, 0]} gridY={-1.18} shadowY={-1.12} minDistance={7} maxDistance={20}>
       <PlanetaryMechanism />
     </ExperimentCanvas>
   );
